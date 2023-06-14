@@ -1,0 +1,6 @@
+jobCount: 3
+branchingFactor:
+  min: 1
+  max: 2
+length: 4
+processCount: 6
