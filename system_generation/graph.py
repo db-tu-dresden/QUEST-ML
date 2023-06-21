@@ -37,7 +37,7 @@ class Graph:
 
         self.last_node_id = id
 
-        if root:
+        if root is not None:
             self.add_edge(root, id)
 
         return self.last_node_id
@@ -63,12 +63,12 @@ class Graph:
         return self.last_node_id
 
     def from_notation(self, notation: notation.Notation):
-        self.join_node()
-
         elem = notation.start
         if elem is None:
             return
-        elem.add_to_graph(self)
+
+        root = self.join_node()
+        elem.add_to_graph(self, root)
 
         return self
 
