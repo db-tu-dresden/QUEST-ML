@@ -148,8 +148,9 @@ class Notation:
         self.refs[ref] = Notation()
         self.refs[ref]._parse(string)
 
-    def _resolve_refs(self, refs: {} = {}):
-        self.refs |= refs
+    def _resolve_refs(self, refs: dict = None):
+        if refs is not None:
+            self.refs |= refs
         if not self.refs:
             return
         elem = self.start
