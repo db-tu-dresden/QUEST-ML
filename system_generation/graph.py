@@ -12,12 +12,16 @@ class Graph:
         self.graph = nx.Graph()
         self.root_id = None
         self.last_node_id = last_node_id
+        self.anchor_nodes = {}
 
     def add_node(self, node_for_adding, **attr):
         self.graph.add_node(node_for_adding, **attr)
 
     def add_nodes_from(self, nodes_for_adding, **attr):
         self.graph.add_nodes_from(nodes_for_adding, **attr)
+
+    def remove_node(self, n):
+        self.graph.remove_node(n)
 
     def add_edge(self, u_of_edge, v_of_edge, **attr):
         self.graph.add_edge(u_of_edge, v_of_edge, **attr)

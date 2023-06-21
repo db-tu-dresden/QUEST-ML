@@ -51,20 +51,21 @@ class Line(NotationElement):
     def add_to_graph(self, graph: graph.Graph, root: int = None):
         last_id = graph.join_nodes(self.count, root)
         if self.next:
-            return self.next.add_to_graph(graph)
-        return last_id
+            return self.next.add_to_graph(graph, last_id)
+        return [last_id]
 
 
 class Fork(NotationElement):
-    VALUES = [r'<\[(?:\$\d+(?:, \$\d+)+)\]>', r'<(?:-*(?:(?:-+\d*-*)?|(?R)?)-*)>']
+    VALUES = [r'<\[(?:\$\d+(?:, \$\d+)+)\](?:>)?', r'<(?:-*(?:(?:-+\d*-*)?|(?R)?)-*)>']
 
-    def __init__(self, value: str, next: NotationElement, children: [NotationElement]):
+    def __init__(self, value: str, next: NotationElement, children: [NotationElement], end: bool):
         super().__init__(value, next)
         self.children = children
+        self.end = end
 
     @classmethod
     def parse(cls, text: str, next: NotationElement = None, notation: Notation = None):
-        FORK = r'<(.*)>'
+        FORK = r'<(.*)'
         match = re.match(FORK, text)
 
         if not match:
@@ -72,17 +73,17 @@ class Fork(NotationElement):
 
         group = match.groups()[0]
 
-        COMPLEX_PATH = r'\[(?:\$\d+(?:, \$\d+)+)\]'
-        complex_fork = re.match(COMPLEX_PATH, group)
+        COMPLEX_PATH = r'<\[(?:\$\d+(?:, \$\d+)+)\](>)?'
+        complex_fork = re.match(COMPLEX_PATH, text)
 
         if complex_fork:
             REF_PATTERN = r'\$\d+'
             refs = re.findall(REF_PATTERN, group)
             notation.refs |= dict.fromkeys(refs)
-            return cls(text, next, refs)
+            return cls(text, next, refs, complex_fork.groups()[0] is not None)
 
         path = notation._parse(group, None) if group else None
-        return cls(text, next, [path, path])
+        return cls(text, next, [path, path], True)
 
     def add_to_graph(self, graph: graph.Graph, root: int = None):
         if root is None:
@@ -90,20 +91,51 @@ class Fork(NotationElement):
 
         last_child_ids = []
         for child in self.children:
-            child_id = graph.join_node(root)
+            child_ids = [graph.join_node(root)]
             if child:
-                child_id = child.add_to_graph(graph, child_id)
-            last_child_ids.append(child_id)
+                child_ids = child.add_to_graph(graph, child_ids[0])
+            last_child_ids.extend(child_ids)
 
-        graph.add_node(graph.last_node_id + 1)
-        graph.last_node_id += 1
+        if self.end:
+            graph.add_node(graph.last_node_id + 1)
+            graph.last_node_id += 1
 
-        for child_id in last_child_ids:
-            graph.add_edge(child_id, graph.last_node_id)
+            for child_id in set(last_child_ids):
+                graph.add_edge(child_id, graph.last_node_id)
+            last_child_ids = [graph.last_node_id]
 
         if self.next:
             return self.next.add_to_graph(graph)
-        return graph.last_node_id
+        return last_child_ids
+
+
+class Anchor(NotationElement):
+    VALUES = [r'!\d+']
+
+    def __init__(self, value: str, next: NotationElement):
+        super().__init__(value, next)
+
+    @classmethod
+    def parse(cls, text: str, next: NotationElement = None, notation: Notation = None):
+        ANCHOR_PATTERN = r'(!\d+)'
+        match = re.match(ANCHOR_PATTERN, text)
+
+        if not match:
+            raise Exception('Fork could not be parsed!')
+        return cls(text, next)
+
+    def add_to_graph(self, graph: graph.Graph, root: int = None):
+        if self.value in graph.anchor_nodes.keys():
+            parent = list(graph.graph.edges(root))[0][1]
+            graph.add_edge(parent, graph.anchor_nodes[self.value])
+
+            graph.remove_node(root)
+            graph.last_node_id -= 1
+
+            return [graph.anchor_nodes[self.value]]
+
+        graph.anchor_nodes[self.value] = root
+        return [root]
 
 
 class Notation:
@@ -112,17 +144,19 @@ class Notation:
         self.start = None
         self.string = None
         self.refs = {}
+        self.anchors = {}
+
+        self.possible = [Fork, Line, Anchor]
 
     def parse_string(self, string: str, next: NotationElement = None):
-        if Line.represents(string):
-            return Line.parse(string, next=next, notation=self)
-
-        if Fork.represents(string):
-            return Fork.parse(string, next=next, notation=self)
+        for elem in self.possible:
+            if elem.represents(string):
+                return elem.parse(string, next=next, notation=self)
 
     def _parse(self, string: str, next: NotationElement = None):
         self.string = string
-        splitter = '(' + '|'.join(Fork.VALUES + Line.VALUES) + ')'
+
+        splitter = '(' + '|'.join([v for e in self.possible for v in e.VALUES]) + ')'
         elements = [elem for elem in regex.split(splitter, string) if elem]
 
         if not elements:
