@@ -78,7 +78,7 @@ class Graph:
 
 
 if __name__ == '__main__':
-    text = '-<->-'
+    text = '-<[$1, $2, $3]>-\n$1: -\n$2: -\n$3: -'
     notation = notation.Notation().parse(text)
     graph = Graph().from_notation(notation)
     graph.draw()

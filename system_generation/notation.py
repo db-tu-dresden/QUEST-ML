@@ -56,7 +56,7 @@ class Line(NotationElement):
 
 
 class Fork(NotationElement):
-    VALUES = [r'<(?:-*(?:(?:-+\d*-*)?|(?R)?)-*)>']
+    VALUES = [r'<\[(?:\$\d+(?:, \$\d+)+)\]>', r'<(?:-*(?:(?:-+\d*-*)?|(?R)?)-*)>']
 
     def __init__(self, value: str, next: NotationElement, children: [NotationElement]):
         super().__init__(value, next)
@@ -71,6 +71,15 @@ class Fork(NotationElement):
             raise Exception('Fork could not be parsed!')
 
         group = match.groups()[0]
+
+        COMPLEX_PATH = r'\[(?:\$\d+(?:, \$\d+)+)\]'
+        complex_fork = re.match(COMPLEX_PATH, group)
+
+        if complex_fork:
+            REF_PATTERN = r'\$\d+'
+            refs = re.findall(REF_PATTERN, group)
+            notation.refs |= dict.fromkeys(refs)
+            return cls(text, next, refs)
 
         path = notation._parse(group, None) if group else None
         return cls(text, next, [path, path])
@@ -102,6 +111,7 @@ class Notation:
     def __init__(self):
         self.start = None
         self.string = None
+        self.refs = {}
 
     def parse_string(self, string: str, next: NotationElement = None):
         if Line.represents(string):
@@ -125,6 +135,42 @@ class Notation:
 
         return next
 
+    def _parse_ref(self, string: str):
+        REF_PATTERN = r'^(\$\d+):(.*)'
+        match = re.match(REF_PATTERN, string)
+
+        if not match:
+            return
+
+        ref = match.groups()[0]
+        string = match.groups()[1].strip()
+
+        self.refs[ref] = Notation().parse(string)
+
+    def _resolve_refs(self, refs: {} = {}):
+        self.refs |= refs
+        if not self.refs:
+            return
+        elem = self.start
+
+        while elem:
+            if isinstance(elem, Fork):
+                for i, child in enumerate(elem.children):
+                    if isinstance(child, str):
+                        self.refs[child]._resolve_refs(self.refs)
+                        elem.children[i] = self.refs[child].start
+            elem = elem.next
+
     def parse(self, string: str):
-        self._parse(string)
+        base, *ref_strs = string.split('\n')
+        self._parse(base)
+
+        for ref_str in ref_strs:
+            self._parse_ref(ref_str)
+
+        if any(1 for v in self.refs.values() if v is None):
+            raise Exception('Path referenced but never defined')
+
+        self._resolve_refs()
+
         return self
