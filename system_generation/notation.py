@@ -58,38 +58,39 @@ class Line(NotationElement):
 class Fork(NotationElement):
     VALUES = [r'<(?:-*(?:(?:-+\d*-*)?|(?R)?)-*)>']
 
-    def __init__(self, value: str, next: NotationElement, upper: NotationElement, lower: NotationElement):
+    def __init__(self, value: str, next: NotationElement, children: [NotationElement]):
         super().__init__(value, next)
-        self.upper = upper
-        self.lower = lower
+        self.children = children
 
     @classmethod
     def parse(cls, text: str, next: NotationElement = None, notation: Notation = None):
-        MATCH = r'<(.*)>'
-        match = re.match(MATCH, text)
+        FORK = r'<(.*)>'
+        match = re.match(FORK, text)
 
         if not match:
             raise Exception('Fork could not be parsed!')
 
-        path = notation._parse(match.groups()[0], None)
+        group = match.groups()[0]
 
-        return cls(text, next, path, path)
+        path = notation._parse(group, None) if group else None
+        return cls(text, next, [path, path])
 
     def add_to_graph(self, graph: graph.Graph, root: int = None):
         if root is None:
             root = graph.last_node_id
 
-        last_idx_upper = graph.join_node(root)
-        if self.upper:
-            last_idx_upper = self.upper.add_to_graph(graph, last_idx_upper)
-        last_idx_lower = graph.join_node(root)
-        if self.lower:
-            last_idx_lower = self.lower.add_to_graph(graph, last_idx_lower)
+        last_child_ids = []
+        for child in self.children:
+            child_id = graph.join_node(root)
+            if child:
+                child_id = child.add_to_graph(graph, child_id)
+            last_child_ids.append(child_id)
 
         graph.add_node(graph.last_node_id + 1)
         graph.last_node_id += 1
-        graph.add_edge(last_idx_upper, graph.last_node_id)
-        graph.add_edge(last_idx_lower, graph.last_node_id)
+
+        for child_id in last_child_ids:
+            graph.add_edge(child_id, graph.last_node_id)
 
         if self.next:
             return self.next.add_to_graph(graph)
