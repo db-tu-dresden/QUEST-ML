@@ -145,7 +145,8 @@ class Notation:
         ref = match.groups()[0]
         string = match.groups()[1].strip()
 
-        self.refs[ref] = Notation().parse(string)
+        self.refs[ref] = Notation()
+        self.refs[ref]._parse(string)
 
     def _resolve_refs(self, refs: {} = {}):
         self.refs |= refs
