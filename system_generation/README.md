@@ -22,7 +22,8 @@ Note, only ```jobCount``` is required.
 ## Notation
 The notation describes the structure of a very simple planar graph.  
 The notation is composed out of lines and forks representing the edges of the graph, nodes are implicit.
-The notation string hast two main parts, the base part and the appendix.  
+Anchors are also part of the notation, they can be used to reference an existing node.
+The notation string has two main parts, the base part and the appendix.  
 The base part describes the initial structure. 
 Any references used must be described in the appendix.
 Base and appendix are seperated by a new line (```\n```).
@@ -49,15 +50,38 @@ where ```$1``` references a subgraph. Forks written in bracket notation must inc
 
 #### References
 References enable the usage of sub graphs, as well as multiple and asymmetric paths in a fork.  
-Denoted by ```$N``` where ```N``` is some number. 
+Denoted by ```$N```, where ```N``` is some number. 
 A used reference must be defined in the appendix.  
 References can also use other references.  
 Note: there is no check for cyclic references; this is expected from the user.
 
+### Anchors
+Anchors are denoted by ```!N``,` where ```N``` is some number.  
+They are a notation element and are used as reference for a node, this enables multiple paths to end at one specific node.
+
 #### Examples
 Simple examples: ```--```, ```-<-1->-```, ```-<<>>-```, ```-<-<-1->->-```, ```<->```.  
-Examples with references: 
-```-<[$1, $2]>-\n$1: -\n$2: -```, 
-```-<[$1, $2, $3]>-\n$1: -\n$2: -\n$3: -```, 
-```-<[$1, $2]>-\n$1: -<>-\n$2: <>```,
+
+Examples with references:  
+```-<[$1, $2]>-\n$1: -\n$2: -```,  
+```-<[$1, $2, $3]>-\n$1: -\n$2: -\n$3: -```,  
+```-<[$1, $2]>-\n$1: -<>-\n$2: <>```,  
 ```-<[$1, $2]>-\n$1: -<[$3, $2]>-\n$2: <>\n$3: -```.
+
+Examples with anchors:  
+```
+-<[$1, $2]>-\n
+$1: <[$3, $4]\n
+$2: !2\n
+$3: !1\n
+$4: !2
+```
+
+```
+-<[$1, $2]>\n
+$1: -<[$3, $4]\n
+$2: -!1\n
+$3: --!2\n
+$4: !1
+```
+
