@@ -31,6 +31,11 @@ class Parseable:
         match = cls._force_match(string)
         return cls(match.group())
 
+    def validate_data_flow(self, incoming_data: {DataFlowElement}):
+        if self.next:
+            return self.next.validate_data_flow(incoming_data)
+        return incoming_data
+
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         pass
 
@@ -80,6 +85,12 @@ class Fork(Parseable):
 
         return cls(string, ref_list, end)
 
+    def validate_data_flow(self, incoming_data: {DataFlowElement}):
+        data = self.ref_list.validate_data_flow(incoming_data)
+        if self.next:
+            return self.next.validate_data_flow(incoming_data)
+        return data
+
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         last_ids = self.ref_list.add_to_graph(graph, root)
 
@@ -112,7 +123,7 @@ class ReferenceList(Parseable):
     def parse(cls, string: str):
         match = cls._force_match(string)
 
-        strings = [string.strip() for string in match.group(1).split(',')]
+        strings = [string[m.start():m.end()] for m in re.finditer(Reference.PATTERN, string)]
         return cls(string, [Reference.parse(string) for string in strings])
 
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
@@ -123,12 +134,48 @@ class ReferenceList(Parseable):
 
         return set(last_ids)
 
+    def validate_data_flow(self, incoming_data: {DataFlowElement}):
+        refs_data = sum([list(ref.data.data) for ref in self.refs], [])
+
+        if len(refs_data) != len(set(refs_data)):
+            raise Exception(f'DataFlowException: One data element takes multiple paths. '
+                            f'Incoming elements: {set(refs_data)}; '
+                            f'Outgoing elements: {refs_data}')
+        if set(refs_data) != incoming_data:
+            raise Exception(f'DataFlowException: Data flow not consistent, element(s) added or removed. '
+                            f'Incoming elements: {incoming_data}; '
+                            f'Outgoing elements: {refs_data}')
+
+        data = set()
+        for ref in self.refs:
+            data.update(ref.validate_data_flow(incoming_data))
+
+        return data
+
 
 class Reference(Parseable):
-    PATTERN = r'\$\d+'
+    PATTERN = r'\((\$\d+): ?(\[(?:\w+(?:, ?)?)*\])\)'
 
     class ReferenceParseException(Exception):
         pass
+
+    def __init__(self, value: str, data: DataFlowElement):
+        super().__init__(value)
+        self.data = data
+
+    @classmethod
+    def parse(cls, string: str):
+        match = cls._force_match(string)
+
+        value = match.group(1)
+        data = DataFlowElement.parse(match.group(2))
+
+        return cls(value, data)
+
+    def validate_data_flow(self, incoming_data: {DataFlowElement}):
+        if self.next:
+            return self.next.validate_data_flow(self.data.data)
+        return self.data.data
 
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         if self.next:
@@ -221,11 +268,25 @@ class Sequence(Parseable):
         self.next.add_to_graph(graph, root)
 
 
+class DataFlowElement(Parseable):
+    PATTERN = r'\[(?:\w+(?:, ?)?)+\]'
+
+    def __init__(self, value, data: [str]):
+        super().__init__(value)
+        self.data = data
+
+    @classmethod
+    def parse(cls, string: str):
+        match = cls._force_match(string)
+        return cls(string, set(re.findall(r'\w+', string)))
+
+
 class Notation:
     def __init__(self):
         self.elements = [Line, Fork, Reference, Anchor]
         self.refs = {}
         self.seq = None
+        self.data = None
 
     def _resolve_ref(self, seq: Sequence):
         elem = seq.next
@@ -243,9 +304,14 @@ class Notation:
 
         self._resolve_ref(self.seq)
 
-    def parse(self, string: str):
-        string, *ref_defs = string.split('\n')
+    def validate_data_flow(self):
+        if self.data:
+            self.seq.validate_data_flow(self.data.data)
 
+    def parse(self, string: str):
+        data_str, string, *ref_defs = string.split('\n')
+
+        self.data = DataFlowElement.parse(data_str)
         self.seq = Sequence.parse(string)
 
         for ref_def in ref_defs:
@@ -253,6 +319,8 @@ class Notation:
             self.refs.update({ref.key: ref})
 
         self._resolve_refs()
+
+        self.validate_data_flow()
 
         return self
 
