@@ -1,212 +1,276 @@
 from __future__ import annotations
-import re
 
-import regex
+import re
 
 from system_generation import graph
 
 
-class NotationElement:
-    VALUES = []
+class Parseable:
+    PATTERN = r'(?!x)x'  # never matches anything
 
-    def __init__(self, value: str, next: NotationElement):
+    class Exception(Exception):
+        pass
+
+    def __init__(self, value: str):
         self.value = value
-        self.next = next
+        self.next = None
 
     @classmethod
-    def represents(cls, text: str):
-        values = r'|'.join(cls.VALUES)
-        if not values:
-            return False
-        return regex.match(values, text) is not None
+    def match(cls, string: str):
+        return re.match(cls.PATTERN, string)
 
     @classmethod
-    def parse(cls, text: str, next: NotationElement = None, notation: Notation = None):
+    def _force_match(cls, string: str):
+        match = re.match(cls.PATTERN, string)
+        if not match:
+            raise cls.Exception(f'Given string can not be parsed as Reference element. String is: {string}')
+        return match
+
+    @classmethod
+    def parse(cls, string: str):
+        match = cls._force_match(string)
+        return cls(match.group())
+
+    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         pass
 
-    def add_to_graph(self, graph: graph.Graph, root: int = None):
+
+class Line(Parseable):
+    PATTERN = r'-(\d+)-|-+'
+
+    class LineParseException(Exception):
         pass
 
-
-class Line(NotationElement):
-    VALUES = [r'-(\d+)?-', r'-']
-
-    def __init__(self, value: str, next: NotationElement, count: int):
-        super().__init__(value, next)
+    def __init__(self, value: str, count: int):
+        super().__init__(value)
         self.count = count
 
     @classmethod
-    def parse(cls, text: str, next: NotationElement = None, notation: Notation = None):
-        MATCH = '|'.join(cls.VALUES)
+    def parse(cls, string: str):
+        match = cls._force_match(string)
 
-        match = re.match(MATCH, text)
+        count = int(match.group(1)) + 2 if match.group(1) else len(string)
 
-        if not match:
-            raise Exception('Line could not be parsed!')
+        return cls(string, count)
 
-        count = int(match.groups()[0]) + 2 if match.groups()[0] else len(text)
-
-        return cls(text, next, count)
-
-    def add_to_graph(self, graph: graph.Graph, root: int = None):
+    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         last_id = graph.join_nodes(self.count, root)
         if self.next:
             return self.next.add_to_graph(graph, last_id)
         return [last_id]
 
 
-class Fork(NotationElement):
-    VALUES = [r'<\[(?:\$\d+(?:, \$\d+)+)\](?:>)?', r'<(?:-*(?:(?:-+\d*-*)?|(?R)?)-*)>']
+class Fork(Parseable):
+    PATTERN = r'<(\[.*\])(>)?'
 
-    def __init__(self, value: str, next: NotationElement, children: [NotationElement], end: bool):
-        super().__init__(value, next)
-        self.children = children
+    class ForkParseException(Exception):
+        pass
+
+    def __init__(self, value: str, ref_list: ReferenceList, end: bool):
+        super().__init__(value)
+        self.ref_list = ref_list
         self.end = end
 
     @classmethod
-    def parse(cls, text: str, next: NotationElement = None, notation: Notation = None):
-        FORK = r'<(.*)'
-        match = re.match(FORK, text)
+    def parse(cls, string: str):
+        match = cls._force_match(string)
 
-        if not match:
-            raise Exception('Fork could not be parsed!')
+        ref_list = ReferenceList.parse(match.group(1))
+        end = match.group(2) is not None
 
-        group = match.groups()[0]
+        return cls(string, ref_list, end)
 
-        COMPLEX_PATH = r'<\[(?:\$\d+(?:, \$\d+)+)\](>)?'
-        complex_fork = re.match(COMPLEX_PATH, text)
-
-        if complex_fork:
-            REF_PATTERN = r'\$\d+'
-            refs = re.findall(REF_PATTERN, group)
-            notation.refs |= dict.fromkeys(refs)
-            return cls(text, next, refs, complex_fork.groups()[0] is not None)
-
-        path = notation._parse(group, None) if group else None
-        return cls(text, next, [path, path], True)
-
-    def add_to_graph(self, graph: graph.Graph, root: int = None):
-        if root is None:
-            root = graph.last_node_id
-
-        last_child_ids = []
-        for child in self.children:
-            child_ids = [graph.join_node(root)]
-            if child:
-                child_ids = child.add_to_graph(graph, child_ids[0])
-            last_child_ids.extend(child_ids)
+    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+        last_ids = self.ref_list.add_to_graph(graph, root)
 
         if self.end:
-            graph.add_node(graph.last_node_id + 1)
             graph.last_node_id += 1
+            end_id = graph.last_node_id
+            graph.add_node(end_id)
 
-            for child_id in set(last_child_ids):
-                graph.add_edge(child_id, graph.last_node_id)
-            last_child_ids = [graph.last_node_id]
+            for ref_id in last_ids:
+                graph.add_edge(ref_id, end_id)
+            last_ids = [end_id]
 
         if self.next:
-            return self.next.add_to_graph(graph)
-        return last_child_ids
+            return self.next.add_to_graph(graph, None)  # TODO: graph.last_node_id??
+        return last_ids
 
 
-class Anchor(NotationElement):
-    VALUES = [r'!\d+']
+class ReferenceList(Parseable):
+    PATTERN = r'\[((?:.+,\s?)+.+)\]'
 
-    def __init__(self, value: str, next: NotationElement):
-        super().__init__(value, next)
+    class ReferenceListParseException(Exception):
+        pass
+
+    def __init__(self, value: str, refs: [Reference]):
+        super().__init__(value)
+        self.refs = refs
 
     @classmethod
-    def parse(cls, text: str, next: NotationElement = None, notation: Notation = None):
-        ANCHOR_PATTERN = r'(!\d+)'
-        match = re.match(ANCHOR_PATTERN, text)
+    def parse(cls, string: str):
+        match = cls._force_match(string)
 
-        if not match:
-            raise Exception('Fork could not be parsed!')
-        return cls(text, next)
+        strings = [string.strip() for string in match.group(1).split(',')]
+        return cls(string, [Reference.parse(string) for string in strings])
 
-    def add_to_graph(self, graph: graph.Graph, root: int = None):
-        if self.value in graph.anchor_nodes.keys():
-            parent = list(graph.graph.edges(root))[0][1]
-            graph.add_edge(parent, graph.anchor_nodes[self.value])
+    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+        last_ids = []
+        for ref in self.refs:
+            node = graph.join_node(root)
+            last_ids.extend(ref.add_to_graph(graph, node))
 
-            graph.remove_node(root)
-            graph.last_node_id -= 1
+        return set(last_ids)
 
-            return [graph.anchor_nodes[self.value]]
 
-        graph.anchor_nodes[self.value] = root
-        return [root]
+class Reference(Parseable):
+    PATTERN = r'\$\d+'
+
+    class ReferenceParseException(Exception):
+        pass
+
+    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+        if self.next:
+            return self.next.add_to_graph(graph, root)
+        return []
+
+
+class ReferenceDefinition(Parseable):
+    PATTERN = r'(\$\d+):(.*)'
+
+    class ReferenceDefinitionParseException(Exception):
+        pass
+
+    def __init__(self, value: str, key: str, seq: Sequence):
+        super().__init__(value)
+        self.key = key
+        self.seq = seq
+
+    @classmethod
+    def parse(cls, string: str):
+        match = cls._force_match(string)
+
+        key = match.group(1)
+        seq = Sequence.parse(match.group(2).strip())
+
+        return cls(string, key, seq)
+
+
+class Anchor(Parseable):
+    PATTERN = r'(!\d+)'
+
+    class AnchorParseException(Exception):
+        pass
+
+    def add_to_graph(self, graph: graph.Graph, root: int):
+        node_id = graph.get_node_by_id(self.value)
+        if not node_id:
+            graph.last_node_id += 1
+            node_id = graph.last_node_id
+            graph.add_node(node_id, id=self.value)
+        graph.add_edge(root, node_id)
+        if self.next:
+            return self.next.add_to_graph(graph, node_id)
+        return [node_id]
+
+
+class Sequence(Parseable):
+    PATTERN = r'.*'
+    elements = [Line, Fork, Reference, Anchor]
+
+    class Exception(Exception):
+        pass
+
+    def __init__(self, value, next: Parseable):
+        super().__init__(value)
+        self.next = next
+
+    @classmethod
+    def parse(cls, string: str):
+        original_string = string
+        first = None
+        last = None
+
+        while string:
+            did_match = False
+            for parseable in cls.elements:
+                match = parseable.match(string)
+                if match:
+                    did_match = True
+                    elem = string[:match.end()]
+                    string = string[match.end():]
+                    elem = parseable.parse(elem)
+
+                    if not first:
+                        first = elem
+                    if last:
+                        last.next = elem
+
+                    last = elem
+                    break
+            if not did_match:
+                raise cls.Exception(
+                    f'Given string can not be parsed as ElementSequenceException. String is: {string}')
+
+        return cls(original_string, first)
+
+    def add_to_graph(self, graph: graph.Graph, root: int):
+        if not self.next:
+            return
+        self.next.add_to_graph(graph, root)
 
 
 class Notation:
-
     def __init__(self):
-        self.start = None
-        self.string = None
+        self.elements = [Line, Fork, Reference, Anchor]
         self.refs = {}
-        self.anchors = {}
+        self.seq = None
 
-        self.possible = [Fork, Line, Anchor]
-
-    def parse_string(self, string: str, next: NotationElement = None):
-        for elem in self.possible:
-            if elem.represents(string):
-                return elem.parse(string, next=next, notation=self)
-
-    def _parse(self, string: str, next: NotationElement = None):
-        self.string = string
-
-        splitter = '(' + '|'.join([v for e in self.possible for v in e.VALUES]) + ')'
-        elements = [elem for elem in regex.split(splitter, string) if elem]
-
-        if not elements:
-            return None
-
-        for elem in reversed(elements):
-            next = self.parse_string(elem, next=next)
-
-        self.start = next
-
-        return next
-
-    def _parse_ref(self, string: str):
-        REF_PATTERN = r'^(\$\d+):(.*)'
-        match = re.match(REF_PATTERN, string)
-
-        if not match:
-            return
-
-        ref = match.groups()[0]
-        string = match.groups()[1].strip()
-
-        self.refs[ref] = Notation()
-        self.refs[ref]._parse(string)
-
-    def _resolve_refs(self, refs: dict = None):
-        if refs is not None:
-            self.refs |= refs
-        if not self.refs:
-            return
-        elem = self.start
+    def _resolve_ref(self, seq: Sequence):
+        elem = seq.next
 
         while elem:
             if isinstance(elem, Fork):
-                for i, child in enumerate(elem.children):
-                    if isinstance(child, str):
-                        self.refs[child]._resolve_refs(self.refs)
-                        elem.children[i] = self.refs[child].start
+                for ref in elem.ref_list.refs:
+                    if not ref.next:
+                        ref.next = self.refs[ref.value].seq.next
             elem = elem.next
 
+    def _resolve_refs(self):
+        for ref in self.refs.values():
+            self._resolve_ref(ref.seq)
+
+        self._resolve_ref(self.seq)
+
     def parse(self, string: str):
-        base, *ref_strs = string.split('\n')
-        self._parse(base)
+        string, *ref_defs = string.split('\n')
 
-        for ref_str in ref_strs:
-            self._parse_ref(ref_str)
+        self.seq = Sequence.parse(string)
 
-        if any(1 for v in self.refs.values() if v is None):
-            raise Exception('Path referenced but never defined')
+        for ref_def in ref_defs:
+            ref = ReferenceDefinition.parse(ref_def)
+            self.refs.update({ref.key: ref})
 
         self._resolve_refs()
 
         return self
+
+    def to_graph(self, graph: graph.Graph, root: int):
+        if self.seq is None:
+            return
+        self.seq.add_to_graph(graph, root)
+
+
+def main():
+    text = '-<[$1, $2]>-\n' \
+           '$1: -<[$3, $2]\n' \
+           '$2: -!1\n' \
+           '$3: -!1'
+
+    notation = Notation()
+    notation.parse(text)
+    print()
+
+
+if __name__ == '__main__':
+    main()

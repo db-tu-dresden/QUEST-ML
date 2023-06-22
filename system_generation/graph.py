@@ -66,13 +66,15 @@ class Graph:
 
         return self.last_node_id
 
-    def from_notation(self, notation: notation.Notation):
-        elem = notation.start
-        if elem is None:
-            return
+    def get_node_by_id(self, id):
+        return next(
+            (node for node, data in self.graph.nodes(data=True) if data.get('id') == id),
+            None)
 
+    def from_notation(self, notation: notation.Notation):
+        self.graph = nx.Graph()
         root = self.join_node()
-        elem.add_to_graph(self, root)
+        notation.to_graph(self, root)
 
         return self
 
