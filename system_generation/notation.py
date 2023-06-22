@@ -91,6 +91,8 @@ class Fork(Parseable):
             for ref_id in last_ids:
                 graph.add_edge(ref_id, end_id)
             last_ids = [end_id]
+            if self.next:
+                return self.next.add_to_graph(graph, end_id)
         elif self.next:
             raise Exception('Fork not closed but next element specified.')
         return last_ids
