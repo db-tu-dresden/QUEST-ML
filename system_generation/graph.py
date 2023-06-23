@@ -71,7 +71,10 @@ class Graph:
             (node for node, data in self.graph.nodes(data=True) if data.get('id') == id),
             None)
 
-    def from_notation(self, notation: notation.Notation):
+    @classmethod
+    def from_notation(cls, notation: notation.Notation):
+        self = cls()
+
         self.graph = nx.Graph()
         root = self.join_node()
         notation.to_graph(self, root)
@@ -105,7 +108,14 @@ class Graph:
 
 
 if __name__ == '__main__':
-    text = '-<[$1, $2, $3]>-\n$1: -\n$2: -\n$3: -'
-    notation = notation.Notation().parse(text)
-    graph = Graph().from_notation(notation)
+
+    text = '[A,B,C]\n' \
+           '-<[($1: [A,B]), ($2: [C])]\n' \
+           '$1: <[($3: [A]), ($2:[B])]\n' \
+           '$2: !1\n' \
+           '$3: -'
+
+    notation = notation.Notation.parse(text)
+
+    graph = Graph.from_notation(notation)
     graph.draw()

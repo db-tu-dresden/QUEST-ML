@@ -326,7 +326,9 @@ class Notation:
         if self.data:
             self.seq.validate_data_flow(self.data)
 
-    def parse(self, string: str):
+    @classmethod
+    def parse(cls, string: str):
+        self = cls()
         data_str, string, *ref_defs = [elem for elem in string.split('\n') if elem]
 
         self.data = DataFlowElement.parse(data_str)
