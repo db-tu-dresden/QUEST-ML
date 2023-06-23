@@ -79,7 +79,21 @@ class Graph:
         return self
 
     def draw(self):
-        nx.draw(self.graph, with_labels=True, font_weight='bold')
+        pos = nx.planar_layout(self.graph)
+        plt.figure()
+        nx.draw(
+            self.graph, pos, edge_color='black', width=1, linewidths=1,
+            node_size=500, node_color='pink', alpha=0.9, with_labels=True
+        )
+
+        edge_labels = {(e[0], e[1]): str(e[2]['data']) for e in self.graph.edges(data=True) if e[2]}
+
+        nx.draw_networkx_edge_labels(
+            self.graph, pos,
+            edge_labels=edge_labels,
+            font_color='red'
+        )
+        plt.axis('off')
         plt.show()
 
 
