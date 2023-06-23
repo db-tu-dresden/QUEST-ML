@@ -266,31 +266,25 @@ class Sequence(Parseable):
 class DataFlowElement(Parseable):
     PATTERN = r'\[(?:\w+(?:, ?)?)*\]'
 
-    def __init__(self, value, data: {str}):
-        super().__init__(value)
-        self.data = data
-
     @classmethod
     def parse(cls, string: str):
         match = cls._force_match(string)
-        return cls(string, set(re.findall(r'\w+', string)))
+        return cls(set(re.findall(r'\w+', string)))
 
     @classmethod
     def from_exclusives(cls, *ls):
-        value = ''
-        data = set()
+        value = set()
         for elem in ls:
             if not isinstance(elem, DataFlowElement):
                 raise Exception(f'DataFlowException: Can not create exclusive DataFlowElement instance '
                                 f'from list containing non DataFlowElements')
-            value += elem.value
-            if data.intersection(elem.data):
+            if value.intersection(elem.value):
                 raise Exception(f'DataFlowException: Can not create exclusive DataFlowElement instance from list. '
                                 f'Same element found multiple times.'
-                                f'Existing elements: {data}; '
-                                f'Tried joining elements: {elem.data}')
-            data = data.union(elem.data)
-        return cls(value, data)
+                                f'Existing elements: {value}; '
+                                f'Tried joining elements: {elem.value}')
+            value = value.union(elem.value)
+        return cls(value)
 
     def __eq__(self, other):
         return self.data == other.data
