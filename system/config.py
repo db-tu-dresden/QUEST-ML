@@ -33,6 +33,9 @@ class Config:
             'schema': self.schema,
         })
 
+    def __getitem__(self, item):
+        return self.data[item]
+
 
 def main():
     c = Config(path='config.yaml')
