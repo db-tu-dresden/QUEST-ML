@@ -130,7 +130,7 @@ class ReferenceList(Parseable):
     def add_to_graph(self, graph: g.Graph, root: int) -> [int]:
         last_ids = []
         for ref in self.refs:
-            node = graph.join_node(root, data=self.data)
+            node = graph.join_node(root, data=ref.data)
             last_ids.extend(ref.add_to_graph(graph, node))
 
         return set(last_ids)
