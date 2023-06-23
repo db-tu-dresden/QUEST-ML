@@ -309,7 +309,7 @@ class Notation:
             self.seq.validate_data_flow(self.data.data)
 
     def parse(self, string: str):
-        data_str, string, *ref_defs = string.split('\n')
+        data_str, string, *ref_defs = [elem for elem in string.split('\n') if elem]
 
         self.data = DataFlowElement.parse(data_str)
         self.seq = Sequence.parse(string)
