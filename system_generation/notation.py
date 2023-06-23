@@ -60,7 +60,7 @@ class Line(Parseable):
         return cls(string, count)
 
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
-        last_id = graph.join_nodes(self.count, root)
+        last_id = graph.join_nodes(self.count, root, data=self.data)
         if self.next:
             return self.next.add_to_graph(graph, last_id)
         return [last_id]
@@ -130,7 +130,7 @@ class ReferenceList(Parseable):
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         last_ids = []
         for ref in self.refs:
-            node = graph.join_node(root)
+            node = graph.join_node(root, data=self.data)
             last_ids.extend(ref.add_to_graph(graph, node))
 
         return set(last_ids)
@@ -211,7 +211,7 @@ class Anchor(Parseable):
             graph.last_node_id += 1
             node_id = graph.last_node_id
             graph.add_node(node_id, id=self.value)
-        graph.add_edge(root, node_id)
+        graph.add_edge(root, node_id, data=self.data)
         if self.next:
             return self.next.add_to_graph(graph, node_id)
         return [node_id]

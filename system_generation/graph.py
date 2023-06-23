@@ -29,7 +29,7 @@ class Graph:
     def add_edges_from(self, ebunch_to_add, **attr):
         self.graph.add_edges_from(ebunch_to_add, **attr)
 
-    def join_node(self, root: int = None):
+    def join_node(self, root: int = None, data: notation.DataFlowElement = None):
         if root is None:
             root = self.last_node_id
 
@@ -42,11 +42,11 @@ class Graph:
         self.last_node_id = id
 
         if root is not None:
-            self.add_edge(root, id)
+            self.add_edge(root, id, data=data)
 
         return self.last_node_id
 
-    def join_nodes(self, n: int, root: int = None):
+    def join_nodes(self, n: int, root: int = None, data: notation.DataFlowElement = None):
         if root is None:
             root = self.last_node_id
 
@@ -60,7 +60,7 @@ class Graph:
 
         if root is not None:
             ids = [root] + ids
-        self.add_edges_from([(ids[idx], ids[idx + 1]) for idx in range(len(ids) - 1)])
+        self.add_edges_from([(ids[idx], ids[idx + 1]) for idx in range(len(ids) - 1)], data=data)
 
         self.last_node_id = ids[-1]
 
