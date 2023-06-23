@@ -13,6 +13,9 @@ def validate_yaml(data: dict, schema: Schema):
 class Config:
 
     default_schema = Schema({
+        'jobs': [And(str, len)],
+        'jobDistribution': [And(Use(float), lambda x: 0 <= x <= 1)],
+        'jobFailureRates': [And(Use(float), lambda x: 0 <= x <= 1)],
         Or('jobLimit', 'until', only_one=True): And(Use(int), lambda x: x > 0),
     })
 

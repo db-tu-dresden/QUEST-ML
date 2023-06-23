@@ -1,1 +1,4 @@
+jobs: ['A', 'B', 'C']
+jobDistribution: [0.1, 0.1, 0.8]
+jobFailureRates: [0, 0, 0]
 jobLimit: 100
