@@ -211,7 +211,7 @@ class Anchor(Parseable):
             graph.last_node_id += 1
             node_id = graph.last_node_id
             graph.add_node(node_id, id=self.value)
-        graph.add_edge(root, node_id, data=self.data)
+        graph.add_edge(root, node_id, data=self.data.value)
         if self.next:
             return self.next.add_to_graph(graph, node_id)
         return [node_id]
