@@ -14,6 +14,7 @@ class Parseable:
     def __init__(self, value: str):
         self.value = value
         self.next = None
+        self.data = None
 
     @classmethod
     def match(cls, string: str):
@@ -31,10 +32,10 @@ class Parseable:
         match = cls._force_match(string)
         return cls(match.group())
 
-    def validate_data_flow(self, incoming_data: {DataFlowElement}):
+    def validate_data_flow(self, incoming_data: DataFlowElement):
+        self.data = incoming_data
         if self.next:
-            return self.next.validate_data_flow(incoming_data)
-        return incoming_data
+            self.next.validate_data_flow(self.data)
 
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         pass
@@ -85,11 +86,11 @@ class Fork(Parseable):
 
         return cls(string, ref_list, end)
 
-    def validate_data_flow(self, incoming_data: {DataFlowElement}):
-        data = self.ref_list.validate_data_flow(incoming_data)
+    def validate_data_flow(self, incoming_data: DataFlowElement):
+        self.data = incoming_data
+        self.ref_list.validate_data_flow(incoming_data)
         if self.next:
-            return self.next.validate_data_flow(incoming_data)
-        return data
+            self.next.validate_data_flow(incoming_data)
 
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         last_ids = self.ref_list.add_to_graph(graph, root)
@@ -134,23 +135,18 @@ class ReferenceList(Parseable):
 
         return set(last_ids)
 
-    def validate_data_flow(self, incoming_data: {DataFlowElement}):
-        refs_data = sum([list(ref.data.data) for ref in self.refs], [])
+    def validate_data_flow(self, incoming_data: DataFlowElement):
+        self.data = incoming_data
 
-        if len(refs_data) != len(set(refs_data)):
-            raise Exception(f'DataFlowException: One data element takes multiple paths. '
-                            f'Incoming elements: {set(refs_data)}; '
-                            f'Outgoing elements: {refs_data}')
-        if set(refs_data) != incoming_data:
+        refs_data = DataFlowElement.from_exclusives(*(ref.data for ref in self.refs))
+
+        if self.data != refs_data:
             raise Exception(f'DataFlowException: Data flow not consistent, element(s) added or removed. '
-                            f'Incoming elements: {incoming_data}; '
+                            f'Incoming elements: {self.data}; '
                             f'Outgoing elements: {refs_data}')
 
-        data = set()
         for ref in self.refs:
-            data.update(ref.validate_data_flow(incoming_data))
-
-        return data
+            ref.validate_data_flow(self.data)
 
 
 class Reference(Parseable):
@@ -172,10 +168,9 @@ class Reference(Parseable):
 
         return cls(value, data)
 
-    def validate_data_flow(self, incoming_data: {DataFlowElement}):
+    def validate_data_flow(self, incoming_data: DataFlowElement):
         if self.next:
-            return self.next.validate_data_flow(self.data.data)
-        return self.data.data
+            self.next.validate_data_flow(self.data)
 
     def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
         if self.next:
@@ -271,7 +266,7 @@ class Sequence(Parseable):
 class DataFlowElement(Parseable):
     PATTERN = r'\[(?:\w+(?:, ?)?)+\]'
 
-    def __init__(self, value, data: [str]):
+    def __init__(self, value, data: {str}):
         super().__init__(value)
         self.data = data
 
@@ -279,6 +274,29 @@ class DataFlowElement(Parseable):
     def parse(cls, string: str):
         match = cls._force_match(string)
         return cls(string, set(re.findall(r'\w+', string)))
+
+    @classmethod
+    def from_exclusives(cls, *ls):
+        value = ''
+        data = set()
+        for elem in ls:
+            if not isinstance(elem, DataFlowElement):
+                raise Exception(f'DataFlowException: Can not create exclusive DataFlowElement instance '
+                                f'from list containing non DataFlowElements')
+            value += elem.value
+            if data.intersection(elem.data):
+                raise Exception(f'DataFlowException: Can not create exclusive DataFlowElement instance from list. '
+                                f'Same element found multiple times.'
+                                f'Existing elements: {data}; '
+                                f'Tried joining elements: {elem.data}')
+            data = data.union(elem.data)
+        return cls(value, data)
+
+    def __eq__(self, other):
+        return self.data == other.data
+
+    def __str__(self):
+        return str(self.data)
 
 
 class Notation:
@@ -306,7 +324,7 @@ class Notation:
 
     def validate_data_flow(self):
         if self.data:
-            self.seq.validate_data_flow(self.data.data)
+            self.seq.validate_data_flow(self.data)
 
     def parse(self, string: str):
         data_str, string, *ref_defs = [elem for elem in string.split('\n') if elem]
