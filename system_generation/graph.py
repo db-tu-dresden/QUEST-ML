@@ -79,7 +79,7 @@ class Graph:
         return self
 
     def draw(self):
-        pos = nx.planar_layout(self.graph)
+        pos = nx.spring_layout(self.graph)
         plt.figure()
         nx.draw(
             self.graph, pos, edge_color='black', width=1, linewidths=1,
