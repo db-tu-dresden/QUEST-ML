@@ -58,28 +58,45 @@ Anchors are denoted by ```!N``` where ```N``` is some number.
 They are a notation element and are used as reference for a node, 
 this enables multiple paths to end at one specific node.
 
-#### Examples
+## Examples
 
-Examples with references:  
+### Example 1
+Notation:
 ```
-[]\n
--<[($1: []), ($2: [])]>-\n
-$1: -\n
+[]
+-<[($1: []), ($2: [])]>-
+$1: -
 $2: -
 ```
-,  
 
+Plot:
+
+![example plot 1](example_plot_1.png)
+
+### Example 2
+Notation:
 ```
-[A,B]\n
-<[($1: [A,C]), ($2: [B])]>\n
-$1: !1\n
-$2: !1\n
+[A,B]
+<[($1: [A,C]), ($2: [B])]>
+$1: !1
+$2: !1
 ```
-,
+
+Plot:
+
+![example plot 2](example_plot_2.png)
+
+
+### Example 1
+Notation:
 ```
-[A,B,C]\n
--<[($1: [A,B]), ($2: [C])]\n
-$1: <[($3: [A]), ($2:[B])]\n
-$2: !1\n
-$3: -
+[A,B,C]
+-<[($1: [A,B]), ($2: [C])]>-
+$1: -<[($3: [A]), ($2:[B])]
+$2: !1
+$3: -!1
 ```
+
+Plot:
+
+![example plot 3](example_plot_3.png)
