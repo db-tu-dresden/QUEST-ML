@@ -289,9 +289,6 @@ class DataFlowElement(Parseable):
     def __eq__(self, other):
         return self.data == other.data
 
-    def __str__(self):
-        return str(self.data) if self.data else ''
-
 
 class Notation:
     def __init__(self):
