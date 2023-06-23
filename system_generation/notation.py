@@ -264,7 +264,7 @@ class Sequence(Parseable):
 
 
 class DataFlowElement(Parseable):
-    PATTERN = r'\[(?:\w+(?:, ?)?)+\]'
+    PATTERN = r'\[(?:\w+(?:, ?)?)*\]'
 
     def __init__(self, value, data: {str}):
         super().__init__(value)
@@ -296,7 +296,7 @@ class DataFlowElement(Parseable):
         return self.data == other.data
 
     def __str__(self):
-        return str(self.data)
+        return str(self.data) if self.data else ''
 
 
 class Notation:

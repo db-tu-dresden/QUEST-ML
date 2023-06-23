@@ -92,7 +92,8 @@ class Graph:
             with_labels=True
         )
 
-        edge_labels = {(e[0], e[1]): str(e[2]['data']) for e in self.graph.edges(data=True) if e[2]}
+        edge_labels = {(e[0], e[1]): str(e[2]['data'])
+                       for e in self.graph.edges(data=True) if e[2] and e[2]['data']}
 
         nx.draw_networkx_edge_labels(
             self.graph, pos,
