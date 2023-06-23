@@ -63,7 +63,7 @@ this enables multiple paths to end at one specific node.
 Examples with references:  
 ```
 []\n
--<[($1: []), ($2: [])>-\n
+-<[($1: []), ($2: [])]>-\n
 $1: -\n
 $2: -
 ```
