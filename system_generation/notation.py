@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from system_generation import graph
+from system_generation import graph as g
 
 
 class Parseable:
@@ -37,7 +37,7 @@ class Parseable:
         if self.next:
             self.next.validate_data_flow(self.data)
 
-    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: g.Graph, root: int) -> [int]:
         pass
 
 
@@ -59,7 +59,7 @@ class Line(Parseable):
 
         return cls(string, count)
 
-    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: g.Graph, root: int) -> [int]:
         last_id = graph.join_nodes(self.count, root, data=self.data)
         if self.next:
             return self.next.add_to_graph(graph, last_id)
@@ -92,7 +92,7 @@ class Fork(Parseable):
         if self.next:
             self.next.validate_data_flow(incoming_data)
 
-    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: g.Graph, root: int) -> [int]:
         last_ids = self.ref_list.add_to_graph(graph, root)
 
         if self.end:
@@ -127,7 +127,7 @@ class ReferenceList(Parseable):
         strings = [string[m.start():m.end()] for m in re.finditer(Reference.PATTERN, string)]
         return cls(string, [Reference.parse(string) for string in strings])
 
-    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: g.Graph, root: int) -> [int]:
         last_ids = []
         for ref in self.refs:
             node = graph.join_node(root, data=self.data)
@@ -172,7 +172,7 @@ class Reference(Parseable):
         if self.next:
             self.next.validate_data_flow(self.data)
 
-    def add_to_graph(self, graph: graph.Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: g.Graph, root: int) -> [int]:
         if self.next:
             return self.next.add_to_graph(graph, root)
         return []
@@ -205,7 +205,7 @@ class Anchor(Parseable):
     class AnchorParseException(Exception):
         pass
 
-    def add_to_graph(self, graph: graph.Graph, root: int):
+    def add_to_graph(self, graph: g.Graph, root: int):
         node_id = graph.get_node_by_id(self.value)
         if not node_id:
             graph.last_node_id += 1
@@ -257,7 +257,7 @@ class Sequence(Parseable):
 
         return cls(original_string, first)
 
-    def add_to_graph(self, graph: graph.Graph, root: int):
+    def add_to_graph(self, graph: g.Graph, root: int):
         if not self.next:
             return
         self.next.add_to_graph(graph, root)
@@ -344,7 +344,7 @@ class Notation:
 
         return self
 
-    def to_graph(self, graph: graph.Graph, root: int):
+    def to_graph(self, graph: g.Graph, root: int):
         if self.seq is None:
             return
         self.seq.add_to_graph(graph, root)
