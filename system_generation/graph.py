@@ -82,8 +82,14 @@ class Graph:
         pos = nx.spring_layout(self.graph)
         plt.figure()
         nx.draw(
-            self.graph, pos, edge_color='black', width=1, linewidths=1,
-            node_size=500, node_color='pink', alpha=0.9, with_labels=True
+            self.graph, pos,
+            edge_color='black',
+            width=1,
+            linewidths=1,
+            node_size=500,
+            node_color=['lightblue', *['pink'] * (self.last_node_id - 1), 'lightblue'],
+            alpha=0.9,
+            with_labels=True
         )
 
         edge_labels = {(e[0], e[1]): str(e[2]['data']) for e in self.graph.edges(data=True) if e[2]}
