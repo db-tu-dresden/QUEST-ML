@@ -3,8 +3,6 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from system_generation import notation as n
-
 
 class Graph:
 
@@ -71,16 +69,6 @@ class Graph:
             (node for node, data in self.graph.nodes(data=True) if data.get('id') == id),
             None)
 
-    @classmethod
-    def from_notation(cls, notation: n.Notation):
-        self = cls()
-
-        self.graph = nx.Graph()
-        root = self.join_node()
-        notation.to_graph(self, root)
-
-        return self
-
     def draw(self):
         pos = nx.spring_layout(self.graph)
         plt.figure()
@@ -108,14 +96,4 @@ class Graph:
 
 
 if __name__ == '__main__':
-
-    text = '[A,B,C]\n' \
-           '-<[($1: [A,B]), ($2: [C])]>-\n' \
-           '$1: -<[($3: [A]), ($2:[B])]\n' \
-           '$2: !1\n' \
-           '$3: -!1'
-
-    notation = n.Notation.parse(text)
-
-    graph = Graph.from_notation(notation)
-    graph.draw()
+    pass
