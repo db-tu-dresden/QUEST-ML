@@ -3,7 +3,7 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from system_generation import notation
+from system_generation import notation as n
 
 
 class Graph:
@@ -29,7 +29,7 @@ class Graph:
     def add_edges_from(self, ebunch_to_add, **attr):
         self.graph.add_edges_from(ebunch_to_add, **attr)
 
-    def join_node(self, root: int = None, data: notation.DataFlowElement = None):
+    def join_node(self, root: int = None, data: n.DataFlowElement = None):
         if root is None:
             root = self.last_node_id
 
@@ -46,7 +46,7 @@ class Graph:
 
         return self.last_node_id
 
-    def join_nodes(self, n: int, root: int = None, data: notation.DataFlowElement = None):
+    def join_nodes(self, n: int, root: int = None, data: n.DataFlowElement = None):
         if root is None:
             root = self.last_node_id
 
@@ -72,7 +72,7 @@ class Graph:
             None)
 
     @classmethod
-    def from_notation(cls, notation: notation.Notation):
+    def from_notation(cls, notation: n.Notation):
         self = cls()
 
         self.graph = nx.Graph()
@@ -115,7 +115,7 @@ if __name__ == '__main__':
            '$2: !1\n' \
            '$3: -'
 
-    notation = notation.Notation.parse(text)
+    notation = n.Notation.parse(text)
 
     graph = Graph.from_notation(notation)
     graph.draw()
