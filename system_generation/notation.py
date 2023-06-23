@@ -351,14 +351,13 @@ class Notation:
 
 
 def main():
-    text = '-<[$1, $2]>-\n' \
-           '$1: -<[$3, $2]\n' \
-           '$2: -!1\n' \
+    text = '[A,B,C]\n' \
+           '-<[($1: [A,B]), ($2: [C])]>-\n' \
+           '$1: -<[($3: [A]), ($2:[B])]\n' \
+           '$2: !1\n' \
            '$3: -!1'
 
-    notation = Notation()
-    notation.parse(text)
-    print()
+    notation = Notation.parse(text)
 
 
 if __name__ == '__main__':
