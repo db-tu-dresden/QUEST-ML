@@ -1,3 +1,5 @@
+from functools import cached_property
+
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -9,6 +11,14 @@ class Graph:
         self.root_id = None
         self.last_node_id = last_node_id
         self.anchor_nodes = {}
+
+    @cached_property
+    def nodes(self, **kwargs):
+        return self.graph.nodes(**kwargs)
+
+    @cached_property
+    def edges(self, *args, **kwargs):
+        return self.graph.edges(*args, **kwargs)
 
     def add_node(self, node_for_adding, **attr):
         self.graph.add_node(node_for_adding, **attr)
