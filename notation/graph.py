@@ -5,7 +5,7 @@ import networkx as nx
 class Graph:
 
     def __init__(self, last_node_id=None):
-        self.graph = nx.Graph()
+        self.graph = nx.DiGraph()
         self.root_id = None
         self.last_node_id = last_node_id
         self.anchor_nodes = {}
