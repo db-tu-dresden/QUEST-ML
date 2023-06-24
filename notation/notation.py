@@ -334,6 +334,8 @@ class Notation:
 
         self.validate_data_flow()
 
+        self.generate_graph()
+
         return self
 
     def generate_graph(self):
@@ -344,7 +346,6 @@ class Notation:
         self.seq.add_to_graph(self.graph, root)
 
     def draw(self):
-        self.generate_graph()
         self.graph.draw()
 
 
