@@ -40,7 +40,7 @@ class Graph:
             root = self.last_node_id
 
         id = self.last_node_id + 1 if self.last_node_id is not None else 0
-        self.add_node(id)
+        self.add_node(id, data=data)
 
         if self.root_id is None:
             self.root_id = id
@@ -59,7 +59,7 @@ class Graph:
         base = self.last_node_id + 1 if self.last_node_id is not None else 0
         ids = list(range(base, base + n))
 
-        self.add_nodes_from(ids)
+        self.add_nodes_from(ids, data=data)
 
         if self.root_id is None:
             self.root_id = ids[0]

@@ -98,7 +98,7 @@ class Fork(Parseable):
         if self.end:
             graph.last_node_id += 1
             end_id = graph.last_node_id
-            graph.add_node(end_id)
+            graph.add_node(end_id, data=self.data.value)
 
             for ref_id in last_ids:
                 graph.add_edge(ref_id, end_id, data=self.data.value)
@@ -210,7 +210,7 @@ class Anchor(Parseable):
         if not node_id:
             graph.last_node_id += 1
             node_id = graph.last_node_id
-            graph.add_node(node_id, id=self.value)
+            graph.add_node(node_id, id=self.value, data=self.data.value)
         graph.add_edge(root, node_id, data=self.data.value)
         if self.next:
             return self.next.add_to_graph(graph, node_id)
@@ -342,7 +342,7 @@ class Notation:
         if self.seq is None:
             return
         self.graph = Graph()
-        root = self.graph.join_node()
+        root = self.graph.join_node(data=self.data.value)
         self.seq.add_to_graph(self.graph, root)
 
     def draw(self):
