@@ -10,13 +10,26 @@ def validate_yaml(data: dict, schema: Schema):
         logging.exception(e)
 
 
+class JobSchema(Schema):
+    def validate(self, data, _is_job_schema=True):
+        data = super(JobSchema, self).validate(data, _is_job_schema=False)
+        if _is_job_schema and len(data):
+            probs = [elem['arrivalProbability'] for elem in data]
+            if sum(probs) != 1.0:
+                raise SchemaError(f'Job arrival probabilities are not a probability distribution.'
+                                  f'Given probabilities are: {probs}')
+        return data
+
+
 class Config:
 
     default_schema = Schema({
-        'jobs': [And(str, len)],
-        'jobDistribution': [And(Use(float), lambda x: 0 <= x <= 1)],
-        'jobFailureRates': [And(Use(float), lambda x: 0 <= x <= 1)],
         Or('jobLimit', 'until', only_one=True): And(Use(int), lambda x: x > 0),
+        'jobs': JobSchema([{
+            'name': And(str, len),
+            'arrivalProbability': And(Use(float), lambda x: 0 <= x <= 1),
+            'failureRate': And(Use(float), lambda x: 0 <= x <= 1)
+        }]),
     })
 
     def __init__(self, path: str, schema: Schema = default_schema):

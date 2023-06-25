@@ -1,4 +1,11 @@
-jobs: ['A', 'B', 'C']
-jobDistribution: [0.1, 0.1, 0.8]
-jobFailureRates: [0, 0, 0]
 jobLimit: 100
+jobs:
+  - name: 'A'
+    arrivalProbability: 0.1
+    failureRate: 0
+  - name: 'B'
+    arrivalProbability: 0.1
+    failureRate: 0
+  - name: 'C'
+    arrivalProbability: 0.8
+    failureRate: 0
