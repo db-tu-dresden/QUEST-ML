@@ -46,15 +46,7 @@ class ArrivalProcess(Process):
 
         yield self.env.process(self.next[job.type.name].push(job))
 
-    def run(self):
-        while True:
-            yield from self.process()
-
 
 class ExitProcess(Process):
     def process(self):
         yield self.env.timeout(1)
-
-    def run(self):
-        while True:
-            yield from self.process()
