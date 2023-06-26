@@ -77,10 +77,7 @@ class System:
         for _, process in sorted(self.processes.items()):
             self.env.process(process.run())
 
-        # self.break_event if self.config.data.get('jobLimit') else self.config.data['until']
-        # TODO: set correct break event
-        self.env.run(until=100)
-        # self.env.run()
+        self.env.run(until=self.config.data['until'])
 
 
 def main():
