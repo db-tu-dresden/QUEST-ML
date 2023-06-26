@@ -24,7 +24,7 @@ class JobSchema(Schema):
 class Config:
 
     default_schema = Schema({
-        Or('jobLimit', 'until', only_one=True): And(Use(int), lambda x: x > 0),
+        'until': And(Use(int), lambda x: x > 0),
         'jobs': JobSchema([{
             'name': And(str, len),
             'arrivalProbability': And(Use(float), lambda x: 0 <= x <= 1),

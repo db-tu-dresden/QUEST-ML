@@ -1,4 +1,4 @@
-jobLimit: 100
+until: 100
 jobs:
   - name: 'A'
     arrivalProbability: 0.1
