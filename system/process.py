@@ -6,8 +6,9 @@ from system.queue import Queue
 
 
 class Process:
-    def __init__(self, env: Environment, queue: Queue = None):
+    def __init__(self, id: int, env: Environment, queue: Queue = None):
         super().__init__()
+        self.id = id
         self.queue = queue
         self.next = {}
 
@@ -32,8 +33,8 @@ class Process:
 
 
 class ArrivalProcess(Process):
-    def __init__(self, job_types: JobTypeCollection, env: Environment):
-        super().__init__(env)
+    def __init__(self, id: int, job_types: JobTypeCollection, env: Environment):
+        super().__init__(id, env)
         self.job_types = job_types
         self.last_job_id = -1
 

@@ -39,23 +39,24 @@ class System:
 
         for node, props in nodes:
             queue = Queue(props['data'], env=self.env)
-            process = Process(queue=queue, env=self.env)
+            process = Process(node, queue=queue, env=self.env)
             self.processes[node] = process
 
             for _, out, props in self.notation.graph.edges(node, data=True):
                 process.update_next({datum: self.processes[out] for datum in props['data']})
 
     def create_arrival_process(self):
-        arrival_process = ArrivalProcess(self.job_types, env=self.env)
+        arrival_process = ArrivalProcess(-1, self.job_types, env=self.env)
         self.processes[-1] = arrival_process
 
     def link_arrival_process(self):
         self.processes[-1].next = defaultdict(lambda: self.processes[0])
 
     def create_exit_process(self):
-        queue = Queue(self.data, env=self.env)
-        exit_process = ExitProcess(queue=queue, env=self.env)
         last_process_id, _ = sorted(self.processes.items(), reverse=True)[0]
+
+        queue = Queue(self.data, env=self.env)
+        exit_process = ExitProcess(last_process_id + 1, queue=queue, env=self.env)
         self.processes[last_process_id + 1] = exit_process
 
     def link_exit_process(self):
