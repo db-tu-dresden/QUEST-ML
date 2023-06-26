@@ -9,3 +9,4 @@ jobs:
   - name: 'C'
     arrivalProbability: 0.8
     failureRate: 0
+loggingRate: 0.1

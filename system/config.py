@@ -30,6 +30,7 @@ class Config:
             'arrivalProbability': And(Use(float), lambda x: 0 <= x <= 1),
             'failureRate': And(Use(float), lambda x: 0 <= x <= 1)
         }]),
+        'loggingRate': And(Use(float), lambda x: x > 0),
     })
 
     def __init__(self, path: str, schema: Schema = default_schema):

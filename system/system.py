@@ -28,7 +28,7 @@ class System:
         self.job_types = JobTypeCollection.from_config(self.config, env=self.env)
         self.processes = {}
 
-        self.logger = Logger(self)
+        self.logger = Logger(self.config['loggingRate'], self)
 
     def build_processes(self):
         if not self.notation.graph:

@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 
 
 class Logger:
-    def __init__(self, system: System):
+    def __init__(self, rate: float, system: System):
+        self.rate = rate
         self.system = system
         self.log = {}
 
@@ -29,7 +30,7 @@ class Logger:
     def process(self):
         self.log_processes()
 
-        yield self.system.env.timeout(0.1)
+        yield self.system.env.timeout(self.rate)
 
     def run(self):
         while True:
