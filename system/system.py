@@ -27,10 +27,6 @@ class System:
         self.job_types = JobTypeCollection.from_config(self.config, env=self.env)
         self.processes = {}
 
-    def get_job_types(self):
-        return [JobType(job['name'], job['arrivalProbability'], job['failureRate'], env=self.env)
-                for job in self.config['jobs']]
-
     def build_processes(self):
         if not self.notation.graph:
             raise Exception('Can not build system with no graph specified.')
