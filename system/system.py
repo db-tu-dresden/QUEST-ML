@@ -6,6 +6,7 @@ from notation import Notation
 from system.config import Config
 from system.environment import Environment
 from system.job import JobTypeCollection, JobType
+from system.logger import Logger
 from system.process import Process, ArrivalProcess, ExitProcess
 from system.queue import Queue
 
@@ -26,6 +27,8 @@ class System:
 
         self.job_types = JobTypeCollection.from_config(self.config, env=self.env)
         self.processes = {}
+
+        self.logger = Logger(self)
 
     def build_processes(self):
         if not self.notation.graph:
@@ -73,6 +76,8 @@ class System:
         self.processes = dict(sorted(self.processes.items()))
 
     def run(self):
+        self.env.process(self.logger.run())
+
         for _, process in sorted(self.processes.items()):
             self.env.process(process.run())
 
