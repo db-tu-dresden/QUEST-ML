@@ -17,14 +17,14 @@ class Process:
         self.next.update(update_dict)
 
     def push(self, job: Job):
-        yield self.queue.put(job)
+        return self.queue.put(job)
 
     def process(self):
         job = yield self.queue.get()
 
         yield self.env.process(job.service())
 
-        yield self.env.process(self.next[job.type.name].push(job))
+        yield self.next[job.type.name].push(job)
 
     def run(self):
         while True:
@@ -44,7 +44,7 @@ class ArrivalProcess(Process):
         self.last_job_id += 1
         job = self.job_types.get_rand_job(self.last_job_id)
 
-        yield self.env.process(self.next[job.type.name].push(job))
+        yield self.next[job.type.name].push(job)
 
 
 class ExitProcess(Process):
