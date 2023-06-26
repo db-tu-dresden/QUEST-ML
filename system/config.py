@@ -54,7 +54,7 @@ class Config:
 
 
 def main():
-    c = Config(path='config.yaml')
+    c = Config(path='../config.yaml')
     print(c)
 
 
