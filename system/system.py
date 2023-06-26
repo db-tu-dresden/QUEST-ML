@@ -5,7 +5,7 @@ from collections import defaultdict
 from notation import Notation
 from system.config import Config
 from system.environment import Environment
-from system.job import JobTypeCollection, JobType
+from system.job import JobTypeCollection
 from system.logger import Logger
 from system.process import Process, ArrivalProcess, ExitProcess
 from system.queue import Queue
