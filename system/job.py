@@ -49,7 +49,7 @@ class Job:
 
     def service(self):
         t = self.env.rng.normal(loc=1.0, scale=0.2)
-        yield self.env.timeout(t)
+        return self.env.timeout(t)
 
     def __repr__(self) -> str:
         return f'Job(id={self.id}, type={repr(self.type)})'

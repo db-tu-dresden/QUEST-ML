@@ -22,7 +22,7 @@ class Process:
     def process(self):
         job = yield self.queue.get()
 
-        yield self.env.process(job.service())
+        yield job.service()
 
         yield self.next[job.type.name].push(job)
 
