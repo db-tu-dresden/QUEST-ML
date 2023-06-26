@@ -74,6 +74,8 @@ class System:
         self.link_arrival_process()
         self.link_exit_process()
 
+        self.processes = dict(sorted(self.processes.items()))
+
     def run(self):
         for _, process in sorted(self.processes.items()):
             self.env.process(process.run())
