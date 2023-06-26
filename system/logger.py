@@ -1,8 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from system.job import Job
+if TYPE_CHECKING:
+    from system.system import System
 
 
 class Logger:
-    def __init__(self, system):
+    def __init__(self, system: System):
         self.system = system
         self.log = {}
 
