@@ -1,7 +1,7 @@
 from notation import Notation
-from system.config import Config
-from system.environment import Environment
-from system.system import System
+from system import Config
+from system import Environment
+from system import System
 
 
 def main():
