@@ -78,7 +78,7 @@ class System:
     def run(self):
         self.env.process(self.logger.run())
 
-        for _, process in sorted(self.processes.items()):
+        for _, process in self.processes.items():
             self.env.process(process.run())
 
         self.env.run(until=self.config.data['until'])
