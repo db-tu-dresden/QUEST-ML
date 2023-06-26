@@ -45,24 +45,33 @@ class System:
             for _, out, props in self.notation.graph.edges(node, data=True):
                 process.update_next({datum: self.processes[out] for datum in props['data']})
 
-    def add_arrival_and_exit_process(self):
+    def create_arrival_process(self):
         arrival_process = ArrivalProcess(self.job_types, env=self.env)
         self.processes[-1] = arrival_process
 
+    def link_arrival_process(self):
+        self.processes[-1].next = defaultdict(lambda: self.processes[0])
+
+    def create_exit_process(self):
         queue = Queue(self.data, env=self.env)
         exit_process = ExitProcess(queue=queue, env=self.env)
-        last_process_id, last_process = sorted(self.processes.items(), reverse=True)[0]
+        last_process_id, _ = sorted(self.processes.items(), reverse=True)[0]
         self.processes[last_process_id + 1] = exit_process
 
-        arrival_process.next = defaultdict(lambda: self.processes[0])
-        last_process.next = defaultdict(lambda: exit_process)
+    def link_exit_process(self):
+        last_process_id, last_process = sorted(self.processes.items(), reverse=True)[0]
+        self.processes[last_process_id - 1].next = defaultdict(lambda: last_process)
 
     def build(self):
         if not self.notation:
             raise Exception('Can not build system with no notation specified.')
 
         self.build_processes()
-        self.add_arrival_and_exit_process()
+
+        self.create_arrival_process()
+        self.create_exit_process()
+        self.link_arrival_process()
+        self.link_exit_process()
 
     def run(self):
         for _, process in sorted(self.processes.items()):
