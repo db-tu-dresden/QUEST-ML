@@ -39,31 +39,3 @@ class Logger:
     def run(self):
         while True:
             yield from self.process()
-
-    def get_log_process_data(self, process: int):
-        process_data = {}
-        for t in self.log.keys():
-            process_data[t] = sum(self.log[t][process].values())
-        return process_data
-
-    def get_log_processes_data(self):
-        data = {}
-        if not len(self.log):
-            return data
-
-        processes = self.log[0].keys()
-
-        for process in processes:
-            data[process] = self.get_log_process_data(process)
-        return data
-
-    def plot(self):
-        data = self.get_log_processes_data()
-
-        ncols = 4
-        nrows = math.ceil(len(data) / ncols)
-        fig, axs = plt.subplots(figsize=(16, 9), ncols=ncols, nrows=nrows)
-        for queue_data, ax in zip(data.values(), axs.ravel()):
-            ax.plot(queue_data.keys(), queue_data.values())
-
-        plt.show()
