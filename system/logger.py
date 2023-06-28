@@ -60,3 +60,16 @@ class Logger:
         self._df = pd.DataFrame(data)
 
         return self._df
+
+    def plot(self):
+        df = self.df
+        x = df.loc[:, 'step']
+
+        ncols = 4
+        nrows = math.ceil((len(df.columns) - 1) / ncols)
+        fig, axs = plt.subplots(figsize=(16, 9), ncols=ncols, nrows=nrows)
+
+        for (name, values), ax in zip(df.loc[:, df.columns != 'step'].items(), axs.ravel()):
+            ax.plot(x, [sum(v for v in entry.values()) for entry in values])
+
+        plt.show()
