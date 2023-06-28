@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 
+import numpy as np
+
 from notation import Notation
 from system.config import Config
 from system.environment import Environment
@@ -27,6 +29,8 @@ class System:
 
         self.job_types = JobTypeCollection.from_config(self.config, env=self.env)
         self.processes = {}
+        self.rng = np.random.default_rng(self.config['seed'])
+        self.rng_list = self.rng.spawn(len(self.notation.graph.nodes) + 2)
 
         self.logger = Logger(self.config['loggingRate'], self)
 
@@ -42,14 +46,14 @@ class System:
 
         for node, props in nodes:
             queue = Queue(props['data'], env=self.env)
-            process = Process(node, queue=queue, env=self.env)
+            process = Process(node, queue=queue, rng=self.rng_list[node], env=self.env)
             self.processes[node] = process
 
             for _, out, props in self.notation.graph.edges(node, data=True):
                 process.update_next({datum: self.processes[out] for datum in props['data']})
 
     def create_arrival_process(self):
-        arrival_process = ArrivalProcess(-1, self.job_types, env=self.env)
+        arrival_process = ArrivalProcess(-1, self.job_types, env=self.env, rng=self.rng_list[-2])
         self.processes[-1] = arrival_process
 
     def link_arrival_process(self):
@@ -59,7 +63,7 @@ class System:
         last_process_id, _ = sorted(self.processes.items(), reverse=True)[0]
 
         queue = Queue(self.data, env=self.env)
-        exit_process = ExitProcess(last_process_id + 1, queue=queue, env=self.env)
+        exit_process = ExitProcess(last_process_id + 1, queue=queue, rng=self.rng_list[-1], env=self.env)
         self.processes[last_process_id + 1] = exit_process
 
     def link_exit_process(self):

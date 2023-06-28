@@ -10,3 +10,4 @@ jobs:
     arrivalProbability: 0.8
     failureRate: 0
 loggingRate: 0.1
+seed: 42
