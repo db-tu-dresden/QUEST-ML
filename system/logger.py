@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING
 
+import pandas as pd
 from matplotlib import pyplot as plt
 
 from system.job import Job
@@ -17,6 +18,7 @@ class Logger:
         self.log = {}
 
         self.default_dist = {job_type.name: 0 for job_type in self.system.job_types.types}
+        self._df = pd.DataFrame()
 
     def get_job_dist(self, jobs: [Job]):
         dist = dict(self.default_dist)
@@ -39,3 +41,22 @@ class Logger:
     def run(self):
         while True:
             yield from self.process()
+
+    @property
+    def df(self):
+        steps = list(self.log.keys())
+
+        if not steps:
+            return self._df
+
+        data = {'step': steps}
+
+        processes = self.log[0].keys()
+        for process in processes:
+            process_data = []
+            for t in self.log.keys():
+                process_data.append(self.log[t][process])
+            data[process] = process_data
+        self._df = pd.DataFrame(data)
+
+        return self._df
