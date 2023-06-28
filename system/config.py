@@ -45,10 +45,8 @@ class Config:
         self.data = validate_yaml(self.data, self.schema)
 
     def __repr__(self):
-        return str({
-            'data': self.data,
-            'schema': self.schema,
-        })
+        cls = self.__class__.__name__
+        return f'{cls}(path={self.path!r}, schema={self.schema!r})'
 
     def __getitem__(self, item):
         return self.data[item]
