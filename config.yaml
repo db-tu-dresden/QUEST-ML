@@ -1,4 +1,6 @@
-until: 100
+until: 1000
+loggingRate: 0.1
+seed: 42
 jobs:
   - name: 'A'
     arrivalProbability: 0.1
@@ -9,5 +11,8 @@ jobs:
   - name: 'C'
     arrivalProbability: 0.8
     failureRate: 0
-loggingRate: 0.1
-seed: 42
+arrivalProcess:
+  beta: 1.0
+processes:
+  mean: 1.0
+  std: 0.2

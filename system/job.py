@@ -51,8 +51,8 @@ class Job:
         self.type = type
         self.env = env
 
-    def service(self, rng: np.random.Generator):
-        t = rng.normal(loc=1.0, scale=0.2)
+    def service(self, rng: np.random.Generator, mean: float, std: float):
+        t = rng.normal(loc=mean, scale=std)
         return self.env.timeout(t)
 
     def __repr__(self) -> str:

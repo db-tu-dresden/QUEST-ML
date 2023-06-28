@@ -1,19 +1,21 @@
 from __future__ import annotations
 
-import numpy as np
-
 from system.environment import Environment
 from system.job import Job, JobTypeCollection
 from system.queue import Queue
+from system.random import RandomContainer
 
 
 class Process:
-    def __init__(self, id: int, env: Environment, rng: np.random.Generator, queue: Queue = None):
+    def __init__(self, id: int, env: Environment, rnd: RandomContainer, queue: Queue = None):
         super().__init__()
         self.id = id
         self.queue = queue
         self.next = {}
-        self.rng = rng
+        self.rng = rnd.rng
+        self.mean = rnd.mean
+        self.std = rnd.std
+        self.beta = rnd.beta
 
         self.env = env
 
@@ -29,7 +31,7 @@ class Process:
         job = yield self.queue.get()
         self.job = job
 
-        yield job.service(self.rng)
+        yield job.service(self.rng, self.mean, self.std)
 
         self.job = None
         yield self.next[job.type.name].push(job)
@@ -44,13 +46,13 @@ class Process:
 
 
 class ArrivalProcess(Process):
-    def __init__(self, id: int, job_types: JobTypeCollection, env: Environment, rng: np.random.Generator):
-        super().__init__(id, env, rng)
+    def __init__(self, id: int, job_types: JobTypeCollection, env: Environment, rnd: RandomContainer):
+        super().__init__(id, env, rnd)
         self.job_types = job_types
         self.last_job_id = -1
 
     def process(self):
-        t = self.rng.exponential()
+        t = self.rng.exponential(scale=self.beta)
         yield self.env.timeout(t)
 
         self.last_job_id += 1
