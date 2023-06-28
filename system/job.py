@@ -18,7 +18,8 @@ class JobType:
         return hash(self.name)
 
     def __repr__(self):
-        return f'JobType(name={self.name}, arrival_prob={self.arrival_prob}, failure_rate={self.failure_rate})'
+        cls = self.__class__.__name__
+        return f'{cls}(name={self.name!r}, arrival_prob={self.arrival_prob!r}, failure_rate={self.failure_rate!r})'
 
 
 class JobTypeCollection:
@@ -39,7 +40,8 @@ class JobTypeCollection:
         return cls(types, env=env)
 
     def __repr__(self):
-        return f'JobTypeCollection(types={repr(set(type for type in self.types))})'
+        cls = self.__class__.__name__
+        return f'{cls}(types={set(type for type in self.types)!r}, env={self.env!r})'
 
 
 class Job:
@@ -54,4 +56,5 @@ class Job:
         return self.env.timeout(t)
 
     def __repr__(self) -> str:
-        return f'Job(id={self.id}, type={repr(self.type)})'
+        cls = self.__class__.__name__
+        return f'{cls}(id={self.id!r}, type={self.type!r})'
