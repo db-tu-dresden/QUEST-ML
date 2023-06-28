@@ -34,6 +34,10 @@ class Process:
         while True:
             yield from self.process()
 
+    def __repr__(self):
+        cls = self.__class__.__name__
+        return f'{cls}(id={self.id!r}, env={self.env!r}, queue={self.queue!r})'
+
 
 class ArrivalProcess(Process):
     def __init__(self, id: int, job_types: JobTypeCollection, env: Environment):
@@ -49,6 +53,10 @@ class ArrivalProcess(Process):
         job = self.job_types.get_rand_job(self.last_job_id, self.rng)
 
         yield self.next[job.type.name].push(job)
+
+    def __repr__(self):
+        cls = self.__class__.__name__
+        return f'{cls}(id={self.id!r}, job_types={self.job_types!r}, env={self.env!r})'
 
 
 class ExitProcess(Process):
