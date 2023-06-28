@@ -48,6 +48,12 @@ class Config:
         cls = self.__class__.__name__
         return f'{cls}(path={self.path!r}, schema={self.schema!r})'
 
+    def __str__(self):
+        return str({
+            'data': self.data,
+            'schema': self.schema,
+        })
+
     def __getitem__(self, item):
         return self.data[item]
 
