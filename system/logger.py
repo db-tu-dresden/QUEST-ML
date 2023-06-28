@@ -20,6 +20,10 @@ class Logger:
         self.default_dist = {job_type.name: 0 for job_type in self.system.job_types.types}
         self._df = pd.DataFrame()
 
+    def __repr__(self):
+        cls = self.__class__.__name__
+        return f'{cls}(rate={self.rate!r}, system={self.system!r})'
+
     def get_job_dist(self, jobs: [Job]):
         dist = dict(self.default_dist)
         for job in jobs:
