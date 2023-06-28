@@ -1,3 +1,5 @@
+import numpy as np
+
 from system.config import Config
 from system.environment import Environment
 
@@ -26,8 +28,8 @@ class JobTypeCollection:
         self.types = types
         self.env = env
 
-    def get_rand_job(self, job_id):
-        job_type = self.env.rng.choice(list(self.types), p=[job_type.arrival_prob for job_type in self.types])
+    def get_rand_job(self, job_id: int, rng: np.random.Generator):
+        job_type = rng.choice(list(self.types), p=[job_type.arrival_prob for job_type in self.types])
         return Job(job_id, job_type, env=self.env)
 
     @classmethod
@@ -47,8 +49,8 @@ class Job:
         self.type = type
         self.env = env
 
-    def service(self):
-        t = self.env.rng.normal(loc=1.0, scale=0.2)
+    def service(self, rng: np.random.Generator):
+        t = rng.normal(loc=1.0, scale=0.2)
         return self.env.timeout(t)
 
     def __repr__(self) -> str:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import numpy as np
+
 from system.environment import Environment
 from system.job import Job, JobTypeCollection
 from system.queue import Queue
@@ -11,6 +13,7 @@ class Process:
         self.id = id
         self.queue = queue
         self.next = {}
+        self.rng = np.random.default_rng(seed=42)
 
         self.env = env
 
@@ -23,7 +26,7 @@ class Process:
     def process(self):
         job = yield self.queue.get()
 
-        yield job.service()
+        yield job.service(self.rng)
 
         yield self.next[job.type.name].push(job)
 
@@ -39,11 +42,11 @@ class ArrivalProcess(Process):
         self.last_job_id = -1
 
     def process(self):
-        t = self.env.rng.exponential()
+        t = self.rng.exponential()
         yield self.env.timeout(t)
 
         self.last_job_id += 1
-        job = self.job_types.get_rand_job(self.last_job_id)
+        job = self.job_types.get_rand_job(self.last_job_id, self.rng)
 
         yield self.next[job.type.name].push(job)
 
