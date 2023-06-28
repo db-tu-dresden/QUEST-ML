@@ -33,8 +33,11 @@ class Logger:
     def log_processes(self):
         job_dists = {}
         for _, process in self.system.processes.items():
-            if process.queue:
-                job_dists[process.id] = self.get_job_dist(process.queue.items)
+            if not process.queue:
+                continue
+            job_dists[process.id] = self.get_job_dist(process.queue.items)
+            if process.job:
+                job_dists[process.id][process.job.type.name] += 1
         self.log[round(self.system.env.now, 1)] = job_dists
 
     def process(self):

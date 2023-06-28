@@ -17,6 +17,8 @@ class Process:
 
         self.env = env
 
+        self.job = None
+
     def update_next(self, update_dict: {str: Process}):
         self.next.update(update_dict)
 
@@ -25,9 +27,11 @@ class Process:
 
     def process(self):
         job = yield self.queue.get()
+        self.job = job
 
         yield job.service(self.rng)
 
+        self.job = None
         yield self.next[job.type.name].push(job)
 
     def run(self):
