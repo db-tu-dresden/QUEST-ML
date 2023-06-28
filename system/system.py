@@ -30,6 +30,10 @@ class System:
 
         self.logger = Logger(self.config['loggingRate'], self)
 
+    def __repr__(self):
+        cls = self.__class__.__name__
+        return f'{cls}(config={self.config!r}, notation={self.notation!r}, env={self.env!r})'
+
     def build_processes(self):
         if not self.notation.graph:
             raise Exception('Can not build system with no graph specified.')
