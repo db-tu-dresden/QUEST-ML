@@ -11,7 +11,7 @@ class Parseable:
     class Exception(Exception):
         pass
 
-    def __init__(self, value: str):
+    def __init__(self, value: Any):
         self.value = value
         self.next = None
         self.data = None
@@ -33,7 +33,7 @@ class Parseable:
         return cls(match.group())
 
     def validate_data_flow(self, incoming_data: DataFlowElement):
-        self.data = incoming_data
+        self.data = DataFlowElement(set(incoming_data.value))
         if self.next:
             self.next.validate_data_flow(self.data)
 
