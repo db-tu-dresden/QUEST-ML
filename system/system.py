@@ -27,6 +27,7 @@ class System:
         self.data = self.notation.data.value
 
         self.env = env
+        env.system = self
 
         self.job_types = JobTypeCollection.from_config(self.config, env=self.env)
         self.processes = {}

@@ -20,11 +20,13 @@ class Process:
         self.env = env
 
         self.job = None
+        self.job_dist = {elem: 0 for elem in self.env.system.data}
 
     def update_next(self, update_dict: {str: Process}):
         self.next.update(update_dict)
 
     def push(self, job: Job):
+        self.job_dist[job.type.name] += 1
         return self.queue.put(job)
 
     def process(self):
@@ -34,6 +36,7 @@ class Process:
         yield job.service(self.rng, self.mean, self.std)
 
         self.job = None
+        self.job_dist[job.type.name] -= 1
         yield self.next[job.type.name].push(job)
 
     def run(self):

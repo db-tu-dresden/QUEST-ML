@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from system.job import Job
+from system.process import ArrivalProcess
 if TYPE_CHECKING:
     from system.system import System
 
@@ -24,20 +24,12 @@ class Logger:
         cls = self.__class__.__name__
         return f'{cls}(rate={self.rate!r}, system={self.system!r})'
 
-    def get_job_dist(self, jobs: [Job]):
-        dist = dict(self.default_dist)
-        for job in jobs:
-            dist[job.type.name] += 1
-        return dist
-
     def log_processes(self):
         job_dists = {}
-        for _, process in self.system.processes.items():
-            if not process.queue:
+        for i, process in self.system.processes.items():
+            if isinstance(process, ArrivalProcess):
                 continue
-            job_dists[process.id] = self.get_job_dist(process.queue.items)
-            if process.job:
-                job_dists[process.id][process.job.type.name] += 1
+            job_dists[process.id] = dict(process.job_dist)
         self.log[round(self.system.env.now, 1)] = job_dists
 
     def process(self):
