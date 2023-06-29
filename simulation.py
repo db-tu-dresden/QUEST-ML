@@ -18,6 +18,7 @@ def main():
     system = System(config, notation, env=env)
     system.build()
     system.run()
+    system.logger.save_df('./data/df.pkl')
 
 
 if __name__ == '__main__':

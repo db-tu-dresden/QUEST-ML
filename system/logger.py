@@ -68,6 +68,9 @@ class Logger:
 
         return self._df
 
+    def save_df(self, path: str):
+        self.df.to_pickle(path)
+
     def plot(self):
         df = self.df
         x = df.loc[:, 'step']
