@@ -76,7 +76,7 @@ Plot:
 ### Example 2
 Notation:
 ```
-[A,B]
+[A,B,C]
 <[($1: [A,C]), ($2: [B])]>
 $1: !1
 $2: !1
@@ -87,7 +87,7 @@ Plot:
 ![example plot 2](example_plot_2.png)
 
 
-### Example 1
+### Example 3
 Notation:
 ```
 [A,B,C]
