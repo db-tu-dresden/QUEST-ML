@@ -214,8 +214,13 @@ class Anchor(Parseable):
         if not node_id:
             graph.last_node_id += 1
             node_id = graph.last_node_id
-            graph.add_node(node_id, id=self.value, data=self.data.value)
-        graph.add_edge(root, node_id, data=self.data.value)
+            graph.add_node(node_id, id=self.value, data=set(self.data.value))
+            edge_data = self.data.value
+        else:
+            root_data = graph.nodes[root]['data']
+            graph.nodes[node_id]['data'].update(root_data)
+            edge_data = root_data
+        graph.add_edge(root, node_id, data=edge_data)
         if self.next:
             return self.next.add_to_graph(graph, node_id)
         return [node_id]
