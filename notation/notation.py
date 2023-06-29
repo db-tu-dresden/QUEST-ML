@@ -101,7 +101,7 @@ class Fork(Parseable):
             graph.add_node(end_id, data=self.data.value)
 
             for ref_id in last_ids:
-                graph.add_edge(ref_id, end_id, data=self.data.value)
+                graph.add_edge(ref_id, end_id, data=graph.nodes(data=True)[ref_id]['data'])
             last_ids = [end_id]
             if self.next:
                 return self.next.add_to_graph(graph, end_id)
