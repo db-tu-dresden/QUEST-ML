@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from typing import Any
 
 from notation.graph import Graph
 
@@ -33,7 +34,10 @@ class Parseable:
         return cls(match.group())
 
     def validate_data_flow(self, incoming_data: DataFlowElement):
-        self.data = DataFlowElement(set(incoming_data.value))
+        if self.data:
+            self.data.value.update(incoming_data.value)
+        else:
+            self.data = DataFlowElement(set(incoming_data.value))
         if self.next:
             self.next.validate_data_flow(self.data)
 
