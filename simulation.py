@@ -2,6 +2,7 @@ from notation import Notation
 from system import Config
 from system import Environment
 from system import System
+import timing
 
 
 def main():
