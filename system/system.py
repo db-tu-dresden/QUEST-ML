@@ -18,9 +18,9 @@ class System:
     def __init__(self, config: Config, notation: Notation, env: Environment):
         super().__init__()
         if config is None or not isinstance(config, Config):
-            raise ValueError(f'Config must be specified and of type Config. Got {repr(config)}')
+            raise ValueError(f'Config must be specified and of type Config. Got {config!r}')
         if notation is None or not isinstance(notation, Notation):
-            raise ValueError(f'Notation must be specified and of type Notation. Got {repr(notation)}')
+            raise ValueError(f'Notation must be specified and of type Notation. Got {notation!r}')
         config_data = set(job['name'] for job in config['jobs'])
         if config_data != notation.data.value:
             raise ValueError(f'Config and notation do not have the same data elements. '
