@@ -115,7 +115,7 @@ class Fork(Parseable):
 
 
 class ReferenceList(Parseable):
-    PATTERN = r'\[((?:.+,\s?)+.+)\]'
+    PATTERN = r'\[((?:[^->]+,\s?)+[^->]+)\]'
 
     class ReferenceListParseException(Exception):
         pass
