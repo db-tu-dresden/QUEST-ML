@@ -21,6 +21,10 @@ class System:
             raise ValueError(f'Config must be specified and of type Config. Got {repr(config)}')
         if notation is None or not isinstance(notation, Notation):
             raise ValueError(f'Notation must be specified and of type Notation. Got {repr(notation)}')
+        config_data = set(job['name'] for job in config['jobs'])
+        if config_data != notation.data.value:
+            raise ValueError(f'Config and notation do not have the same data elements. '
+                             f'Got {config_data!r} from config and {notation.data.value!r} from notation.')
 
         self.config = config
         self.notation = notation
