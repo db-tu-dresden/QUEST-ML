@@ -93,7 +93,7 @@ class Graph:
             width=1,
             linewidths=1,
             node_size=500,
-            node_color=['lightblue', *['pink'] * (self.last_node_id - 1), 'lightblue'],
+            node_color=['lightblue', *['pink'] * (len(self.nodes) - 2), 'lightblue'],
             alpha=0.9,
             with_labels=True
         )
