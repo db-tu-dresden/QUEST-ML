@@ -9,6 +9,7 @@ def main():
         text = f.read()
 
     notation = Notation.parse(text)
+    notation.draw()
 
     config = Config('config.yaml')
 
