@@ -73,5 +73,6 @@ class Logger:
 
         for (name, values), ax in zip(df.loc[:, df.columns != 'step'].items(), axs.ravel()):
             ax.plot(x, [sum(v for v in entry.values()) for entry in values])
+            ax.set_title(f'Process {name}')
 
         plt.show()
