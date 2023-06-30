@@ -223,17 +223,22 @@ class Anchor(Parseable):
         return anchor
 
     def add_to_graph(self, graph: Graph, root: int):
-        node_id = graph.get_node_by_id(self.value)
-        if not node_id:
-            graph.last_node_id += 1
-            node_id = graph.last_node_id
-            graph.add_node(node_id, id=self.value, data=set(self.data.value))
-            edge_data = self.data.value
-        else:
-            root_data = graph.nodes[root]['data']
-            graph.nodes[node_id]['data'].update(root_data)
-            edge_data = root_data
-        graph.add_edge(root, node_id, data=edge_data)
+        edges = []
+        node_data = set()
+        root_data = graph.nodes[root]['data']
+
+        old_node_id = graph.get_node_by_id(self.value)
+        if old_node_id:
+            node_data.update(graph.nodes[old_node_id]['data'])
+            edges = list(graph.in_edges(old_node_id, data=True))
+            graph.remove_edges_from(edges)
+            graph.remove_node(old_node_id)
+
+        graph.last_node_id += 1
+        self.node_id = graph.last_node_id
+        graph.add_node(self.node_id, id=self.value, data=node_data.union(root_data))
+        graph.add_edges_from([(n, self.node_id, data) for n, _, data in edges])
+        graph.add_edge(root, self.node_id, data=root_data)
         if self.next:
             return self.next.add_to_graph(graph, self.node_id)
         return [self]
