@@ -55,6 +55,9 @@ class Job:
         t = rng.normal(loc=mean, scale=std)
         return self.env.timeout(t)
 
+    def did_fail(self, rng: np.random.Generator):
+        return self.type.failure_rate > rng.uniform()
+
     def __repr__(self) -> str:
         cls = self.__class__.__name__
         return f'{cls}(id={self.id!r}, type={self.type!r})'

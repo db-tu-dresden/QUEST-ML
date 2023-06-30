@@ -45,7 +45,11 @@ class Process:
 
         yield job.service(self.rng, self.mean, self.std)
 
-        yield self.job_to_next()
+        if job.did_fail(self.rng):
+            job = self.remove_current_job()
+            yield self.push(job)
+        else:
+            yield self.job_to_next()
 
     def run(self):
         while True:
