@@ -16,6 +16,7 @@ class Parseable:
         self.value = value
         self.next = None
         self.data = None
+        self.node_id = None
 
     @classmethod
     def match(cls, string: str):
@@ -64,10 +65,10 @@ class Line(Parseable):
         return cls(string, count)
 
     def add_to_graph(self, graph: Graph, root: int) -> [int]:
-        last_id = graph.join_nodes(self.count, root, data=self.data.value)
+        self.node_id = graph.join_nodes(self.count, root, data=self.data.value)
         if self.next:
-            return self.next.add_to_graph(graph, last_id)
-        return [last_id]
+            return self.next.add_to_graph(graph, self.node_id)
+        return [self]
 
 
 class Fork(Parseable):
@@ -97,21 +98,23 @@ class Fork(Parseable):
             self.next.validate_data_flow(incoming_data)
 
     def add_to_graph(self, graph: Graph, root: int) -> [int]:
-        last_ids = self.ref_list.add_to_graph(graph, root)
+        last_nodes = self.ref_list.add_to_graph(graph, root)
 
         if self.end:
             graph.last_node_id += 1
             end_id = graph.last_node_id
+            self.node_id = end_id
             graph.add_node(end_id, data=self.data.value)
 
-            for ref_id in last_ids:
-                graph.add_edge(ref_id, end_id, data=graph.nodes(data=True)[ref_id]['data'])
-            last_ids = [end_id]
+            for node in last_nodes:
+                node_id = node.node_id
+                graph.add_edge(node_id, end_id, data=graph.nodes(data=True)[node_id]['data'])
+            last_nodes = [self]
             if self.next:
                 return self.next.add_to_graph(graph, end_id)
         elif self.next:
             raise Exception('Fork not closed but next element specified.')
-        return last_ids
+        return last_nodes
 
 
 class ReferenceList(Parseable):
@@ -132,12 +135,12 @@ class ReferenceList(Parseable):
         return cls(string, [Reference.parse(string, notation) for string in strings])
 
     def add_to_graph(self, graph: Graph, root: int) -> [int]:
-        last_ids = []
+        last_nodes = []
         for ref in self.refs:
             node = graph.join_node(root, data=ref.data.value)
-            last_ids.extend(ref.add_to_graph(graph, node))
+            last_nodes.extend(ref.add_to_graph(graph, node))
 
-        return set(last_ids)
+        return set(last_nodes)
 
     def validate_data_flow(self, incoming_data: DataFlowElement):
         self.data = incoming_data
@@ -232,8 +235,8 @@ class Anchor(Parseable):
             edge_data = root_data
         graph.add_edge(root, node_id, data=edge_data)
         if self.next:
-            return self.next.add_to_graph(graph, node_id)
-        return [node_id]
+            return self.next.add_to_graph(graph, self.node_id)
+        return [self]
 
 
 class Sequence(Parseable):
