@@ -17,6 +17,10 @@ class Graph:
         return self.graph.nodes(**kwargs)
 
     @cached_property
+    def in_edges(self, *args, **kwargs):
+        return self.graph.in_edges(*args, **kwargs)
+
+    @cached_property
     def edges(self, *args, **kwargs):
         return self.graph.edges(*args, **kwargs)
 
@@ -34,6 +38,9 @@ class Graph:
 
     def add_edges_from(self, ebunch_to_add, **attr):
         self.graph.add_edges_from(ebunch_to_add, **attr)
+
+    def remove_edges_from(self, ebunch):
+        return self.graph.remove_edges_from(ebunch)
 
     def join_node(self, root: int = None, data=None):
         if root is None:
