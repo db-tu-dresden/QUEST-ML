@@ -42,7 +42,7 @@ class Parseable:
         if self.next:
             self.next.validate_data_flow(self.data)
 
-    def add_to_graph(self, graph: Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: Graph, root: int) -> [Parseable]:
         pass
 
 
@@ -64,7 +64,7 @@ class Line(Parseable):
 
         return cls(string, count)
 
-    def add_to_graph(self, graph: Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: Graph, root: int) -> [Parseable]:
         self.node_id = graph.join_nodes(self.count, root, data=self.data.value)
         if self.next:
             return self.next.add_to_graph(graph, self.node_id)
@@ -97,7 +97,7 @@ class Fork(Parseable):
         if self.next:
             self.next.validate_data_flow(incoming_data)
 
-    def add_to_graph(self, graph: Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: Graph, root: int) -> [Parseable]:
         last_nodes = self.ref_list.add_to_graph(graph, root)
 
         if self.end:
@@ -134,7 +134,7 @@ class ReferenceList(Parseable):
         strings = [string[m.start():m.end()] for m in re.finditer(Reference.PATTERN, string)]
         return cls(string, [Reference.parse(string, notation) for string in strings])
 
-    def add_to_graph(self, graph: Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: Graph, root: int) -> [Parseable]:
         last_nodes = []
         for ref in self.refs:
             node = graph.join_node(root, data=ref.data.value)
@@ -179,7 +179,7 @@ class Reference(Parseable):
         if self.next:
             self.next.validate_data_flow(self.data)
 
-    def add_to_graph(self, graph: Graph, root: int) -> [int]:
+    def add_to_graph(self, graph: Graph, root: int) -> [Parseable]:
         if self.next:
             return self.next.add_to_graph(graph, root)
         return [Parseable(None, node_id=root)]
