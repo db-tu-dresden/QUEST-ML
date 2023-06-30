@@ -1,7 +1,5 @@
 from notation import Notation
-from system import Config
-from system import Environment
-from system import System
+from system import Config, Environment, System
 import timing
 
 
