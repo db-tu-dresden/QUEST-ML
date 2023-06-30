@@ -11,6 +11,7 @@ class Graph:
         self.root_id = None
         self.last_node_id = last_node_id
         self.anchor_nodes = {}
+        self.draw_node_data = False
 
     @cached_property
     def nodes(self, **kwargs):
@@ -95,8 +96,12 @@ class Graph:
             node_size=500,
             node_color=['lightblue', *['pink'] * (len(self.nodes) - 2), 'lightblue'],
             alpha=0.9,
-            with_labels=True
+            with_labels=not self.draw_node_data
         )
+
+        if self.draw_node_data:
+            node_labels = {n[0]: str(n[1]['data']) for n in self.graph.nodes(data=True) if n[1] and n[1]['data']}
+            nx.draw_networkx_labels(self.graph, pos, labels=node_labels)
 
         edge_labels = {(e[0], e[1]): str(e[2]['data'])
                        for e in self.graph.edges(data=True) if e[2] and e[2]['data']}
