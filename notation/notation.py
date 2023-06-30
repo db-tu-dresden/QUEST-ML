@@ -29,7 +29,7 @@ class Parseable:
         return match
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         match = cls._force_match(string)
         return cls(match.group())
 
@@ -56,7 +56,7 @@ class Line(Parseable):
         self.count = count
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         match = cls._force_match(string)
 
         count = int(match.group(1)) + 2 if match.group(1) else len(string)
@@ -82,10 +82,10 @@ class Fork(Parseable):
         self.end = end
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         match = cls._force_match(string)
 
-        ref_list = ReferenceList.parse(match.group(1))
+        ref_list = ReferenceList.parse(match.group(1), notation)
         end = match.group(2) is not None
 
         return cls(string, ref_list, end)
@@ -125,11 +125,11 @@ class ReferenceList(Parseable):
         self.refs = refs
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         match = cls._force_match(string)
 
         strings = [string[m.start():m.end()] for m in re.finditer(Reference.PATTERN, string)]
-        return cls(string, [Reference.parse(string) for string in strings])
+        return cls(string, [Reference.parse(string, notation) for string in strings])
 
     def add_to_graph(self, graph: Graph, root: int) -> [int]:
         last_ids = []
@@ -164,11 +164,11 @@ class Reference(Parseable):
         self.data = data
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         match = cls._force_match(string)
 
         value = match.group(1)
-        data = DataFlowElement.parse(match.group(2))
+        data = DataFlowElement.parse(match.group(2), notation)
 
         return cls(value, data)
 
@@ -194,11 +194,11 @@ class ReferenceDefinition(Parseable):
         self.seq = seq
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         match = cls._force_match(string)
 
         key = match.group(1)
-        seq = Sequence.parse(match.group(2).strip())
+        seq = Sequence.parse(match.group(2).strip(), notation)
 
         return cls(string, key, seq)
 
@@ -208,6 +208,16 @@ class Anchor(Parseable):
 
     class AnchorParseException(Exception):
         pass
+
+    @classmethod
+    def parse(cls, string: str, notation: Notation):
+        match = cls._force_match(string)
+        anchor = next((anchor for anchor in notation.anchors if anchor.value == match.group()), None)
+        if anchor:
+            return anchor
+        anchor = cls(match.group())
+        notation.anchors.update([anchor])
+        return anchor
 
     def add_to_graph(self, graph: Graph, root: int):
         node_id = graph.get_node_by_id(self.value)
@@ -238,7 +248,7 @@ class Sequence(Parseable):
         self.next = next
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         original_string = string
         first = None
         last = None
@@ -251,7 +261,7 @@ class Sequence(Parseable):
                     did_match = True
                     elem = string[:match.end()]
                     string = string[match.end():]
-                    elem = parseable.parse(elem)
+                    elem = parseable.parse(elem, notation)
 
                     if not first:
                         first = elem
@@ -276,7 +286,7 @@ class DataFlowElement(Parseable):
     PATTERN = r'\[(?:\w+(?:, ?)?)*\]'
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str, notation: Notation):
         match = cls._force_match(string)
         return cls(set(re.findall(r'\w+', string)))
 
@@ -303,6 +313,7 @@ class Notation:
     def __init__(self):
         self.elements = [Line, Fork, Reference, Anchor]
         self.refs = {}
+        self.anchors = set()
         self.seq = None
         self.data = None
         self.graph = None
@@ -332,11 +343,11 @@ class Notation:
         self = cls()
         data_str, string, *ref_defs = [elem for elem in string.split('\n') if elem]
 
-        self.data = DataFlowElement.parse(data_str)
-        self.seq = Sequence.parse(string)
+        self.data = DataFlowElement.parse(data_str, self)
+        self.seq = Sequence.parse(string, self)
 
         for ref_def in ref_defs:
-            ref = ReferenceDefinition.parse(ref_def)
+            ref = ReferenceDefinition.parse(ref_def, self)
             self.refs.update({ref.key: ref})
 
         self._resolve_refs()
