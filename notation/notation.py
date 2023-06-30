@@ -140,7 +140,7 @@ class ReferenceList(Parseable):
             node = graph.join_node(root, data=ref.data.value)
             last_nodes.extend(ref.add_to_graph(graph, node))
 
-        return set(last_nodes)
+        return list(set(last_nodes))
 
     def validate_data_flow(self, incoming_data: DataFlowElement):
         self.data = incoming_data
