@@ -26,7 +26,7 @@ class Config:
     default_schema = Schema({
         'until': And(Use(int), lambda x: x > 0),
         'loggingRate': And(Use(float), lambda x: x > 0),
-        'seed': object,
+        'randomSeed': object,
         'jobs': JobSchema([{
             'name': And(str, len),
             'arrivalProbability': And(Use(float), lambda x: 0 <= x <= 1),

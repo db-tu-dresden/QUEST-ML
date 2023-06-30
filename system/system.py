@@ -31,7 +31,7 @@ class System:
 
         self.job_types = JobTypeCollection.from_config(self.config, env=self.env)
         self.processes = {}
-        self.rng = np.random.default_rng(self.config['seed'])
+        self.rng = np.random.default_rng(self.config['randomSeed'])
         self.rng_list = self.rng.spawn(len(self.notation.graph.nodes) + 2)
         self.rand_containers = [RandomContainer(rng,
                                                 mean=self.config['processes']['mean'],

@@ -1,6 +1,6 @@
 until: 1000
 loggingRate: 0.1
-seed: 42
+randomSeed: 42
 jobs:
   - name: 'A'
     arrivalProbability: 0.1
