@@ -29,15 +29,23 @@ class Process:
         self.job_dist[job.type.name] += 1
         return self.queue.put(job)
 
+    def remove_current_job(self):
+        job = self.job
+        self.job = None
+        self.job_dist[job.type.name] -= 1
+        return job
+
+    def job_to_next(self):
+        job = self.remove_current_job()
+        return self.next[job.type.name].push(job)
+
     def process(self):
         job = yield self.queue.get()
         self.job = job
 
         yield job.service(self.rng, self.mean, self.std)
 
-        self.job = None
-        self.job_dist[job.type.name] -= 1
-        yield self.next[job.type.name].push(job)
+        yield self.job_to_next()
 
     def run(self):
         while True:
