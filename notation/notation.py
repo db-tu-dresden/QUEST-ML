@@ -71,7 +71,7 @@ class Line(Parseable):
 
 
 class Fork(Parseable):
-    PATTERN = r'<(\[.*\])(>)?'
+    PATTERN = r'<(\[[^->]*\])(>)?'
 
     class ForkParseException(Exception):
         pass
