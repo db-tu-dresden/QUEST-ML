@@ -40,12 +40,11 @@ class Process:
         return self.next[job.type.name].push(job)
 
     def process(self):
-        job = yield self.queue.get()
-        self.job = job
+        self.job = yield self.queue.get()
 
-        yield job.service(self.rng, self.mean, self.std)
+        yield self.job.service(self.rng, self.mean, self.std)
 
-        if job.did_fail(self.rng):
+        if self.job.did_fail(self.rng):
             job = self.remove_current_job()
             yield self.push(job)
         else:
