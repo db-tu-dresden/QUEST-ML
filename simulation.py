@@ -17,6 +17,7 @@ def main():
     system = System(config, notation, env=env)
     system.build()
     system.run()
+    system.logger.plot()
     system.logger.save_df('./save/df.pkl')
 
 
