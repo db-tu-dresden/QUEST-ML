@@ -12,11 +12,11 @@ class Parseable:
     class Exception(Exception):
         pass
 
-    def __init__(self, value: Any):
+    def __init__(self, value: Any, node_id: int = None):
         self.value = value
+        self.node_id = node_id
         self.next = None
         self.data = None
-        self.node_id = None
 
     @classmethod
     def match(cls, string: str):
@@ -182,7 +182,7 @@ class Reference(Parseable):
     def add_to_graph(self, graph: Graph, root: int) -> [int]:
         if self.next:
             return self.next.add_to_graph(graph, root)
-        return []
+        return [Parseable(None, node_id=root)]
 
 
 class ReferenceDefinition(Parseable):
