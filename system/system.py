@@ -100,7 +100,7 @@ class System:
         for _, process in self.processes.items():
             self.env.process(process.run())
 
-        self.env.run(until=self.config.data['until'])
+        self.env.run(until=self.config['until'])
 
 
 def main():
