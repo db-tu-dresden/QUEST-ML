@@ -85,7 +85,7 @@ class Graph:
             (node for node, data in self.graph.nodes(data=True) if data.get('id') == id),
             None)
 
-    def draw(self):
+    def draw(self, path: str = None, show: bool = True):
         pos = nx.spring_layout(self.graph)
         plt.figure()
         nx.draw(
@@ -112,7 +112,11 @@ class Graph:
             font_color='red'
         )
         plt.axis('off')
-        plt.show()
+
+        if path:
+            plt.savefig(path)
+        if show:
+            plt.show()
 
 
 if __name__ == '__main__':

@@ -63,7 +63,7 @@ class Logger:
     def save_df(self, path: str):
         self.df.to_pickle(path)
 
-    def plot(self):
+    def plot(self, path: str = None, show: bool = True):
         df = self.df
         x = df.loc[:, 'step']
 
@@ -75,4 +75,7 @@ class Logger:
             ax.plot(x, [sum(v for v in entry.values()) for entry in values])
             ax.set_title(f'Process {name}')
 
-        plt.show()
+        if path:
+            plt.savefig(path)
+        if show:
+            plt.show()

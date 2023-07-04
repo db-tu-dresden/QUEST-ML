@@ -373,8 +373,8 @@ class Notation:
         root = self.graph.join_node(data=self.data.value)
         self.seq.add_to_graph(self.graph, root)
 
-    def draw(self):
-        self.graph.draw()
+    def draw(self, path: str = None, show: bool = True):
+        self.graph.draw(path=path, show=show)
 
 
 def main():
