@@ -1,0 +1,21 @@
+epochs: 100
+learning_rate: 0.1
+momentum: 0.9
+batch_size: 1
+
+job_id: -1
+
+pin_memory: True
+set_gradients_none: False
+fp16: False
+allow_tf32: False
+
+master_addr:
+device:
+
+min_checkpoint_epoch: 10
+min_checkpoint_epoch_dist: 0
+
+root_dir: ''
+checkpoint_path: ''
+model_save_path: ''

@@ -7,7 +7,7 @@ import torch.cuda
 import torch.distributed as dist
 import torch.multiprocessing as mp
 
-import const
+from ml.config import Config
 
 
 def find_free_port(addr):
@@ -17,18 +17,18 @@ def find_free_port(addr):
         return s.getsockname()[1]
 
 
-def setup(rank, world_size, port):
-    torch.backends.cuda.matmul.allow_tf32 = const.ALLOW_TF32
+def setup(rank, world_size, port, config: Config):
+    torch.backends.cuda.matmul.allow_tf32 = config['allow_tf32']
 
-    os.environ['MASTER_ADDR'] = const.MASTER_ADDR
+    os.environ['MASTER_ADDR'] = config['master_addr']
     os.environ['MASTER_PORT'] = str(port)
     os.environ["WORLD_SIZE"] = str(world_size)
     os.environ["RANK"] = str(rank)
 
     dist.init_process_group('nccl', rank=rank, world_size=world_size)
-    const.DEVICE = f'cuda:{rank}'
-    torch.cuda.set_device(const.DEVICE)
-    set_stdout()
+    config['device'] = f'cuda:{rank}'
+    torch.cuda.set_device(config['device'])
+    set_stdout(config['root_dir'] + 'job-' + config['job_id'])
     dist.barrier()
 
 
@@ -75,9 +75,8 @@ def sync():
         dist.barrier()
 
 
-def set_stdout():
+def set_stdout(stdout_base: str):
     if is_dist_avail_and_initialized():
-        stdout_base = const.ROOT_DIR + '/../slurm-' + const.SLURM_JOB_ID
         stdout = f'{stdout_base}-{dist.get_rank()}.out'
         sys.stdout = open(stdout, 'a')
         sys.stderr = open(stdout, 'a')
