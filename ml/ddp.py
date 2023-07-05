@@ -2,6 +2,7 @@ import os
 import socket
 import sys
 from contextlib import closing
+from typing import Any
 
 import torch.cuda
 import torch.distributed as dist
@@ -10,14 +11,14 @@ import torch.multiprocessing as mp
 from ml.config import Config
 
 
-def find_free_port(addr):
+def find_free_port(addr: str):
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         s.bind((addr, 0))
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         return s.getsockname()[1]
 
 
-def setup(rank, world_size, port, config: Config):
+def setup(rank: int, world_size: int, port: Any, config: Config):
     torch.backends.cuda.matmul.allow_tf32 = config['allow_tf32']
 
     os.environ['MASTER_ADDR'] = config['master_addr']
@@ -37,8 +38,8 @@ def cleanup():
         dist.destroy_process_group()
 
 
-def run(fn, world_size, arch_mode, module, experiment_name, port):
-    mp.spawn(fn, args=(world_size, arch_mode, module, experiment_name, port,),
+def run(fn, world_size: int, model, experiment_name, port):
+    mp.spawn(fn, args=(world_size, model, experiment_name, port,),
              nprocs=world_size, join=True)
 
 
