@@ -1,3 +1,5 @@
+on_gpu: False
+
 epochs: 100
 learning_rate: 0.1
 momentum: 0.9
@@ -11,7 +13,8 @@ set_gradients_none: False
 fp16: False
 allow_tf32: False
 
-master_addr:
+master_addr: localhost
+master_port:
 device:
 
 min_checkpoint_epoch: 10

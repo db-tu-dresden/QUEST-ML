@@ -13,6 +13,7 @@ def validate_yaml(data: dict, schema: Schema):
 class Config:
 
     default_schema = Schema({
+        'on_gpu': Use(bool),
         'epochs': And(Use(int), lambda x: x > 0),
         'learning_rate': And(Use(float), lambda x: x > 0),
         'momentum': And(Use(float), lambda x: x > 0),
@@ -27,6 +28,7 @@ class Config:
         'allow_tf32': Use(bool),
 
         'master_addr': Or(None, And(Use(str), lambda x: len(x) > 0)),
+        'master_port': Or(None, Use(int)),
         'device': Or(None, Use(int)),
 
         'min_checkpoint_epoch': Use(int),
