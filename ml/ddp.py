@@ -18,15 +18,15 @@ def find_free_port(addr: str):
         return s.getsockname()[1]
 
 
-def setup(rank: int, world_size: int, port: Any, config: Config):
+def setup(rank: int, config: Config):
     torch.backends.cuda.matmul.allow_tf32 = config['allow_tf32']
 
     os.environ['MASTER_ADDR'] = config['master_addr']
-    os.environ['MASTER_PORT'] = str(port)
-    os.environ["WORLD_SIZE"] = str(world_size)
+    os.environ['MASTER_PORT'] = str(config['master_port'])
+    os.environ["WORLD_SIZE"] = str(config['world_size'])
     os.environ["RANK"] = str(rank)
 
-    dist.init_process_group('nccl', rank=rank, world_size=world_size)
+    dist.init_process_group('nccl', rank=rank, world_size=config['world_size'])
     config['device'] = f'cuda:{rank}'
     torch.cuda.set_device(config['device'])
     set_stdout(config['root_dir'] + 'job-' + config['job_id'])
@@ -38,9 +38,9 @@ def cleanup():
         dist.destroy_process_group()
 
 
-def run(fn, world_size: int, model, experiment_name, port):
-    mp.spawn(fn, args=(world_size, model, experiment_name, port,),
-             nprocs=world_size, join=True)
+def run(fn, config: Config, *args):
+    mp.spawn(fn, args=(config, *args),
+             nprocs=config['world_size'], join=True)
 
 
 def is_dist_avail_and_initialized():

@@ -140,11 +140,22 @@ class Trainer:
         ddp.cleanup()
 
     @classmethod
-    def initialize(cls, rank: int, world_size: int, config: Config, model, port,
-                   train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
+    def _initialize(cls, rank: int | None, config: Config, model,
+                    train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
         if rank is not None:
-            ddp.setup(rank, world_size, port, config)
+            ddp.setup(rank, config)
 
         config['world_size'] = dist.get_world_size() if dist.is_initialized() else 1
 
         return cls(config, model, train_data, valid_data, test_data)
+
+    @classmethod
+    def initialize(cls, config: Config, model,
+                   train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
+        config['world_size'] = torch.cuda.device_count()
+        config['master_port'] = ddp.find_free_port(config['master_addr'])
+
+        if config['on_gpu']:
+            ddp.run(cls._initialize, config, model, train_data, valid_data, test_data)
+        else:
+            return cls._initialize(None, config, model, train_data, valid_data, test_data)
