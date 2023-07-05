@@ -42,9 +42,10 @@ class Config:
     })
 
     def __init__(self, path: str, schema: Schema = default_schema):
+        self.path = path
         self.schema = schema
 
-        with open(path) as f:
+        with open(self.path) as f:
             self.data = yaml.full_load(f)
 
         self.validate()
