@@ -40,7 +40,7 @@ class System:
                                                 mean=self.config['processes']['mean'],
                                                 std=self.config['processes']['std'],
                                                 beta=self.config['arrivalProcess']['beta'])
-                                for rng in self.rng.spawn(len(self.notation.graph.nodes) + 2)]
+                                for rng in self.rng.spawn(len(self.notation.graph.nodes) + 1)]
 
         self.logger = Logger(self.config['loggingRate'], self)
 
@@ -53,21 +53,21 @@ class System:
             raise Exception('Can not build system with no graph specified.')
 
         nodes = reversed(list(self.notation.graph.nodes(data=True)))
+        n = len(self.notation.graph.nodes)
 
-        for node, props in nodes:
+        if n == 0:
+            raise Exception('Can not build system with no nodes specified.')
+
+        for i, (node, props) in enumerate(nodes):
             queue = Queue(props['data'], env=self.env)
-            process = Process(node, queue=queue, rnd=self.rand_containers[node], env=self.env)
+            if i == n - 1:
+                process = ArrivalProcess(-1, self.job_types, rnd=self.rand_containers[node], env=self.env)
+            else:
+                process = Process(node, queue=queue, rnd=self.rand_containers[node], env=self.env)
             self.processes[node] = process
 
             for _, out, props in self.notation.graph.edges(node, data=True):
                 process.update_next({datum: self.processes[out] for datum in props['data']})
-
-    def create_arrival_process(self):
-        arrival_process = ArrivalProcess(-1, self.job_types, env=self.env, rnd=self.rand_containers[-2])
-        self.processes[-1] = arrival_process
-
-    def link_arrival_process(self):
-        self.processes[-1].next = defaultdict(lambda: self.processes[0])
 
     def create_exit_process(self):
         last_process_id, _ = sorted(self.processes.items(), reverse=True)[0]
@@ -86,9 +86,7 @@ class System:
 
         self.build_processes()
 
-        self.create_arrival_process()
         self.create_exit_process()
-        self.link_arrival_process()
         self.link_exit_process()
 
         self.processes = dict(sorted(self.processes.items()))

@@ -26,7 +26,9 @@ Create a system instance:
 system = System(config, notation, env=env)
 ```
 The `System` needs the aforementioned config and environment, it also relies on a notation instance.
-For information how the notation is created please read the [README.md](../notation/README.md) of the notation package.
+For information how the notation is created please read the [README.md](../notation/README.md) of the notation package. 
+Note that the arrival process, the process creating the jobs, needs to be explicitly specified. 
+It is the first node of any given notation.
 
 Then build and run the simulation with:
 ```python
