@@ -2,10 +2,14 @@ from contextlib import contextmanager
 from enum import Enum
 
 import torch
+import torch.distributed as dist
+from torch import optim, nn
+from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
 
 from ml import ddp
 from ml.config import Config
+from ml.data import ProcessDataset
 from ml.logger import Logger
 
 
@@ -25,28 +29,49 @@ def optional(condition, context_manager):
 
 
 class Trainer:
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, model,
+                 train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
         self.logger = Logger()
 
         self.config = config
-        self.device = None
+        self.device = self.config['device']
 
-        self.model = None
+        self.model = model
+
+        self.train_data = train_data
+        self.valid_data = valid_data
+        self.test_data = test_data
 
         self.scaler = None
-
         self.train_sampler = None
         self.valid_sampler = None
         self.test_sampler = None
 
-        self.train_dataloader = None
-        self.valid_dataloader = None
-        self.test_dataloader = None
+        if ddp.is_dist_avail_and_initialized():
+            self.scaler = torch.cuda.amp.GradScaler()
 
-        self.criterion = None
-        self.optimizer = None
+            self.train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_data)
+            self.valid_sampler = torch.utils.data.distributed.DistributedSampler(self.valid_data)
+            self.test_sampler = torch.utils.data.distributed.DistributedSampler(self.test_data)
 
-        self.scheduler = None
+            self.model = DistributedDataParallel(self.model.to(self.device), device_ids=[self.config['rank']])
+
+        self.train_dataloader = DataLoader(self.train_data, batch_size=self.config['batch_size'],
+                                           sampler=self.train_sampler,
+                                           num_workers=self.config['num_workers_dataloader'],
+                                           pin_memory=self.config['pin_memory'])
+        self.valid_dataloader = DataLoader(self.valid_data, batch_size=self.config['batch_size'],
+                                           sampler=self.valid_sampler,
+                                           num_workers=self.config['num_workers_dataloader'],
+                                           pin_memory=self.config['pin_memory'])
+        self.test_dataloader = DataLoader(self.test_data, batch_size=self.config['batch_size'],
+                                          sampler=self.test_sampler,
+                                          num_workers=self.config['num_workers_dataloader'],
+                                          pin_memory=self.config['pin_memory'])
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],
+                                   momentum=self.config['momentum'])
 
     def batch_data_to_device(self, batch):
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
@@ -90,9 +115,6 @@ class Trainer:
     def _test(self):
         return self._go(Mode.TEST, self.test_dataloader)
 
-    def cleanup(self):
-        ddp.cleanup()
-
     def train(self):
         for epoch in range(self.config['epochs']):
             self.logger.epoch(epoch)
@@ -103,7 +125,6 @@ class Trainer:
             train_loss, train_accuracy = self._train()
             valid_loss, valid_accuracy = self._valid()
 
-            self.scheduler.step()
         test_loss, test_accuracy = self._test()
 
         self.cleanup()
@@ -113,3 +134,17 @@ class Trainer:
 
     def test(self):
         self._test()
+
+    @staticmethod
+    def cleanup():
+        ddp.cleanup()
+
+    @classmethod
+    def initialize(cls, rank: int, world_size: int, config: Config, model, port,
+                   train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
+        if rank is not None:
+            ddp.setup(rank, world_size, port, config)
+
+        config['world_size'] = dist.get_world_size() if dist.is_initialized() else 1
+
+        return cls(config, model, train_data, valid_data, test_data)
