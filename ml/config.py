@@ -20,6 +20,7 @@ class Config:
 
         'job_id': Use(int),
 
+        'num_workers_dataloader': Use(int),
         'pin_memory': Use(bool),
         'set_gradients_none': Use(bool),
         'fp16': Use(bool),

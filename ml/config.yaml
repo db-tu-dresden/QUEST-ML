@@ -6,6 +6,7 @@ batch_size: 1
 job_id: -1
 
 pin_memory: True
+num_workers_dataloader: 0
 set_gradients_none: False
 fp16: False
 allow_tf32: False
