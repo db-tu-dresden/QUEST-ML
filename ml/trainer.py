@@ -4,7 +4,7 @@ from enum import Enum
 import torch
 from torch.utils.data import DataLoader
 
-from ml import ddp, save
+from ml import ddp
 from ml.config import Config
 from ml.logger import Logger
 
@@ -103,12 +103,9 @@ class Trainer:
             train_loss, train_accuracy = self._train()
             valid_loss, valid_accuracy = self._valid()
 
-            self.save_checkpoint(epoch, valid_loss)
-
             self.scheduler.step()
         test_loss, test_accuracy = self._test()
 
-        self.save_model()
         self.cleanup()
 
     def valid(self):
@@ -116,10 +113,3 @@ class Trainer:
 
     def test(self):
         self._test()
-
-    def save_checkpoint(self, epoch, loss):
-        save.checkpoint_encoders_decoders(epoch, self.model, loss,
-                                          self.config['checkpoint_path'] + self.config['slurm_job_id'])
-
-    def save_model(self):
-        save.model(self.model.state_dict(), self.config['model_save_path'])
