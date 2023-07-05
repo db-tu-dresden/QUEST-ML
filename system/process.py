@@ -72,6 +72,8 @@ class ArrivalProcess(Process):
         self.last_job_id += 1
         job = self.job_types.get_rand_job(self.last_job_id, self.rng)
 
+        self.job_dist[job.type.name] += 1
+
         yield self.next[job.type.name].push(job)
 
     def __repr__(self):

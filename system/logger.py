@@ -27,8 +27,6 @@ class Logger:
     def log_processes(self):
         job_dists = {}
         for i, process in self.system.processes.items():
-            if isinstance(process, ArrivalProcess):
-                continue
             job_dists[process.id] = dict(process.job_dist)
         self.log[round(self.system.env.now, 1)] = job_dists
 
