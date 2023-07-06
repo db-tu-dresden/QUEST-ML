@@ -79,6 +79,8 @@ class Trainer:
     def _go(self, mode: Mode, dataloader: DataLoader):
         epoch_loss = torch.zeros(1)
 
+        self.logger.watch(self.model, self.criterion, log="all", log_freq=10)
+
         if mode == Mode.TRAIN:
             self.model.train()
             self.optimizer.zero_grad(set_to_none=self.config['set_gradients_none'])
@@ -101,8 +103,8 @@ class Trainer:
                         batch_loss.backward()
                         self.optimizer.step()
 
-                # log step
-            # log epoch
+                self.logger.log_batch(batch_loss)
+                epoch_loss += batch_loss
 
         return epoch_loss
 
@@ -116,16 +118,17 @@ class Trainer:
         return self._go(Mode.TEST, self.test_dataloader)
 
     def train(self):
-        for epoch in range(self.config['epochs']):
-            self.logger.epoch(epoch)
-            if self.train_sampler and self.valid_sampler:
-                self.train_sampler.set_epoch(epoch)
-                self.valid_sampler.set_epoch(epoch)
+        with self.logger(self.config):
+            for epoch in range(self.config['epochs']):
+                self.logger.epoch(epoch)
+                if self.train_sampler and self.valid_sampler:
+                    self.train_sampler.set_epoch(epoch)
+                    self.valid_sampler.set_epoch(epoch)
 
-            train_loss, train_accuracy = self._train()
-            valid_loss, valid_accuracy = self._valid()
+                train_loss, train_accuracy = self._train()
+                valid_loss, valid_accuracy = self._valid()
 
-        test_loss, test_accuracy = self._test()
+            test_loss, test_accuracy = self._test()
 
         self.cleanup()
 
