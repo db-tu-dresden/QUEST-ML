@@ -1,2 +1,5 @@
 .idea
 save
+wandb
+
+.wandb.sh
