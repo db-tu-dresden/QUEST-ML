@@ -1,4 +1,5 @@
 import pandas as pd
+import torch
 from torch.utils.data import Dataset
 
 
@@ -16,15 +17,9 @@ class ProcessDataset(Dataset):
         return cls(pd.read_pickle(path))
 
     def __len__(self):
-        return len(self.df)
+        return len(self.df) - 1     # -1 because the next step is the label; therefore the last step is omitted
 
     def __getitem__(self, item):
-        return self.df.iloc[[item]]
-
-
-def main():
-    ProcessDataset.from_path('../save/df.pkl')
-
-
-if __name__ == '__main__':
-    main()
+        _, *dist_source = self.df.iloc[[item]].to_numpy()[0]
+        _, *dist_target = self.df.iloc[[item + 1]].to_numpy()[0]
+        return torch.tensor(dist_source), torch.tensor(dist_target)
