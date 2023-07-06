@@ -97,8 +97,8 @@ class Trainer:
                         batch_loss.backward()
                         self.optimizer.step()
 
-                self.logger.log_batch(batch_loss)
-                epoch_loss += batch_loss
+                self.logger.log_batch(batch_loss.detach())
+                epoch_loss += batch_loss.detach()
 
         return epoch_loss
 
