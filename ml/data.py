@@ -25,4 +25,4 @@ class ProcessDataset(Dataset):
     def __getitem__(self, item):
         _, *dist_source = self.df.iloc[[item]].to_numpy()[0]
         _, *dist_target = self.df.iloc[[item + 1]].to_numpy()[0]
-        return torch.tensor(dist_source), torch.tensor(dist_target)
+        return torch.tensor(dist_source, dtype=torch.float), torch.tensor(dist_target, dtype=torch.float)
