@@ -75,7 +75,6 @@ class Trainer:
 
         if mode == Mode.TRAIN:
             self.model.train()
-            self.optimizer.zero_grad(set_to_none=self.config['set_gradients_none'])
         else:
             self.model.eval()
 
@@ -84,6 +83,10 @@ class Trainer:
                 inputs, targets = self.batch_data_to_device(batch_data)
                 inputs = inputs.flatten()
                 targets = targets.flatten()
+
+                if mode == Mode.TRAIN:
+                    self.optimizer.zero_grad(set_to_none=self.config['set_gradients_none'])
+
                 with optional(self.config['fp16'] and self.scaler, torch.cuda.amp.autocast):
                     outputs = self.model(inputs)
                 batch_loss = self.criterion(outputs, targets)
