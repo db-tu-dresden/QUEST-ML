@@ -119,10 +119,10 @@ class Trainer:
                     self.train_sampler.set_epoch(epoch)
                     self.valid_sampler.set_epoch(epoch)
 
-                train_loss, train_accuracy = self._train()
-                valid_loss, valid_accuracy = self._valid()
+                train_loss = self._train()
+                valid_loss = self._valid()
 
-            test_loss, test_accuracy = self._test()
+            test_loss = self._test()
 
         self.model.save(path=self.config['model_save_path'])
         self.cleanup()
