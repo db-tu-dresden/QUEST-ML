@@ -90,6 +90,8 @@ class Trainer:
         with optional(mode != Mode.TRAIN, torch.no_grad):
             for batch_data in dataloader:
                 inputs, targets = self.batch_data_to_device(batch_data)
+                inputs = inputs.flatten()
+                targets = targets.flatten()
                 with optional(self.config['fp16'] and self.scaler, torch.cuda.amp.autocast):
                     decoders_outputs, outputs_seqs = self.model(inputs)
                 batch_loss = self.criterion(decoders_outputs, targets)
