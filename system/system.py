@@ -98,11 +98,3 @@ class System:
             self.env.process(process.run())
 
         self.env.run(until=self.config['until'])
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()

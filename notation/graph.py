@@ -117,7 +117,3 @@ class Graph:
             plt.savefig(path)
         if show:
             plt.show()
-
-
-if __name__ == '__main__':
-    pass

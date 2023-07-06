@@ -375,18 +375,3 @@ class Notation:
 
     def draw(self, path: str = None, show: bool = True):
         self.graph.draw(path=path, show=show)
-
-
-def main():
-    text = '[A,B,C]\n' \
-           '-<[($1: [A,B]), ($2: [C])]>-\n' \
-           '$1: -<[($3: [A]), ($2:[B])]\n' \
-           '$2: !1\n' \
-           '$3: -!1'
-
-    notation = Notation.parse(text)
-    notation.draw()
-
-
-if __name__ == '__main__':
-    main()

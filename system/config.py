@@ -68,12 +68,3 @@ class Config:
 
     def __setitem__(self, key, value):
         self.data[key] = value
-
-
-def main():
-    c = Config(path='../config.yaml')
-    print(c)
-
-
-if __name__ == '__main__':
-    main()
