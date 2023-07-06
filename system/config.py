@@ -66,6 +66,9 @@ class Config:
     def __getitem__(self, item):
         return self.data[item]
 
+    def __setitem__(self, key, value):
+        self.data[key] = value
+
 
 def main():
     c = Config(path='../config.yaml')
