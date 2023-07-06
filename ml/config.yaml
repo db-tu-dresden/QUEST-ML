@@ -1,4 +1,5 @@
 on_gpu: False
+wandb: False
 
 epochs: 100
 learning_rate: 0.1

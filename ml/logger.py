@@ -8,9 +8,11 @@ from ml.config import Config
 
 
 class Logger:
-    def __init__(self, project: str = 'carQUEST-ML'):
-        self.wandb = wandb.login()
+    def __init__(self, config: Config, project: str = 'carQUEST-ML'):
+        self.config = config
+        self.wandb = wandb.login() if self.config['wandb'] else None
         self.project = project
+
         self._epoch = 0
         self._step = 0
 
@@ -25,16 +27,20 @@ class Logger:
             step = self._step
             self._step += 1
 
-        wandb.log({"epoch": self._epoch, "loss": loss}, step=step)
+        if self.config['wandb']:
+            wandb.log({"epoch": self._epoch, "loss": loss}, step=step)
 
     def log(self, msg, level=logging.INFO):
         if isinstance(msg, dict):
-            if self.wandb:
+            if self.config['wandb']:
                 wandb.log(msg)
         logging.log(level, msg)
 
     def watch(self, model: nn.Module, *args, **kwargs):
-        wandb.watch(model, *args, **kwargs)
+        if self.config['wandb']:
+            wandb.watch(model, *args, **kwargs)
 
     def __call__(self, config: Config):
-        yield wandb.init(config.data, project=self.project)
+        if self.config['wandb']:
+            return wandb.init(config=config.data, project=self.project)
+        return

@@ -14,6 +14,7 @@ class Config:
 
     default_schema = Schema({
         'on_gpu': Use(bool),
+        'wandb': Use(bool),
         'epochs': And(Use(int), lambda x: x > 0),
         'learning_rate': And(Use(float), lambda x: x > 0),
         'momentum': And(Use(float), lambda x: x > 0),

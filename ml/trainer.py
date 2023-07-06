@@ -31,7 +31,7 @@ def optional(condition, context_manager):
 class Trainer:
     def __init__(self, config: Config, model,
                  train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
-        self.logger = Logger()
+        self.logger = Logger(config)
 
         self.config = config
         self.device = self.config['device']
