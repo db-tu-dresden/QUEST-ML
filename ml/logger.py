@@ -8,8 +8,9 @@ from ml.config import Config
 
 
 class Logger:
-    def __init__(self):
+    def __init__(self, project: str = 'carQUEST-ML'):
         self.wandb = wandb.login()
+        self.project = project
         self._epoch = 0
         self._step = 0
 
@@ -36,4 +37,4 @@ class Logger:
         wandb.watch(model, *args, **kwargs)
 
     def __call__(self, config: Config):
-        yield wandb.init(config.data)
+        yield wandb.init(config.data, project=self.project)
