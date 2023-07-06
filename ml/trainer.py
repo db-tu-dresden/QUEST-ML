@@ -11,21 +11,13 @@ from ml import ddp
 from ml.config import Config
 from ml.data import ProcessDataset
 from ml.logger import Logger
+from ml.utils import optional
 
 
 class Mode(Enum):
     TRAIN = 'train'
     VALID = 'valid'
     TEST = 'test'
-
-
-@contextmanager
-def optional(condition, context_manager):
-    if condition:
-        with context_manager():
-            yield
-    else:
-        yield
 
 
 class Trainer:
