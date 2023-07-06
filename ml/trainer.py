@@ -86,7 +86,7 @@ class Trainer:
             self.model.eval()
 
         with optional(mode != Mode.TRAIN, torch.no_grad):
-            for batch, batch_data in enumerate(dataloader):
+            for batch_data in dataloader:
                 inputs, targets = self.batch_data_to_device(batch_data)
                 with optional(self.config['fp16'] and self.scaler, torch.cuda.amp.autocast):
                     decoders_outputs, outputs_seqs = self.model(inputs)
