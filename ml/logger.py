@@ -1,5 +1,3 @@
-import logging
-
 import torch
 import wandb
 from torch import nn
@@ -31,11 +29,11 @@ class Logger:
         if self.config['wandb']:
             wandb.log({"epoch": self._epoch, "loss": loss}, step=step)
 
-    def log(self, msg, level=logging.INFO):
+    def log(self, msg):
         if isinstance(msg, dict):
             if self.config['wandb']:
                 wandb.log(msg)
-        logging.log(level, msg)
+        print(msg)
 
     def watch(self, model: nn.Module, *args, **kwargs):
         if self.config['wandb']:
