@@ -61,7 +61,7 @@ class Trainer:
                                           num_workers=self.config['num_workers_dataloader'],
                                           pin_memory=self.config['pin_memory'])
 
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.MSELoss()
         self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],
                                    momentum=self.config['momentum'])
 
