@@ -3,6 +3,7 @@ on_gpu: False
 epochs: 100
 learning_rate: 0.1
 momentum: 0.9
+hidden_size: 256
 batch_size: 1
 
 job_id: -1
