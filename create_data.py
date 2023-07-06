@@ -52,7 +52,7 @@ def run(args):
     ]
 
     for state in states:
-        path = os.path.join(base_path, state['dir'])
+        path = os.path.join(base_path, 'data', state['dir'])
         if not os.path.exists(path):
             os.makedirs(path)
 
