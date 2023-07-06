@@ -2,6 +2,7 @@ from enum import Enum
 
 import torch
 import torch.distributed as dist
+from tqdm import tqdm
 from torch import optim, nn
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
@@ -78,7 +79,7 @@ class Trainer:
             self.model.eval()
 
         with optional(mode != Mode.TRAIN, torch.no_grad):
-            for batch_data in dataloader:
+            for batch_data in tqdm(dataloader):
                 inputs, targets = self.batch_data_to_device(batch_data)
                 inputs = inputs.flatten()
                 targets = targets.flatten()
