@@ -5,6 +5,7 @@ import wandb
 from torch import nn
 
 from ml.config import Config
+from ml.utils import optional
 
 
 class Logger:
@@ -41,6 +42,4 @@ class Logger:
             wandb.watch(model, *args, **kwargs)
 
     def __call__(self, config: Config):
-        if self.config['wandb']:
-            return wandb.init(config=config.data, project=self.project)
-        return
+        return optional(self.config['wandb'], wandb.init, config=config.data, project=self.project)
