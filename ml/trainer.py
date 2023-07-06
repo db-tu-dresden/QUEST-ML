@@ -130,6 +130,7 @@ class Trainer:
 
             test_loss, test_accuracy = self._test()
 
+        self.model.save(path=self.config['model_save_path'])
         self.cleanup()
 
     def valid(self):
