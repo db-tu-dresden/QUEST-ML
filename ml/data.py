@@ -16,6 +16,9 @@ class ProcessDataset(Dataset):
     def from_path(cls, path: str):
         return cls(pd.read_pickle(path))
 
+    def get_sample_shape(self):
+        return self[0][0].shape
+
     def __len__(self):
         return len(self.df) - 1     # -1 because the next step is the label; therefore the last step is omitted
 
