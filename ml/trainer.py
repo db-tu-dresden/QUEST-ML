@@ -85,8 +85,8 @@ class Trainer:
                 inputs = inputs.flatten()
                 targets = targets.flatten()
                 with optional(self.config['fp16'] and self.scaler, torch.cuda.amp.autocast):
-                    decoders_outputs, outputs_seqs = self.model(inputs)
-                batch_loss = self.criterion(decoders_outputs, targets)
+                    outputs = self.model(inputs)
+                batch_loss = self.criterion(outputs, targets)
 
                 if mode == Mode.TRAIN:
                     if self.scaler:
