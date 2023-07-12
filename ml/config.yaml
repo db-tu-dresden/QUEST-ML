@@ -20,6 +20,7 @@ allow_tf32: False
 
 # dataloader parameters
 shuffle: True
+drop_last: True
 pin_memory: True
 num_workers_dataloader: 0
 

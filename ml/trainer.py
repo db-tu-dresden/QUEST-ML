@@ -52,17 +52,20 @@ class Trainer:
                                            shuffle=self.config['shuffle'],
                                            sampler=self.train_sampler,
                                            num_workers=self.config['num_workers_dataloader'],
-                                           pin_memory=self.config['pin_memory'])
+                                           pin_memory=self.config['pin_memory'],
+                                           drop_last=self.config['drop_last'])
         self.valid_dataloader = DataLoader(self.valid_data, batch_size=self.config['batch_size'],
                                            shuffle=self.config['shuffle'],
                                            sampler=self.valid_sampler,
                                            num_workers=self.config['num_workers_dataloader'],
-                                           pin_memory=self.config['pin_memory'])
+                                           pin_memory=self.config['pin_memory'],
+                                           drop_last=self.config['drop_last'])
         self.test_dataloader = DataLoader(self.test_data, batch_size=self.config['batch_size'],
                                           shuffle=self.config['shuffle'],
                                           sampler=self.test_sampler,
                                           num_workers=self.config['num_workers_dataloader'],
-                                          pin_memory=self.config['pin_memory'])
+                                          pin_memory=self.config['pin_memory'],
+                                          drop_last=self.config['drop_last'])
 
         self.criterion = nn.MSELoss()
         self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],

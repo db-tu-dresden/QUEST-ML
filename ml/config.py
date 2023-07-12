@@ -26,6 +26,7 @@ class Config:
         'job_id': Use(int),
 
         'shuffle': Use(bool),
+        'drop_last': Use(bool),
         'num_workers_dataloader': Use(int),
         'pin_memory': Use(bool),
         'set_gradients_none': Use(bool),
