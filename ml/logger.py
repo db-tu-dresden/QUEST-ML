@@ -24,7 +24,7 @@ class Logger:
     def epoch(self, epoch: int):
         self._epoch = epoch
         self.log(f'-------------------------\n'
-                 f'Epoch {epoch + 1}\n'
+                 f'Epoch {epoch + 1} / {self.config["epochs"]}\n'
                  f'-------------------------\n')
 
     def log_epoch(self, train_loss: torch.Tensor, valid_loss: torch.Tensor):
