@@ -49,14 +49,17 @@ class Trainer:
             self.model = DistributedDataParallel(self.model.to(self.device), device_ids=[self.config['rank']])
 
         self.train_dataloader = DataLoader(self.train_data, batch_size=self.config['batch_size'],
+                                           shuffle=self.config['shuffle'],
                                            sampler=self.train_sampler,
                                            num_workers=self.config['num_workers_dataloader'],
                                            pin_memory=self.config['pin_memory'])
         self.valid_dataloader = DataLoader(self.valid_data, batch_size=self.config['batch_size'],
+                                           shuffle=self.config['shuffle'],
                                            sampler=self.valid_sampler,
                                            num_workers=self.config['num_workers_dataloader'],
                                            pin_memory=self.config['pin_memory'])
         self.test_dataloader = DataLoader(self.test_data, batch_size=self.config['batch_size'],
+                                          shuffle=self.config['shuffle'],
                                           sampler=self.test_sampler,
                                           num_workers=self.config['num_workers_dataloader'],
                                           pin_memory=self.config['pin_memory'])
