@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import torch
 import wandb
 from torch import nn
 
 from ml.config import Config
 from ml.utils import optional
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ml.trainer import Mode
 
 
 class Logger:
@@ -25,13 +31,13 @@ class Logger:
         wandb.log({'epoch': self._epoch})
         print(f'Epoch {self._epoch + 1}: train loss {train_loss} | validation loss {valid_loss}')
 
-    def log_batch(self, loss: torch.Tensor, step: int = None):
+    def log_batch(self, mode: Mode, loss: torch.Tensor, step: int = None):
         if step is None:
             step = self._step
             self._step += 1
 
         if self.config['wandb']:
-            wandb.log({"epoch": self._epoch, "loss": loss}, step=step)
+            wandb.log({f'{mode.value}_loss': loss}, step=step)
 
     def log(self, msg):
         if isinstance(msg, dict):
