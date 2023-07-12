@@ -13,33 +13,42 @@ def validate_yaml(data: dict, schema: Schema):
 class Config:
 
     default_schema = Schema({
+        # general
         'on_gpu': Use(bool),
+        'job_id': Use(int),
+
+        # logging
         'wandb': Use(bool),
         'wandb_watch_model': Use(bool),
 
+        # training hyperparameters
         'epochs': And(Use(int), lambda x: x > 0),
         'learning_rate': And(Use(float), lambda x: x > 0),
         'momentum': And(Use(float), lambda x: x > 0),
         'hidden_size': And(Use(int), lambda x: x > 0),
         'batch_size': And(Use(int), lambda x: x > 0),
 
-        'job_id': Use(int),
-
-        'shuffle': Use(bool),
-        'drop_last': Use(bool),
-        'num_workers_dataloader': Use(int),
-        'pin_memory': Use(bool),
+        # training configuration
         'set_gradients_none': Use(bool),
         'fp16': Use(bool),
         'allow_tf32': Use(bool),
 
+        # dataloader parameters
+        'shuffle': Use(bool),
+        'drop_last': Use(bool),
+        'pin_memory': Use(bool),
+        'num_workers_dataloader': Use(int),
+
+        # distributed training
         'master_addr': Or(None, And(Use(str), lambda x: len(x) > 0)),
         'master_port': Or(None, Use(int)),
         'device': Or(None, Use(int)),
 
+        # model checkpoint
         'min_checkpoint_epoch': Use(int),
         'min_checkpoint_epoch_dist': Use(int),
 
+        # paths
         'root_dir': Use(str),
         'checkpoint_path': Use(str),
         'model_save_path': Use(str),
