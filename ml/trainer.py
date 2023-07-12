@@ -76,7 +76,10 @@ class Trainer:
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
 
     def _go(self, mode: Mode, dataloader: DataLoader):
-        epoch_loss = torch.zeros(1)
+        data_size = len(dataloader.dataset) / self.config['world_size']
+        num_batches = int(data_size / self.config['batch_size'])
+
+        epoch_loss = 0
 
         if mode == Mode.TRAIN:
             self.model.train()
@@ -108,7 +111,7 @@ class Trainer:
                 self.logger.log_batch(mode, batch_loss.item())
                 epoch_loss += batch_loss.item()
 
-        return epoch_loss
+        return epoch_loss / num_batches
 
     def _train(self):
         return self._go(Mode.TRAIN, self.train_dataloader)
