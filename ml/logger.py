@@ -27,12 +27,12 @@ class Logger:
                  f'Epoch {epoch + 1} / {self.config["epochs"]}\n'
                  f'-------------------------\n')
 
-    def log_epoch(self, train_loss: torch.Tensor, valid_loss: torch.Tensor):
+    def log_epoch(self, train_loss: float, valid_loss: float):
         if self.config['wandb']:
             wandb.log({'epoch': self._epoch})
         print(f'Epoch {self._epoch + 1}: train loss {train_loss} | validation loss {valid_loss}')
 
-    def log_batch(self, mode: Mode, loss: torch.Tensor, step: int = None):
+    def log_batch(self, mode: Mode, loss: float, step: int = None):
         if step is None:
             step = self._step
             self._step += 1
