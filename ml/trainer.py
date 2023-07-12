@@ -127,6 +127,8 @@ class Trainer:
                 train_loss = self._train()
                 valid_loss = self._valid()
 
+                self.logger.log_epoch(train_loss, valid_loss)
+
             test_loss = self._test()
             self.logger.log({'test_loss': test_loss})
 
