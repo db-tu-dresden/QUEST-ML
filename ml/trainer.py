@@ -74,8 +74,6 @@ class Trainer:
     def _go(self, mode: Mode, dataloader: DataLoader):
         epoch_loss = torch.zeros(1)
 
-        self.logger.watch(self.model, self.criterion, log="all", log_freq=10)
-
         if mode == Mode.TRAIN:
             self.model.train()
         else:
@@ -119,6 +117,7 @@ class Trainer:
 
     def train(self):
         with self.logger(self.config):
+            self.logger.watch(self.model, self.criterion, log="all")
             for epoch in range(self.config['epochs']):
                 self.logger.epoch(epoch)
                 if self.train_sampler and self.valid_sampler:
