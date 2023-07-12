@@ -66,6 +66,9 @@ class Config:
     def validate(self):
         self.data = validate_yaml(self.data, self.schema)
 
+    def update(self, new_config: dict):
+        self.data.update(new_config)
+
     def __repr__(self):
         cls = self.__class__.__name__
         return f'{cls}(path={self.path!r}, schema={self.schema!r})'

@@ -119,7 +119,10 @@ class Trainer:
     def _test(self):
         return self._go(Mode.TEST, self.test_dataloader)
 
-    def train(self):
+    def train(self, config: dict = None):
+        if config is not None:
+            self.config.update(config)
+
         with self.logger(self.config):
             if self.config['wandb_watch_model']:
                 self.logger.watch(self.model, self.criterion, log="all")
