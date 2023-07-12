@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 import torch
@@ -149,6 +150,12 @@ class Trainer:
     def cleanup():
         ddp.cleanup()
 
+    @staticmethod
+    def get_datasets_from_path(path: str):
+        return ProcessDataset.from_path(os.path.join(path, 'data', 'train', 'df.pkl')), \
+            ProcessDataset.from_path(os.path.join(path, 'data', 'valid', 'df.pkl')), \
+            ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'df.pkl'))
+
     @classmethod
     def _initialize(cls, rank: int | None, config: Config, model,
                     train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
@@ -160,10 +167,13 @@ class Trainer:
         return cls(config, model, train_data, valid_data, test_data)
 
     @classmethod
-    def initialize(cls, config: Config, model,
-                   train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
+    def initialize(cls, config: Config, model, data_path: str = None, train_data: ProcessDataset = None,
+                   valid_data: ProcessDataset = None, test_data: ProcessDataset = None):
         config['world_size'] = torch.cuda.device_count()
         config['master_port'] = ddp.find_free_port(config['master_addr'])
+
+        if data_path:
+            train_data, valid_data, test_data = cls.get_datasets_from_path(data_path)
 
         if config['on_gpu']:
             ddp.run(cls._initialize, config, model, train_data, valid_data, test_data)

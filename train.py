@@ -20,7 +20,7 @@ def run(args):
     base_path = args.path
     config = Config('ml/config.yaml')
 
-    train_ds, valid_ds, test_ds = get_datasets(base_path)
+    _, _, test_ds = get_datasets(base_path)
 
     input_size = math.prod(test_ds.get_sample_shape())  # num processes * num jobs
     hidden_size = config['hidden_size']
@@ -28,7 +28,7 @@ def run(args):
 
     model = FNN(input_size, hidden_size, output_size)
 
-    trainer = Trainer.initialize(config, model, train_ds, valid_ds, test_ds)
+    trainer = Trainer.initialize(config, model, data_path=base_path)
     trainer.train()
 
 
