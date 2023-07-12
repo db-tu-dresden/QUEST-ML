@@ -128,6 +128,7 @@ class Trainer:
                 valid_loss = self._valid()
 
             test_loss = self._test()
+            self.logger.log({'test_loss': test_loss})
 
         self.model.save(path=self.config['model_save_path'])
         self.cleanup()
