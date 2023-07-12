@@ -117,7 +117,8 @@ class Trainer:
 
     def train(self):
         with self.logger(self.config):
-            self.logger.watch(self.model, self.criterion, log="all")
+            if self.config['wandb_watch_model']:
+                self.logger.watch(self.model, self.criterion, log="all")
             for epoch in range(self.config['epochs']):
                 self.logger.epoch(epoch)
                 if self.train_sampler and self.valid_sampler:

@@ -1,5 +1,6 @@
 on_gpu: False
 wandb: False
+wandb_watch_model: False
 
 epochs: 100
 learning_rate: 0.1
