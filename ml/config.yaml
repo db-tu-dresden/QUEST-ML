@@ -1,29 +1,38 @@
+# general
 on_gpu: False
-wandb: False
+job_id: -1
+
+# logging
+wandb: True
 wandb_watch_model: False
 
-epochs: 100
+# training hyperparameters
+epochs: 500
 learning_rate: 0.1
 momentum: 0.9
 hidden_size: 256
 batch_size: 1
 
-job_id: -1
-
-shuffle: True
-pin_memory: True
-num_workers_dataloader: 0
+# training configuration
 set_gradients_none: False
 fp16: False
 allow_tf32: False
 
+# dataloader parameters
+shuffle: True
+pin_memory: True
+num_workers_dataloader: 0
+
+# distributed training
 master_addr: localhost
 master_port:
 device:
 
+# model checkpoint
 min_checkpoint_epoch: 10
 min_checkpoint_epoch_dist: 0
 
+# paths
 root_dir: ''
 checkpoint_path: ''
 model_save_path: ''
