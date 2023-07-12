@@ -21,6 +21,9 @@ class Logger:
                  f'Epoch {epoch + 1}\n'
                  f'-------------------------\n')
 
+    def log_epoch(self, train_loss: torch.Tensor, valid_loss: torch.Tensor):
+        print(f'Epoch {self._epoch + 1}: train loss {train_loss} | validation loss {valid_loss}')
+
     def log_batch(self, loss: torch.Tensor, step: int = None):
         if step is None:
             step = self._step
