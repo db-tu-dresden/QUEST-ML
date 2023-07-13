@@ -44,7 +44,9 @@ class Logger:
         if isinstance(msg, dict):
             if self.config['wandb']:
                 wandb.log(msg)
-        print(msg)
+            print(' | '.join([f'{k}: {v}' for k, v in msg.items()]))
+        else:
+            print(msg)
 
     def watch(self, model: nn.Module, *args, **kwargs):
         if self.config['wandb']:
