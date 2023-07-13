@@ -43,5 +43,6 @@ save_model: False
 
 # paths
 base_path: ''
+data_path: ''
 checkpoint_path: ''
 model_save_path: ''
