@@ -19,6 +19,8 @@ def get_datasets(path: str):
 def run(args):
     base_path = args.path
     config = Config('ml/config.yaml')
+    config['base_path'] = base_path
+    config['data_path'] = os.path.join(base_path, 'data')
 
     _, _, test_ds = get_datasets(base_path)
 
@@ -28,7 +30,7 @@ def run(args):
 
     model = FNN(input_size, hidden_size, output_size)
 
-    trainer = Trainer.initialize(config, model, data_path=base_path)
+    trainer = Trainer.initialize(config, model)
     trainer.train()
 
 
