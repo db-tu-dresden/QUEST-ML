@@ -13,10 +13,9 @@ if TYPE_CHECKING:
 
 
 class Logger:
-    def __init__(self, config: Config, project: str = 'carQUEST-ML'):
+    def __init__(self, config: Config):
         self.config = config
         self.wandb = wandb.login() if self.config['wandb'] else None
-        self.project = project
 
         self._epoch = 0
         self._step = 0
@@ -60,4 +59,4 @@ class Logger:
             wandb.watch(model, *args, **kwargs)
 
     def __call__(self, config: Config):
-        return optional(self.config['wandb'], wandb.init, config=config.data, project=self.project)
+        return optional(self.config['wandb'], wandb.init, config=config.data, project=self.config['wandb_project'])
