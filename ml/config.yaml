@@ -42,6 +42,6 @@ min_checkpoint_epoch_dist: 0
 save_model: False
 
 # paths
-root_dir: ''
+base_path: ''
 checkpoint_path: ''
 model_save_path: ''

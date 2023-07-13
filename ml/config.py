@@ -56,7 +56,7 @@ class Config:
         'save_model': Use(bool),
 
         # paths
-        'root_dir': Use(str),
+        'base_path': Use(str),
         'checkpoint_path': Use(str),
         'model_save_path': Use(str),
     })
