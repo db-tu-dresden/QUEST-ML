@@ -1,13 +1,8 @@
-import math
 import os
 from enum import Enum
 
 import torch
 import torch.distributed as dist
-from ray import tune
-from ray.air import session
-from ray.air.checkpoint import Checkpoint
-from ray.tune.schedulers import ASHAScheduler
 from tqdm import tqdm
 from torch import optim, nn
 from torch.nn.parallel import DistributedDataParallel
@@ -76,9 +71,8 @@ class Trainer:
                                           drop_last=self.config['drop_last'])
 
         self.criterion = nn.MSELoss()
-        if self.model:
-            self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],
-                                       momentum=self.config['momentum'])
+        self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],
+                                   momentum=self.config['momentum'])
 
     def batch_data_to_device(self, batch):
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
@@ -170,104 +164,6 @@ class Trainer:
     @staticmethod
     def cleanup():
         ddp.cleanup()
-
-    def _ray_tune_checkpoint(self, train_loss: float, valid_loss: float):
-        os.makedirs(self.config['checkpoint_path'], exist_ok=True)
-        torch.save(
-            (self.model.state_dict(), self.optimizer.state_dict()),
-            os.path.join(self.config['checkpoint_path'], 'checkpoint.pt'))
-        checkpoint = Checkpoint.from_directory(self.config['checkpoint_path'])
-        session.report({'loss': valid_loss}, checkpoint=checkpoint)
-
-    def _ray_tune_train(self, config: dict):
-        self.config.update(config)
-
-        self.train_dataloader = DataLoader(self.train_data, batch_size=self.config['batch_size'],
-                                           shuffle=self.config['shuffle'],
-                                           num_workers=self.config['num_workers_dataloader'],
-                                           pin_memory=self.config['pin_memory'],
-                                           drop_last=self.config['drop_last'])
-        self.valid_dataloader = DataLoader(self.valid_data, batch_size=self.config['batch_size'],
-                                           shuffle=self.config['shuffle'],
-                                           num_workers=self.config['num_workers_dataloader'],
-                                           pin_memory=self.config['pin_memory'],
-                                           drop_last=self.config['drop_last'])
-        self.test_dataloader = DataLoader(self.test_data, batch_size=self.config['batch_size'],
-                                          shuffle=self.config['shuffle'],
-                                          num_workers=self.config['num_workers_dataloader'],
-                                          pin_memory=self.config['pin_memory'],
-                                          drop_last=self.config['drop_last'])
-
-        # build model
-        input_size = math.prod(self.train_data.get_sample_shape())
-        hidden_size = self.config['hidden_size']
-        output_size = input_size
-        layers = self.config['layers']
-        self.model = FNN(input_size, hidden_size, output_size, layers)
-
-        # move model to device if on gpu
-        device = 'cpu'
-        if torch.cuda.is_available():
-            device = 'cuda:0'
-            if torch.cuda.device_count() > 1:
-                self.model = nn.DataParallel(self.model)
-        self.model.to(device)
-
-        self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],
-                                   momentum=self.config['momentum'])
-
-        # load checkpoint if exists
-        loaded_checkpoint = session.get_checkpoint()
-        if loaded_checkpoint:
-            with loaded_checkpoint.as_directory() as loaded_checkpoint_dir:
-                model_state, optimizer_state = torch.load(os.path.join(loaded_checkpoint_dir, 'checkpoint.pt'))
-            self.model.load_state_dict(model_state)
-            self.optimizer.load_state_dict(optimizer_state)
-
-        # train
-        self.train()
-
-    def ray_tune(self, tune_config: dict, num_samples: int = 10, max_num_epochs: int = 10, gpus_per_trial: int = 2):
-        scheduler = ASHAScheduler(
-            max_t=max_num_epochs,
-            grace_period=1,
-            reduction_factor=2)
-
-        tuner = tune.Tuner(
-            tune.with_resources(
-                tune.with_parameters(self._ray_tune_train),
-                resources={'cpu': 2, 'gpu': gpus_per_trial}
-            ),
-            tune_config=tune.TuneConfig(
-                metric='loss',
-                mode='min',
-                scheduler=scheduler,
-                num_samples=num_samples,
-            ),
-            param_space=tune_config,
-        )
-
-        self.post_epoch_hooks.append(self._ray_tune_checkpoint)
-        results = tuner.fit()
-
-        best_result = results.get_best_result('loss', 'min')
-
-        self.logger.log(f'Best trial config: {best_result.config}', verbose=True)
-        self.logger.log(f'Best trial final validation loss: {best_result.metrics["loss"]}', verbose=True)
-        self.logger.log(f'Best trial final validation accuracy: {best_result.metrics["accuracy"]}', verbose=True)
-
-        # build model
-        input_size = math.prod(self.train_data.get_sample_shape())
-        hidden_size = best_result.config['hidden_size']
-        output_size = input_size
-        layers = best_result.config['layers']
-        self.model = FNN(input_size, hidden_size, output_size, layers)
-
-        # move model to device if on gpu
-        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
-        self.model.to(device)
-
-        self.test()
 
     @staticmethod
     def get_datasets_from_path(path: str):
