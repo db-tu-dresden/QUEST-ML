@@ -22,6 +22,14 @@ parser.add_argument('-e', '--max-epochs', help='Max number of epochs per trail.'
 parser.add_argument('-g', '--gpus', help='GPUs used per trail.', default=0)
 
 
+TUNE_CONFIG = {
+    'hidden_size': tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
+    'layers': tune.sample_from(lambda _: np.random.randint(2, 4)),
+    'learning_rate': tune.loguniform(1e-4, 1e-1),
+    'batch_size': tune.choice([2, 4, 8, 16])
+}
+
+
 def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_num_epochs: int = 10,
                 gpus_per_trial: int = 2):
     scheduler = ASHAScheduler(
@@ -116,12 +124,7 @@ def test(config: Config):
 
 
 def run(args):
-    tune_config = {
-        'hidden_size': tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
-        'layers': tune.sample_from(lambda _: np.random.randint(2, 4)),
-        'learning_rate': tune.loguniform(1e-4, 1e-1),
-        'batch_size': tune.choice([2, 4, 8, 16])
-    }
+    tune_config = TUNE_CONFIG
 
     base_path = args.path
     trainer_config = Config(os.path.abspath('ml/config.yaml'))
