@@ -51,6 +51,9 @@ class Config:
         'min_checkpoint_epoch': Use(int),
         'min_checkpoint_epoch_dist': Use(int),
 
+        # model save
+        'save_model': Use(bool),
+
         # paths
         'root_dir': Use(str),
         'checkpoint_path': Use(str),

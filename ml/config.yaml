@@ -36,6 +36,9 @@ device:
 min_checkpoint_epoch: 10
 min_checkpoint_epoch_dist: 0
 
+# model save
+save_model: False
+
 # paths
 root_dir: ''
 checkpoint_path: ''
