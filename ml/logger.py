@@ -59,4 +59,5 @@ class Logger:
             wandb.watch(model, *args, **kwargs)
 
     def __call__(self, config: Config):
-        return optional(self.config['wandb'], wandb.init, config=config.data, project=self.config['wandb_project'])
+        return optional(self.config['wandb'], wandb.init, config=config.data, project=self.config['wandb_project'],
+                        group=self.config['wandb_group'] if self.config['wandb_group'] else None)

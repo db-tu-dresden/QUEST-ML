@@ -5,6 +5,7 @@ job_id: -1
 # logging
 wandb: True
 wandb_project: 'carQUEST-ML'
+wandb_group: ''
 wandb_watch_model: False
 verbose: True
 
