@@ -27,10 +27,13 @@ class Logger:
                  f'Epoch {epoch + 1} / {self.config["epochs"]}\n'
                  f'-------------------------\n')
 
-    def log_epoch(self, train_loss: float, valid_loss: float):
+    def log_epoch(self, train_loss: float, valid_loss: float, verbose: bool = None):
+        if verbose is None:
+            verbose = self.config['verbose']
         if self.config['wandb']:
             wandb.log({'epoch': self._epoch})
-        print(f'Epoch {self._epoch + 1}: train loss {train_loss} | validation loss {valid_loss}')
+        if verbose:
+            print(f'Epoch {self._epoch + 1}: train loss {train_loss} | validation loss {valid_loss}')
 
     def log_batch(self, mode: Mode, loss: float, step: int = None):
         if step is None:
@@ -40,13 +43,17 @@ class Logger:
         if self.config['wandb']:
             wandb.log({f'{mode.value}_loss': loss}, step=step)
 
-    def log(self, msg):
+    def log(self, msg, verbose: bool = None):
+        if verbose is None:
+            verbose = self.config['verbose']
         if isinstance(msg, dict):
             if self.config['wandb']:
                 wandb.log(msg)
-            print(' | '.join([f'{k}: {v}' for k, v in msg.items()]))
+            if verbose:
+                print(' | '.join([f'{k}: {v}' for k, v in msg.items()]))
         else:
-            print(msg)
+            if verbose:
+                print(msg)
 
     def watch(self, model: nn.Module, *args, **kwargs):
         if self.config['wandb']:

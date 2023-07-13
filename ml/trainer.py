@@ -95,7 +95,7 @@ class Trainer:
             self.model.eval()
 
         with optional(mode != Mode.TRAIN, torch.no_grad):
-            for batch_data in tqdm(dataloader):
+            for batch_data in tqdm(dataloader, disable=not self.config['verbose']):
                 inputs, targets = self.batch_data_to_device(batch_data)
                 inputs = inputs.view(self.config['batch_size'], -1)
                 targets = targets.view(self.config['batch_size'], -1)
@@ -252,9 +252,9 @@ class Trainer:
 
         best_result = results.get_best_result('loss', 'min')
 
-        print(f'Best trial config: {best_result.config}')
-        print(f'Best trial final validation loss: {best_result.metrics["loss"]}')
-        print(f'Best trial final validation accuracy: {best_result.metrics["accuracy"]}')
+        self.logger.log(f'Best trial config: {best_result.config}', verbose=True)
+        self.logger.log(f'Best trial final validation loss: {best_result.metrics["loss"]}', verbose=True)
+        self.logger.log(f'Best trial final validation accuracy: {best_result.metrics["accuracy"]}', verbose=True)
 
         # build model
         input_size = math.prod(self.train_data.get_sample_shape())

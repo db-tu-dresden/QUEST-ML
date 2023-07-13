@@ -26,6 +26,7 @@ def run(args):
     base_path = args.path
     trainer_config = Config(os.path.abspath('ml/config.yaml'))
     trainer_config['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
+    trainer_config['verbose'] = False
 
     train_ds, valid_ds, test_ds = Trainer.get_datasets_from_path(base_path)
 

@@ -20,6 +20,7 @@ class Config:
         # logging
         'wandb': Use(bool),
         'wandb_watch_model': Use(bool),
+        'verbose': Use(bool),
 
         # training hyperparameters
         'epochs': And(Use(int), lambda x: x > 0),
