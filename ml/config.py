@@ -19,6 +19,7 @@ class Config:
 
         # logging
         'wandb': Use(bool),
+        'wandb_project': Use(str),
         'wandb_watch_model': Use(bool),
         'verbose': Use(bool),
 
