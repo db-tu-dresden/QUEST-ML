@@ -10,8 +10,11 @@ wandb_watch_model: False
 epochs: 500
 learning_rate: 0.1
 momentum: 0.9
-hidden_size: 256
 batch_size: 1
+
+# model parameters
+hidden_size: 256
+layers: 2
 
 # training configuration
 set_gradients_none: False

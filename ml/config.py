@@ -25,8 +25,11 @@ class Config:
         'epochs': And(Use(int), lambda x: x > 0),
         'learning_rate': And(Use(float), lambda x: x > 0),
         'momentum': And(Use(float), lambda x: x > 0),
-        'hidden_size': And(Use(int), lambda x: x > 0),
         'batch_size': And(Use(int), lambda x: x > 0),
+
+        # model parameters
+        'hidden_size': And(Use(int), lambda x: x > 0),
+        'layers': And(Use(int), lambda x: x > 0),
 
         # training configuration
         'set_gradients_none': Use(bool),
