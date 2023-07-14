@@ -45,6 +45,10 @@ class Config:
         'pin_memory': Use(bool),
         'num_workers_dataloader': Use(int),
 
+        # data
+        'processes': And(Use(int), lambda x: x > 0),
+        'jobs': And(Use(int), lambda x: x > 0),
+
         # distributed training
         'master_addr': Or(None, And(Use(str), lambda x: len(x) > 0)),
         'master_port': Or(None, Use(int)),
