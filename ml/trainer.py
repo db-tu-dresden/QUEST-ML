@@ -143,7 +143,7 @@ class Trainer:
                 valid_loss = self.valid()
 
                 for hook in self.post_epoch_hooks:
-                    hook(train_loss, valid_loss)
+                    hook(self, train_loss, valid_loss)
 
             test_loss = self.test()
 
