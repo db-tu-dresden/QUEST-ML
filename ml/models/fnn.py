@@ -33,7 +33,6 @@ class MLP(Model):
             self.model.add_module(f'act{i + 2}', nn.ReLU())
 
         self.model.add_module(f'dense{hidden_layers + 2}',  nn.Linear(hidden_size, output_size))
-        self.model.add_module(f'act{hidden_layers + 2}', nn.Sigmoid())
 
     def forward(self, x: torch.Tensor):
         return self.model(x)
