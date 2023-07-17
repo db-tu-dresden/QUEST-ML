@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 
 
 class ProcessDataset(Dataset):
-    def __init__(self, df: pd.DataFrame, scaling_factor=10):
+    def __init__(self, df: pd.DataFrame, scaling_factor: int = 10):
         self.df = df
         self.scaling_factor = scaling_factor
 
