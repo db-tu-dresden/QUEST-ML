@@ -13,10 +13,12 @@ class FNN(Model):
         self.activation = nn.ReLU()
 
     def forward(self, x: torch.Tensor):
-        out = x
+        shape = x.shape
+        out = x.view(shape[0], -1)
         for layer in self.layers:
             out = self.activation(layer(out))
         out = self.out_layer(out)
+        out = out.view(shape[0], shape[1], -1)
         return out
 
 
@@ -35,4 +37,8 @@ class MLP(Model):
         self.model.add_module(f'dense{hidden_layers + 2}',  nn.Linear(hidden_size, output_size))
 
     def forward(self, x: torch.Tensor):
-        return self.model(x)
+        shape = x.shape
+        out = x.view(shape[0], -1)
+        out = self.model(out)
+        out = out.view(shape[0], shape[1], -1)
+        return out

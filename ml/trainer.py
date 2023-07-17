@@ -91,8 +91,6 @@ class Trainer:
         with optional(mode != Mode.TRAIN, torch.no_grad):
             for batch_data in tqdm(dataloader, disable=not self.config['verbose']):
                 inputs, targets = self.batch_data_to_device(batch_data)
-                inputs = inputs.view(self.config['batch_size'], -1)
-                targets = targets.view(self.config['batch_size'], -1)
 
                 if mode == Mode.TRAIN:
                     self.optimizer.zero_grad(set_to_none=self.config['set_gradients_none'])
