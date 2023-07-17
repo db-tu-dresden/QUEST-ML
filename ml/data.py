@@ -1,32 +1,35 @@
-import pandas as pd
+import pickle
+
 import torch
 from torch.utils.data import Dataset
+import xarray as xr
 
 
 class ProcessDataset(Dataset):
-    def __init__(self, df: pd.DataFrame, scaling_factor: int = 10):
-        self.df = df
+    def __init__(self, da: xr.DataArray, scaling_factor: int = 10, window_size: int = 10):
+        self.da = da
         self.scaling_factor = scaling_factor
+        self.window_size = window_size
 
-        for name, data in self.df.items():
-            if name == 'step':
-                continue
-            self.df[name] = data.map(lambda x: list(x.values()))
-
-        self.orig_df = self.df
-        self.df = pd.DataFrame(self.df.iloc[::self.scaling_factor, :]).reset_index(drop=True)
+        self.orig_da = self.da
+        self.da = self.da[::scaling_factor]
 
     @classmethod
     def from_path(cls, path: str):
-        return cls(pd.read_pickle(path))
+        with open(path, 'rb') as f:
+            da = pickle.load(f)
+        return cls(da)
 
     def get_sample_shape(self):
         return self[0][0].shape
 
     def __len__(self):
-        return len(self.df) - 1     # -1 because the next step is the label; therefore the last step is omitted
+        return len(self.da) - 1     # -1 because the next step is the label; therefore the last step is omitted
 
     def __getitem__(self, item):
-        _, *dist_source = self.df.iloc[[item]].to_numpy()[0]
-        _, *dist_target = self.df.iloc[[item]].to_numpy()[0]
+        jobs = sorted(self.da['job'].data)
+
+        dist_source = self.da.sel(job=jobs)[item].to_numpy()
+        dist_target = self.da.sel(job=jobs)[item].to_numpy()
+
         return torch.tensor(dist_source, dtype=torch.float), torch.tensor(dist_target, dtype=torch.float)

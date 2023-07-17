@@ -42,8 +42,9 @@ system.logger.plot()
 ```
 
 The job distribution of each proces over time can be saved in a pandas dataframe by:
+
 ```python
-system.logger.save_df('./save/df.pkl')
+system.logger.save('./save/df.pkl')
 ```
 
 ## Config

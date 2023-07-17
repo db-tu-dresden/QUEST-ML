@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import math
+import pickle
 from typing import TYPE_CHECKING
 
-import pandas as pd
+import numpy as np
+import xarray as xr
 from matplotlib import pyplot as plt
 
-from system.process import ArrivalProcess
 if TYPE_CHECKING:
     from system.system import System
 
@@ -18,7 +19,7 @@ class Logger:
         self.log = {}
 
         self.default_dist = {job_type.name: 0 for job_type in self.system.job_types.types}
-        self._df = pd.DataFrame()
+        self._da = xr.DataArray()
 
     def __repr__(self):
         cls = self.__class__.__name__
@@ -40,38 +41,36 @@ class Logger:
             yield from self.process()
 
     @property
-    def df(self):
+    def da(self):
         steps = list(self.log.keys())
+        processes = list(self.log[0].keys())
+        jobs = list(self.log[0][-1].keys())
 
-        if not steps:
-            return self._df
+        npa = np.array([[list(p.values()) for p in t.values()] for t in self.log.values()])
+        self._da = xr.DataArray(data=npa, dims=['step', 'process', 'job'],
+                                coords=dict(
+                                    step=steps,
+                                    process=processes,
+                                    job=jobs,
+                                ),
+                                attrs=dict(
+                                    granularity=self.rate),
+                                )
 
-        data = {'step': steps}
+        return self._da
 
-        processes = self.log[0].keys()
-        for process in processes:
-            process_data = []
-            for t in self.log.keys():
-                process_data.append(self.log[t][process])
-            data[process] = process_data
-        self._df = pd.DataFrame(data)
-
-        return self._df
-
-    def save_df(self, path: str):
-        self.df.to_pickle(path)
+    def save(self, path: str):
+        with open(path, 'wb') as f:
+            pickle.dump(self.da, f)
 
     def plot(self, path: str = None, show: bool = True):
-        df = self.df
-        x = df.loc[:, 'step']
-
         ncols = 4
-        nrows = math.ceil((len(df.columns) - 1) / ncols)
+        nrows = math.ceil((len(self.da['process']) - 1) / ncols)
         fig, axs = plt.subplots(figsize=(16, 9), ncols=ncols, nrows=nrows)
 
-        for (name, values), ax in zip(df.loc[:, df.columns != 'step'].items(), axs.ravel()):
-            ax.plot(x, [sum(v for v in entry.values()) for entry in values])
-            ax.set_title(f'Process {name}')
+        for process, ax in zip(self.da['process'].data, axs.ravel()):
+            ax.plot(self.da['step'], self.da.sel(process=process).sum('job'))
+            ax.set_title(f'Process {process}')
 
         if path:
             plt.savefig(path)
