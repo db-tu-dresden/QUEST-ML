@@ -4,8 +4,9 @@ from torch.utils.data import Dataset
 
 
 class ProcessDataset(Dataset):
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, scaling_factor=10):
         self.df = df
+        self.scaling_factor = scaling_factor
 
         for name, data in self.df.items():
             if name == 'step':
@@ -20,9 +21,9 @@ class ProcessDataset(Dataset):
         return self[0][0].shape
 
     def __len__(self):
-        return len(self.df) - 1     # -1 because the next step is the label; therefore the last step is omitted
+        return len(self.df) // self.scaling_factor - 1     # -1 because the next step is the label; therefore the last step is omitted
 
     def __getitem__(self, item):
-        _, *dist_source = self.df.iloc[[item]].to_numpy()[0]
-        _, *dist_target = self.df.iloc[[item + 1]].to_numpy()[0]
+        _, *dist_source = self.df.iloc[[item * self.scaling_factor]].to_numpy()[0]
+        _, *dist_target = self.df.iloc[[(item + 1) * self.scaling_factor]].to_numpy()[0]
         return torch.tensor(dist_source, dtype=torch.float), torch.tensor(dist_target, dtype=torch.float)
