@@ -20,7 +20,7 @@ class FNN(Model):
         return out
 
 
-class FNN2(Model):
+class MLP(Model):
     def __init__(self, input_size: int, hidden_size: int, output_size: int, hidden_layers: int = 2):
         super().__init__()
 
