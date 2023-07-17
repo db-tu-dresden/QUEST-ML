@@ -13,6 +13,9 @@ class ProcessDataset(Dataset):
                 continue
             self.df[name] = data.map(lambda x: list(x.values()))
 
+        self.orig_df = self.df
+        self.df = pd.DataFrame(self.df.iloc[::self.scaling_factor, :]).reset_index(drop=True)
+
     @classmethod
     def from_path(cls, path: str):
         return cls(pd.read_pickle(path))
@@ -21,9 +24,9 @@ class ProcessDataset(Dataset):
         return self[0][0].shape
 
     def __len__(self):
-        return len(self.df) // self.scaling_factor - 1     # -1 because the next step is the label; therefore the last step is omitted
+        return len(self.df) - 1     # -1 because the next step is the label; therefore the last step is omitted
 
     def __getitem__(self, item):
-        _, *dist_source = self.df.iloc[[item * self.scaling_factor]].to_numpy()[0]
-        _, *dist_target = self.df.iloc[[(item + 1) * self.scaling_factor]].to_numpy()[0]
+        _, *dist_source = self.df.iloc[[item]].to_numpy()[0]
+        _, *dist_target = self.df.iloc[[item]].to_numpy()[0]
         return torch.tensor(dist_source, dtype=torch.float), torch.tensor(dist_target, dtype=torch.float)
