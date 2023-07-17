@@ -10,7 +10,7 @@ class FNN(Model):
         self.layers = [nn.Linear(input_size, hidden_size)] + \
                       [nn.Linear(hidden_size, hidden_size) for _ in range(layers - 1)]
         self.out_layer = nn.Linear(hidden_size, output_size)
-        self.activation = nn.Sigmoid()
+        self.activation = nn.ReLU()
 
     def forward(self, x: torch.Tensor):
         out = x
