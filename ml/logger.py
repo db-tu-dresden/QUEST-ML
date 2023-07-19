@@ -16,6 +16,8 @@ class Logger:
         self.config = config
         self.wandb = wandb.login() if self.config['wandb'] else None
 
+        self.float_formatter = '.4f'
+
         self._epoch = 0
         self._step = 0
 
@@ -44,7 +46,7 @@ class Logger:
             if to_wandb:
                 wandb.log(msg)
             if verbose:
-                print(' | '.join([f'{k}: {v}' for k, v in msg.items()]))
+                print(' | '.join([f'{k}: {v:{self.float_formatter}}' for k, v in msg.items()]))
         else:
             if verbose:
                 print(msg)
