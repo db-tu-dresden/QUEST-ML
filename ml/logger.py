@@ -23,7 +23,9 @@ class Logger:
 
     def epoch(self, epoch: int):
         self._epoch = epoch
-        self.log(f'-------------------------\n'
+        self.log(f'\n'
+                 f'\n'
+                 f'-------------------------\n'
                  f'Epoch {epoch + 1} / {self.config["epochs"]}\n'
                  f'-------------------------\n')
         if self.config['wandb']:
