@@ -27,14 +27,6 @@ class Logger:
         if self.config['wandb']:
             wandb.log({'epoch': self._epoch})
 
-    def log_epoch(self, train_loss: float, valid_loss: float, verbose: bool = None):
-        if verbose is None:
-            verbose = self.config['verbose']
-        if self.config['wandb']:
-            wandb.log({'epoch': self._epoch})
-        if verbose:
-            print(f'Epoch {self._epoch + 1}: train loss {train_loss} | validation loss {valid_loss}')
-
     def log_batch(self, mode: Mode, loss: float, step: int = None):
         if step is None:
             step = self._step
