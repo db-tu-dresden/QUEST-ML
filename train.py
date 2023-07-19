@@ -1,5 +1,4 @@
 import argparse
-import math
 import os
 
 from ml import Config, ProcessDataset, Trainer
@@ -24,7 +23,10 @@ def run(args):
 
     _, _, test_ds = get_datasets(base_path)
 
-    input_size = math.prod(test_ds.get_sample_shape())  # num processes * num jobs
+    config['processes'] = test_ds.get_sample_shape()[0]
+    config['jobs'] = test_ds.get_sample_shape()[1]
+
+    input_size = config['processes'] * config['jobs']  # num processes * num jobs
     hidden_size = config['hidden_size']
     output_size = input_size
 
