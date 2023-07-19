@@ -11,12 +11,12 @@ verbose: True
 
 # training hyperparameters
 epochs: 500
-learning_rate: 0.1
+learning_rate: 0.002
 momentum: 0.9
-batch_size: 1
+batch_size: 16
 
 # model parameters
-hidden_size: 256
+hidden_size: 64
 layers: 2
 
 # training configuration
