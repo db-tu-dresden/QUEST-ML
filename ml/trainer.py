@@ -166,10 +166,10 @@ class Trainer:
         ddp.cleanup()
 
     @staticmethod
-    def get_datasets_from_path(path: str):
-        return ProcessDataset.from_path(os.path.join(path, 'train', 'df.pkl')), \
-            ProcessDataset.from_path(os.path.join(path, 'valid', 'df.pkl')), \
-            ProcessDataset.from_path(os.path.join(path, 'test', 'df.pkl'))
+    def get_datasets_from_path(path: str, scaling_factor: int):
+        return ProcessDataset.from_path(os.path.join(path, 'train', 'df.pkl'), scaling_factor), \
+            ProcessDataset.from_path(os.path.join(path, 'valid', 'df.pkl'), scaling_factor), \
+            ProcessDataset.from_path(os.path.join(path, 'test', 'df.pkl'), scaling_factor)
 
     @classmethod
     def _initialize(cls, rank: int | None, config: Config, model,
@@ -188,7 +188,8 @@ class Trainer:
         config['master_port'] = ddp.find_free_port(config['master_addr'])
 
         if not train_data and not valid_data and not test_data:
-            train_data, valid_data, test_data = cls.get_datasets_from_path(config['data_path'])
+            train_data, valid_data, test_data = cls.get_datasets_from_path(config['data_path'],
+                                                                           config['scaling_factor'])
 
         if config['on_gpu']:
             ddp.run(cls._initialize, config, model, train_data, valid_data, test_data)

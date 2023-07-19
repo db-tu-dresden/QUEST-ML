@@ -33,6 +33,7 @@ num_workers_dataloader: 0
 # data
 processes: 0
 jobs: 0
+scaling_factor: 10
 
 # distributed training
 master_addr: localhost

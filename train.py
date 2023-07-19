@@ -9,10 +9,10 @@ parser.add_argument('-p', '--path', help='Path where a config.yaml describing th
                                          'a graph_description.note describing the process graph lie.')
 
 
-def get_datasets(path: str):
-    return ProcessDataset.from_path(os.path.join(path, 'data', 'train', 'da.pkl')), \
-        ProcessDataset.from_path(os.path.join(path, 'data', 'valid', 'da.pkl')), \
-        ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'da.pkl'))
+def get_datasets(path: str, scaling_factor: int):
+    return ProcessDataset.from_path(os.path.join(path, 'data', 'train', 'da.pkl'), scaling_factor), \
+        ProcessDataset.from_path(os.path.join(path, 'data', 'valid', 'da.pkl'), scaling_factor), \
+        ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'da.pkl'), scaling_factor)
 
 
 def run(args):
@@ -21,7 +21,7 @@ def run(args):
     config['base_path'] = base_path
     config['data_path'] = os.path.join(base_path, 'data')
 
-    _, _, test_ds = get_datasets(base_path)
+    _, _, test_ds = get_datasets(base_path, config['scaling_factor'])
 
     config['processes'] = test_ds.get_sample_shape()[0]
     config['jobs'] = test_ds.get_sample_shape()[1]

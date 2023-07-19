@@ -48,6 +48,7 @@ class Config:
         # data
         'processes': Use(int),
         'jobs': Use(int),
+        'scaling_factor': And(Use(int), lambda x: x > 0),
 
         # distributed training
         'master_addr': Or(None, And(Use(str), lambda x: len(x) > 0)),

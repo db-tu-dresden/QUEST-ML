@@ -6,7 +6,7 @@ import xarray as xr
 
 
 class ProcessDataset(Dataset):
-    def __init__(self, da: xr.DataArray, scaling_factor: int = 10, window_size: int = 10):
+    def __init__(self, da: xr.DataArray, scaling_factor: int = 1, window_size: int = 10):
         self.da = da
         self.scaling_factor = scaling_factor
         self.window_size = window_size
@@ -15,10 +15,10 @@ class ProcessDataset(Dataset):
         self.da = self.da[::scaling_factor]
 
     @classmethod
-    def from_path(cls, path: str):
+    def from_path(cls, path: str, scaling_factor: int):
         with open(path, 'rb') as f:
             da = pickle.load(f)
-        return cls(da)
+        return cls(da, scaling_factor)
 
     def get_sample_shape(self):
         return self[0][0].shape
