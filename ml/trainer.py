@@ -109,7 +109,8 @@ class Trainer:
                         batch_loss.backward()
                         self.optimizer.step()
 
-                self.logger.log_batch(mode, batch_loss.item())
+                    self.logger.log_batch(mode, batch_loss.item())
+
                 epoch_loss += batch_loss.item()
 
         return epoch_loss / num_batches
@@ -137,7 +138,7 @@ class Trainer:
                     self.valid_sampler.set_epoch(epoch)
 
                 train_loss = self._train()
-                self.logger.log({'train_loss': train_loss})
+                self.logger.log({'train_loss': train_loss}, to_wandb=False)
 
                 valid_loss = self.valid()
 
