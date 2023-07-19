@@ -27,7 +27,7 @@ def run_simulation(config: Config, notation: Notation, path: str):
     system.build()
     system.run()
     system.logger.plot(path=os.path.join(path, 'dist.png'), show=False)
-    system.logger.save(os.path.join(path, 'df.pkl'))
+    system.logger.save(os.path.join(path, 'da.pkl'))
 
 
 def run(args):

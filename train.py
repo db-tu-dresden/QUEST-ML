@@ -11,9 +11,9 @@ parser.add_argument('-p', '--path', help='Path where a config.yaml describing th
 
 
 def get_datasets(path: str):
-    return ProcessDataset.from_path(os.path.join(path, 'data', 'train', 'df.pkl')), \
-        ProcessDataset.from_path(os.path.join(path, 'data', 'valid', 'df.pkl')), \
-        ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'df.pkl'))
+    return ProcessDataset.from_path(os.path.join(path, 'data', 'train', 'da.pkl')), \
+        ProcessDataset.from_path(os.path.join(path, 'data', 'valid', 'da.pkl')), \
+        ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'da.pkl'))
 
 
 def run(args):
