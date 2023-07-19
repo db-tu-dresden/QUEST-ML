@@ -37,10 +37,12 @@ class System:
         self.processes = {}
         self.rng = np.random.default_rng(self.config['randomSeed'])
         self.rand_containers = [RandomContainer(rng,
-                                                mean=self.config['processes']['mean'],
-                                                std=self.config['processes']['std'],
+                                                mean=self.config['processes'][i]['mean']
+                                                if i < len(self.config['processes']) else None,
+                                                std=self.config['processes'][i]['std']
+                                                if i < len(self.config['processes']) else None,
                                                 beta=self.config['arrivalProcess']['beta'])
-                                for rng in self.rng.spawn(len(self.notation.graph.nodes) + 1)]
+                                for i, rng in enumerate(self.rng.spawn(len(self.notation.graph.nodes) + 1))]
 
         self.logger = Logger(self.config['loggingRate'], self)
 
