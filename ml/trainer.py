@@ -1,4 +1,5 @@
 import os
+import sys
 from enum import Enum
 
 import torch
@@ -89,7 +90,7 @@ class Trainer:
             self.model.eval()
 
         with optional(mode != Mode.TRAIN, torch.no_grad):
-            for batch_data in tqdm(dataloader, disable=not self.config['verbose']):
+            for batch_data in tqdm(dataloader, disable=not self.config['verbose'], file=sys.stdout):
                 inputs, targets = self.batch_data_to_device(batch_data)
 
                 if mode == Mode.TRAIN:
