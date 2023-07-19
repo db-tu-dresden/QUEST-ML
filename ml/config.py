@@ -46,8 +46,8 @@ class Config:
         'num_workers_dataloader': Use(int),
 
         # data
-        'processes': And(Use(int), lambda x: x > 0),
-        'jobs': And(Use(int), lambda x: x > 0),
+        'processes': Use(int),
+        'jobs': Use(int),
 
         # distributed training
         'master_addr': Or(None, And(Use(str), lambda x: len(x) > 0)),
