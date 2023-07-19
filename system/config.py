@@ -35,10 +35,10 @@ class Config:
         'arrivalProcess': {
             'beta': And(Use(float), lambda x: x > 0),
         },
-        'processes': {
+        'processes': [{
             'mean': Use(float),
             'std': And(Use(float), lambda x: x > 0),
-        }
+        }]
     })
 
     def __init__(self, path: str, schema: Schema = default_schema):

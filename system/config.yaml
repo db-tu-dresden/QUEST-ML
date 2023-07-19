@@ -14,5 +14,11 @@ jobs:
 arrivalProcess:
   beta: 1.0
 processes:
-  mean: 1.0
-  std: 0.2
+  - mean: 1.0
+    std: 0.2
+  - mean: 1.0
+    std: 0.2
+  - mean: 1.0
+    std: 0.2
+  - mean: 1.0
+    std: 0.2
