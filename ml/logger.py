@@ -24,6 +24,8 @@ class Logger:
         self.log(f'-------------------------\n'
                  f'Epoch {epoch + 1} / {self.config["epochs"]}\n'
                  f'-------------------------\n')
+        if self.config['wandb']:
+            wandb.log({'epoch': self._epoch})
 
     def log_epoch(self, train_loss: float, valid_loss: float, verbose: bool = None):
         if verbose is None:
