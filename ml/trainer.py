@@ -153,12 +153,12 @@ class Trainer:
 
     def valid(self):
         valid_loss = self._valid()
-        self.logger.log({'valid_loss': valid_loss})
+        self.logger.log({'valid/valid_loss': valid_loss})
         return valid_loss
 
     def test(self):
         test_loss = self._test()
-        self.logger.log({'test_loss': test_loss})
+        self.logger.log({'test/test_loss': test_loss})
         return test_loss
 
     @staticmethod
