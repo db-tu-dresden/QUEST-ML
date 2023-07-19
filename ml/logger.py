@@ -19,7 +19,6 @@ class Logger:
         self.float_formatter = '.4f'
 
         self._epoch = 0
-        self._step = 0
 
     def epoch(self, epoch: int):
         self._epoch = epoch
@@ -31,13 +30,9 @@ class Logger:
         if self.config['wandb']:
             wandb.log({'epoch': self._epoch})
 
-    def log_batch(self, mode: Mode, loss: float, step: int = None):
-        if step is None:
-            step = self._step
-            self._step += 1
-
+    def log_batch(self, mode: Mode, loss: float):
         if self.config['wandb']:
-            wandb.log({f'{mode.value}_loss': loss}, step=step)
+            wandb.log({f'{mode.value}/{mode.value}_loss': loss})
 
     def log(self, msg, to_wandb: bool = None, verbose: bool = None):
         if verbose is None:
