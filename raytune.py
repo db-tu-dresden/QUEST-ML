@@ -76,7 +76,7 @@ def trainer_checkpoint(trainer: Trainer, train_loss: float, valid_loss: float):
 def train(tune_config: dict, config: Config):
     config.update(tune_config)
 
-    train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'])
+    train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'], config['scaling_factor'])
 
     input_size = math.prod(test_data.get_sample_shape())  # num processes * num jobs
     hidden_size = config['hidden_size']
