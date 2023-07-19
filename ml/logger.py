@@ -35,11 +35,13 @@ class Logger:
         if self.config['wandb']:
             wandb.log({f'{mode.value}_loss': loss}, step=step)
 
-    def log(self, msg, verbose: bool = None):
+    def log(self, msg, to_wandb: bool = None, verbose: bool = None):
         if verbose is None:
             verbose = self.config['verbose']
+        if to_wandb is None:
+            to_wandb = self.config['wandb']
         if isinstance(msg, dict):
-            if self.config['wandb']:
+            if to_wandb:
                 wandb.log(msg)
             if verbose:
                 print(' | '.join([f'{k}: {v}' for k, v in msg.items()]))
