@@ -41,11 +41,13 @@ The jobs of each process over time can be plotted by:
 system.logger.plot()
 ```
 
-The job distribution of each proces over time can be saved in a pandas dataframe by:
+The job distribution of each process over time can be saved in a xarray DataArray by:
 
 ```python
-system.logger.save('./save/df.pkl')
+system.logger.save('./save/da.pkl')
 ```
+
+This creates a DataArray with the dimensions time (step), process, and job.
 
 ## Config
 The following is an example config.  
