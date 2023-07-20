@@ -33,8 +33,7 @@ def run(args):
 
     model = FNN(input_size, hidden_size, output_size)
 
-    trainer = Trainer.initialize(config, model)
-    trainer.train()
+    Trainer.run(config, model)
 
 
 if __name__ == '__main__':

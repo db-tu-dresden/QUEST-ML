@@ -27,7 +27,6 @@ class Trainer:
     def __init__(self, config: Config, model,
                  train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
         self.logger = Logger(config)
-        self.post_epoch_hooks = []
 
         self.config = config
         self.device = self.config['device']
@@ -173,9 +172,6 @@ class Trainer:
                 valid_loss = self.valid()
                 self.checkpoint(valid_loss)
 
-                for hook in self.post_epoch_hooks:
-                    hook(self, train_loss, valid_loss)
-
                 self.logger.log({'learning_rate': self.optimizer.param_groups[0]['lr']})
                 self.lr_scheduler.step(valid_loss)
 
@@ -206,18 +202,19 @@ class Trainer:
             ProcessDataset.from_path(os.path.join(path, 'test', pickle_file_name), scaling_factor)
 
     @classmethod
-    def _initialize(cls, rank: int | None, config: Config, model,
-                    train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
+    def _run(cls, rank: int | None, config: Config, model,
+             train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
         if rank is not None:
             ddp.setup(rank, config)
 
         config['world_size'] = dist.get_world_size() if dist.is_initialized() else 1
 
-        return cls(config, model, train_data, valid_data, test_data)
+        trainer = cls(config, model, train_data, valid_data, test_data)
+        trainer.train()
 
     @classmethod
-    def initialize(cls, config: Config, model, train_data: ProcessDataset = None, valid_data: ProcessDataset = None,
-                   test_data: ProcessDataset = None):
+    def run(cls, config: Config, model, train_data: ProcessDataset = None, valid_data: ProcessDataset = None,
+            test_data: ProcessDataset = None):
         config['world_size'] = torch.cuda.device_count()
         config['master_port'] = ddp.find_free_port(config['master_addr'])
 
@@ -227,6 +224,6 @@ class Trainer:
                                                                            config['pickle_file_name'])
 
         if config['on_gpu']:
-            ddp.run(cls._initialize, config, model, train_data, valid_data, test_data)
+            ddp.run(cls._run, config, model, train_data, valid_data, test_data)
         else:
-            return cls._initialize(None, config, model, train_data, valid_data, test_data)
+            cls._run(None, config, model, train_data, valid_data, test_data)

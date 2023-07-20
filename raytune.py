@@ -64,13 +64,24 @@ def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_nu
     test(config)
 
 
-def trainer_checkpoint(trainer: Trainer, train_loss: float, valid_loss: float):
+def checkpoint(trainer: Trainer, valid_loss: float, file_name: str = None):
     os.makedirs(trainer.config['checkpoint_path'], exist_ok=True)
     torch.save(
         (trainer.model.state_dict(), trainer.optimizer.state_dict()),
-        os.path.join(trainer.config['checkpoint_path'], 'checkpoint.pt'))
+        os.path.join(trainer.config['checkpoint_path'], trainer.config['checkpoint_file']))
     checkpoint = Checkpoint.from_directory(trainer.config['checkpoint_path'])
     session.report({'loss': valid_loss}, checkpoint=checkpoint)
+
+
+def load_checkpoint(trainer: Trainer):
+    # load checkpoint if exists
+    loaded_checkpoint = session.get_checkpoint()
+    if loaded_checkpoint:
+        with loaded_checkpoint.as_directory() as loaded_checkpoint_dir:
+            model_state, optimizer_state = torch.load(os.path.join(loaded_checkpoint_dir,
+                                                                   trainer.config['checkpoint_file']))
+        trainer.model.load_state_dict(model_state)
+        trainer.optimizer.load_state_dict(optimizer_state)
 
 
 def train(tune_config: dict, config: Config):
@@ -93,17 +104,10 @@ def train(tune_config: dict, config: Config):
             model = nn.DataParallel(model)
     model.to(device)
 
-    trainer = Trainer.initialize(config, model, train_data, valid_data, test_data)
-    trainer.post_epoch_hooks.append(trainer_checkpoint)
+    Trainer.checkpoint = checkpoint
+    Trainer.load_checkpoint = load_checkpoint
 
-    # load checkpoint if exists
-    loaded_checkpoint = session.get_checkpoint()
-    if loaded_checkpoint:
-        with loaded_checkpoint.as_directory() as loaded_checkpoint_dir:
-            model_state, optimizer_state = torch.load(os.path.join(loaded_checkpoint_dir, 'checkpoint.pt'))
-        trainer.model.load_state_dict(model_state)
-        trainer.optimizer.load_state_dict(optimizer_state)
-
+    trainer = Trainer.run(config, model, train_data, valid_data, test_data)
     trainer.train()
 
 
