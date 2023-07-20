@@ -72,6 +72,7 @@ class Config:
         'base_path': Use(str),
         'data_path': Use(str),
         'checkpoint_path': Use(str),
+        'checkpoint_file': Use(str),
         'model_save_path': Use(str),
     })
 

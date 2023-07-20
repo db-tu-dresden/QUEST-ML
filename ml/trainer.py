@@ -32,6 +32,10 @@ class Trainer:
         self.config = config
         self.device = self.config['device']
 
+        self.checkpoint_stats = {
+            'min_valid_loss': float('inf')
+        }
+
         self.model = model
 
         self.train_data = train_data
@@ -77,6 +81,29 @@ class Trainer:
         self.lr_scheduler = ReduceLROnPlateau(self.optimizer, 'min',
                                               factor=config['lr_scheduler_factor'],
                                               patience=config['lr_scheduler_patience'])
+
+        self.load_checkpoint()
+
+    def checkpoint(self, valid_loss: float, file_name: str = None):
+        if ddp.is_main_process():
+            os.makedirs(self.config['checkpoint_path'], exist_ok=True)
+            torch.save({
+                'model': self.model.state_dict(),
+                'optimizer': self.optimizer.state_dict(),
+                'valid_loss': valid_loss,
+            }, os.path.join(self.config['checkpoint_path'], file_name or self.config['checkpoint_file']))
+
+            if valid_loss < self.checkpoint_stats['min_valid_loss']:
+                self.checkpoint_stats['min_valid_loss'] = valid_loss
+                self.checkpoint(valid_loss, 'best.pt')
+
+    def load_checkpoint(self):
+        try:
+            checkpoint = torch.load(os.path.join(self.config['checkpoint_path'], self.config['checkpoint_file']))
+            self.model.load_state_dict(checkpoint['model'])
+            self.optimizer.load_state_dict(checkpoint['optimizer'])
+        except FileNotFoundError:
+            pass
 
     def batch_data_to_device(self, batch):
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
@@ -144,6 +171,7 @@ class Trainer:
                 self.logger.log({'train_loss': train_loss}, to_wandb=False)
 
                 valid_loss = self.valid()
+                self.checkpoint(valid_loss)
 
                 for hook in self.post_epoch_hooks:
                     hook(self, train_loss, valid_loss)

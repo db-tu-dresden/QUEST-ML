@@ -57,4 +57,5 @@ save_model: False
 base_path: ''
 data_path: ''
 checkpoint_path: ''
+checkpoint_file: 'checkpoint.pt'
 model_save_path: ''

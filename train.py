@@ -20,6 +20,7 @@ def run(args):
     config = Config('ml/config.yaml')
     config['base_path'] = base_path
     config['data_path'] = os.path.join(base_path, 'data')
+    config['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
 
     _, _, test_ds = get_datasets(base_path, config['scaling_factor'])
 
