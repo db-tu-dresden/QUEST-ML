@@ -104,6 +104,10 @@ class Trainer:
         except FileNotFoundError:
             pass
 
+    @staticmethod
+    def get_accuracy(outputs: [torch.Tensor], targets: [torch.Tensor]):
+        return (outputs.round() == targets).all(axis=2).all(axis=1).sum().item() / outputs.shape[0]
+
     def batch_data_to_device(self, batch):
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
 
@@ -112,6 +116,7 @@ class Trainer:
         num_batches = int(data_size / self.config['batch_size'])
 
         epoch_loss = 0
+        epoch_accuracy = 0
 
         if mode == Mode.TRAIN:
             self.model.train()
@@ -128,6 +133,7 @@ class Trainer:
                 with optional(self.config['fp16'] and self.scaler, torch.cuda.amp.autocast):
                     outputs = self.model(inputs)
                 batch_loss = self.criterion(outputs, targets)
+                batch_accuracy = self.get_accuracy(outputs, targets)
 
                 if mode == Mode.TRAIN:
                     if self.scaler:
@@ -141,8 +147,9 @@ class Trainer:
                     self.logger.log_batch(mode, batch_loss.item())
 
                 epoch_loss += batch_loss.item()
+                epoch_accuracy += batch_accuracy
 
-        return epoch_loss / num_batches
+        return epoch_loss / num_batches, epoch_accuracy / num_batches
 
     def _train(self):
         return self._go(Mode.TRAIN, self.train_dataloader)
@@ -166,30 +173,39 @@ class Trainer:
                     self.train_sampler.set_epoch(epoch)
                     self.valid_sampler.set_epoch(epoch)
 
-                train_loss = self._train()
-                self.logger.log({'train_loss': train_loss}, to_wandb=False)
+                train_loss, train_acc = self._train()
+                self.logger.log({
+                    'train_loss': train_loss,
+                    'train_acc': train_acc,
+                }, to_wandb=False)
 
-                valid_loss = self.valid()
+                valid_loss, valid_acc = self.valid()
                 self.checkpoint(valid_loss)
 
                 self.logger.log({'learning_rate': self.optimizer.param_groups[0]['lr']})
                 self.lr_scheduler.step(valid_loss)
 
-            test_loss = self.test()
+            test_loss, test_acc = self.test()
 
         if self.config['save_model']:
             self.model.save(path=self.config['model_save_path'])
         self.cleanup()
 
     def valid(self):
-        valid_loss = self._valid()
-        self.logger.log({'valid/valid_loss': valid_loss})
-        return valid_loss
+        valid_loss, valid_acc = self._valid()
+        self.logger.log({
+            'valid/valid_loss': valid_loss,
+            'valid/valid_accuracy': valid_acc,
+        })
+        return valid_loss, valid_acc
 
     def test(self):
-        test_loss = self._test()
-        self.logger.log({'test/test_loss': test_loss})
-        return test_loss
+        test_loss, test_acc = self._test()
+        self.logger.log({
+            'test/test_loss': test_loss,
+            'test/test_accuracy': test_acc,
+        })
+        return test_loss, test_acc
 
     @staticmethod
     def cleanup():
