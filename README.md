@@ -10,7 +10,8 @@ To enable this, create a directory with a config.yaml describing the configurati
 When these two files are present in a directory run: `python create_data.py --path PATH-TO-YOUR-DIR`.  
 This creates the subdirectories `train`, `valid` and `test`.
 For each of these directories a separate simulation is run.  
-Inside each directory a pandas dataframe is created containing all logged data.  
+Inside each directory a xarray DataArray is created containing all logged data.  
+The dimensions of the DataArray are time (step), process, and job.  
 Alongside, a plot is created displaying all process queues over the runtime of the simulation.  
 In the given root directory an image is created describing the structure of the system.
 
