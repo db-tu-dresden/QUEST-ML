@@ -50,6 +50,7 @@ class Config:
         'num_workers_dataloader': Use(int),
 
         # data
+        'pickle_file_name': And(Use(str), lambda x: len(x) > 0),
         'processes': Use(int),
         'jobs': Use(int),
         'scaling_factor': And(Use(int), lambda x: x > 0),

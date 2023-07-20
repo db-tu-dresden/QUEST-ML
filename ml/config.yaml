@@ -35,6 +35,7 @@ pin_memory: True
 num_workers_dataloader: 0
 
 # data
+pickle_file_name: da.pkl
 processes: 0
 jobs: 0
 scaling_factor: 10
