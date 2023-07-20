@@ -28,6 +28,11 @@ If the ml config value `wandb` is `True` and a user is logged into wandb,
 training metrics can be seen on the given website.  
 At the end of the training the model is saved.
 
+Optional arguments are:  
+`--gpu`, if set, the training uses GPUs.  
+`--n_gpus N`, where `N` is the number of GPUs to use, default is all available.  
+`--wandb B`, where `B` is either `True` or `False`, whether to use wandb for logging, default is `True`.
+
 
 ## Hyperparameter search
 For hyperparameter search [ray-tune](https://www.ray.io/ray-tune) is used. 
