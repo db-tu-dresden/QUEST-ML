@@ -4,11 +4,16 @@ Modeling queue simulations in production lines with ML
 ## Data creation
 First a dataset needs to be created. 
 To enable this, create a directory with a config.yaml describing the configuration of the system  
-([README.md](system/README.md) explains how this is done) and a graph_description.note describing the structure of the system  
+([README.md](system/README.md) explains how this is done) and a graph_description.note describing the structure of the system 
 ([README.md](notation/README.md) explains how this is done).
 
 When these two files are present in a directory run: `python create_data.py --path PATH-TO-YOUR-DIR`.  
-This creates the subdirectories `train`, `valid` and `test`.
+Optional arguments are:  
+`--train N`, where `N` is the number of steps the simulation runs for the training data creation, the default is 10000.  
+`--valid N`, where `N` is the number of steps the simulation runs for the validation data creation, the default is 2000.  
+`--test N`, where `N` is the number of steps the simulation runs for the test data creation, the default is 10000.  
+
+This creates the subdirectories `/train`, `/valid` and `/test`.
 For each of these directories a separate simulation is run.  
 Inside each directory a xarray DataArray is created containing all logged data.  
 The dimensions of the DataArray are time (step), process, and job.  
