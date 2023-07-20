@@ -10,13 +10,13 @@ wandb_watch_model: False
 verbose: True
 
 # training hyperparameters
-epochs: 500
-learning_rate: 0.002
+epochs: 50
+learning_rate: 0.01
 momentum: 0.9
 batch_size: 16
 
 # model parameters
-hidden_size: 64
+hidden_size: 32
 layers: 2
 
 # learning rate scheduler
