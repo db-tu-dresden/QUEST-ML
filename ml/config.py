@@ -15,6 +15,7 @@ class Config:
     default_schema = Schema({
         # general
         'on_gpu': Use(bool),
+        'world_size': And(Use(int), lambda x: x >= 0),
         'job_id': Use(int),
 
         # logging

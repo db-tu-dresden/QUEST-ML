@@ -207,15 +207,13 @@ class Trainer:
         if rank is not None:
             ddp.setup(rank, config)
 
-        config['world_size'] = dist.get_world_size() if dist.is_initialized() else 1
-
         trainer = cls(config, model, train_data, valid_data, test_data)
         trainer.train()
 
     @classmethod
     def run(cls, config: Config, model, train_data: ProcessDataset = None, valid_data: ProcessDataset = None,
             test_data: ProcessDataset = None):
-        config['world_size'] = torch.cuda.device_count()
+        config['world_size'] = config['world_size'] or torch.cuda.device_count() or 1
         config['master_port'] = ddp.find_free_port(config['master_addr'])
 
         if not train_data and not valid_data and not test_data:
