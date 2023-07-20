@@ -14,7 +14,6 @@ from ml import ddp
 from ml.config import Config
 from ml.data import ProcessDataset
 from ml.logger import Logger
-from ml.models.fnn import FNN
 from ml.utils import optional
 
 
