@@ -7,6 +7,7 @@ from ml.models.fnn import FNN
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
                                          'a graph_description.note describing the process graph lie.')
+parser.add_argument('-g', '--gpu', action='store_true', help='Enable GPU usage')
 
 
 def get_datasets(path: str, scaling_factor: int):
@@ -21,6 +22,8 @@ def run(args):
     config['base_path'] = base_path
     config['data_path'] = os.path.join(base_path, 'data')
     config['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
+
+    config['on_gpu'] = args.gpu
 
     _, _, test_ds = get_datasets(base_path, config['scaling_factor'])
 
