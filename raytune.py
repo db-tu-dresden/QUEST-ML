@@ -106,7 +106,7 @@ def train(tune_config: dict, config: Config):
 
 
 def test(config: Config):
-    train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'])
+    train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'], config['scaling_factor'])
 
     # build model for test
     input_size = math.prod(test_data.get_sample_shape())  # num processes * num jobs
