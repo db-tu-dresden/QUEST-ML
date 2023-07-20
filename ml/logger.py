@@ -16,7 +16,7 @@ class Logger:
         self.config = config
         self.wandb = wandb.login() if self.config['wandb'] else None
 
-        self.float_formatter = '.4f'
+        self.float_formatter = f'.{config["float_precision"]}f'
 
         self._epoch = 0
 

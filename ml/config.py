@@ -23,6 +23,7 @@ class Config:
         'wandb_group': Use(str),
         'wandb_watch_model': Use(bool),
         'verbose': Use(bool),
+        'float_precision': And(Use(int), lambda x: x > 0),
 
         # training hyperparameters
         'epochs': And(Use(int), lambda x: x > 0),
