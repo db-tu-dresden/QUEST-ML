@@ -9,6 +9,9 @@ import timing
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
                                          'a graph_description.note describing the process graph lie.')
+parser.add_argument('--train', type=int, help='Training steps to simulate', default=10000)
+parser.add_argument('--valid', type=int, help='Validation steps to simulate', default=2000)
+parser.add_argument('--test', type=int, help='Test steps to simulate', default=10000)
 
 
 def get_notation(path: str):
@@ -39,15 +42,15 @@ def run(args):
     states = [
         {
             'dir': 'train',
-            'steps': 10000
+            'steps': args.train,
         },
         {
             'dir': 'valid',
-            'steps': 2000
+            'steps': args.valid
         },
         {
             'dir': 'test',
-            'steps': 10000
+            'steps': args.test,
         }
     ]
 
