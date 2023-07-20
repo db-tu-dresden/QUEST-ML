@@ -4,6 +4,7 @@ from enum import Enum
 
 import torch
 import torch.distributed as dist
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 from torch import optim, nn
 from torch.nn.parallel import DistributedDataParallel
@@ -74,6 +75,9 @@ class Trainer:
         self.criterion = nn.MSELoss()
         self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],
                                    momentum=self.config['momentum'])
+        self.lr_scheduler = ReduceLROnPlateau(self.optimizer, 'min',
+                                              factor=config['lr_scheduler_factor'],
+                                              patience=config['lr_scheduler_patience'])
 
     def batch_data_to_device(self, batch):
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
@@ -144,6 +148,9 @@ class Trainer:
 
                 for hook in self.post_epoch_hooks:
                     hook(self, train_loss, valid_loss)
+
+                self.logger.log({'learning_rate': self.optimizer.param_groups[0]['lr']})
+                self.lr_scheduler.step(valid_loss)
 
             test_loss = self.test()
 

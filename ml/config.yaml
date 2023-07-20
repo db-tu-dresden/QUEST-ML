@@ -19,6 +19,10 @@ batch_size: 16
 hidden_size: 64
 layers: 2
 
+# learning rate scheduler
+lr_scheduler_factor: 0.1
+lr_scheduler_patience: 3
+
 # training configuration
 set_gradients_none: False
 fp16: False

@@ -34,6 +34,10 @@ class Config:
         'hidden_size': And(Use(int), lambda x: x > 0),
         'layers': And(Use(int), lambda x: x > 0),
 
+        # learning rate scheduler
+        'lr_scheduler_factor': And(Use(float), lambda x: x > 0),
+        'lr_scheduler_patience': And(Use(int), lambda x: x > 0),
+
         # training configuration
         'set_gradients_none': Use(bool),
         'fp16': Use(bool),
