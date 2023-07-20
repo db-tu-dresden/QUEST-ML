@@ -1,6 +1,5 @@
 numpy~=1.25.0
 matplotlib~=3.7.1
-pandas~=2.0.2
 simpy~=4.0.1
 PyYAML~=6.0
 schema~=0.7.5
