@@ -173,7 +173,7 @@ class Trainer:
         ddp.cleanup()
 
     @staticmethod
-    def get_datasets_from_path(path: str, scaling_factor: int):
+    def get_datasets_from_path(path: str, scaling_factor: int = 1):
         return ProcessDataset.from_path(os.path.join(path, 'train', 'df.pkl'), scaling_factor), \
             ProcessDataset.from_path(os.path.join(path, 'valid', 'df.pkl'), scaling_factor), \
             ProcessDataset.from_path(os.path.join(path, 'test', 'df.pkl'), scaling_factor)

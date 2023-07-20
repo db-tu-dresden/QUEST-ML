@@ -14,7 +14,7 @@ class ProcessDataset(Dataset):
         self.da = self.da[::scaling_factor]
 
     @classmethod
-    def from_path(cls, path: str, scaling_factor: int):
+    def from_path(cls, path: str, scaling_factor: int = 1):
         with open(path, 'rb') as f:
             da = pickle.load(f)
         return cls(da, scaling_factor)
