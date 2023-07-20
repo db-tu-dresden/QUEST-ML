@@ -9,6 +9,7 @@ parser.add_argument('-p', '--path', help='Path where a config.yaml describing th
                                          'a graph_description.note describing the process graph lie.')
 parser.add_argument('-g', '--gpu', action='store_true', help='Enable GPU usage')
 parser.add_argument('-n', '--n_gpus', type=int, help='How many GPUs to use.If not set, all GPUs are used')
+parser.add_argument('--wandb', type=bool, default=True, help='Whether to use wandb is used for logging.')
 
 
 def get_datasets(path: str, scaling_factor: int):
@@ -26,6 +27,7 @@ def run(args):
 
     config['on_gpu'] = args.gpu
     config['world_size'] = args.n_gpus
+    config['wandb'] = args.wandb
 
     _, _, test_ds = get_datasets(base_path, config['scaling_factor'])
 
