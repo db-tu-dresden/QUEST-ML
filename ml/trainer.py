@@ -152,7 +152,7 @@ class Trainer:
             epoch_accuracy /= num_batches
 
             if mode == Mode.VALID:
-                self.logger.log_data(inputs.detach(), outputs.detach().round(), targets.detach(),
+                self.logger.log_data(inputs.detach().cpu(), outputs.detach().round().cpu(), targets.detach().cpu(),
                                      epoch_loss, epoch_accuracy)
 
         return epoch_loss, epoch_accuracy
