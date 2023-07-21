@@ -96,6 +96,8 @@ class Trainer:
                 self.checkpoint(valid_loss, 'best.pt')
 
     def load_checkpoint(self):
+        if not self.config['from_checkpoint']:
+            return
         try:
             checkpoint = torch.load(os.path.join(self.config['checkpoint_path'], self.config['checkpoint_file']))
             self.model.load_state_dict(checkpoint['model'])

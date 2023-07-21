@@ -65,6 +65,7 @@ class Config:
         'device': Or(None, Use(int)),
 
         # model checkpoint
+        'from_checkpoint': Use(bool),
         'min_checkpoint_epoch': Use(int),
         'min_checkpoint_epoch_dist': Use(int),
 

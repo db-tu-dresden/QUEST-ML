@@ -50,6 +50,7 @@ master_port:
 device:
 
 # model checkpoint
+from_checkpoint: False
 min_checkpoint_epoch: 10
 min_checkpoint_epoch_dist: 0
 
