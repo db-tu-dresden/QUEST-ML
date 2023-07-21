@@ -111,7 +111,7 @@ class Trainer:
     def batch_data_to_device(self, batch):
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
 
-    def _calc_epoch(self, mode: Mode, dataloader: DataLoader):
+    def _train_epoch(self, mode: Mode, dataloader: DataLoader):
         data_size = len(dataloader.dataset) / self.config['world_size']
         num_batches = int(data_size / self.config['batch_size'])
 
@@ -152,13 +152,13 @@ class Trainer:
         return epoch_loss / num_batches, epoch_accuracy / num_batches
 
     def _train(self):
-        return self._calc_epoch(Mode.TRAIN, self.train_dataloader)
+        return self._train_epoch(Mode.TRAIN, self.train_dataloader)
 
     def _valid(self):
-        return self._calc_epoch(Mode.VALID, self.valid_dataloader)
+        return self._train_epoch(Mode.VALID, self.valid_dataloader)
 
     def _test(self):
-        return self._calc_epoch(Mode.TEST, self.test_dataloader)
+        return self._train_epoch(Mode.TEST, self.test_dataloader)
 
     def train(self, config: dict = None):
         if config is not None:
