@@ -12,7 +12,7 @@ from torch import nn
 import wandb
 
 from ml import Trainer, Config
-from ml.models.fnn import FNN
+from ml.models.fnn import MLP
 
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
@@ -94,7 +94,7 @@ def train(tune_config: dict, config: Config):
     input_size = math.prod(test_data.get_sample_shape())  # num processes * num jobs
     hidden_size = config['hidden_size']
     output_size = input_size
-    model = FNN(input_size, hidden_size, output_size)
+    model = MLP(input_size, hidden_size, output_size)
 
     # move model to device if on gpu
     device = 'cpu'
@@ -120,7 +120,7 @@ def test(config: Config):
     input_size = math.prod(test_data.get_sample_shape())  # num processes * num jobs
     hidden_size = config['hidden_size']
     output_size = input_size
-    model = FNN(input_size, hidden_size, output_size)
+    model = MLP(input_size, hidden_size, output_size)
 
     # move model to device if on gpu
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
