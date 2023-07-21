@@ -3,7 +3,6 @@ import sys
 from enum import Enum
 
 import torch
-import torch.distributed as dist
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 from torch import optim, nn

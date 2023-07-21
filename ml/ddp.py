@@ -2,7 +2,6 @@ import os
 import socket
 import sys
 from contextlib import closing
-from typing import Any
 
 import torch.cuda
 import torch.distributed as dist
