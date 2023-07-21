@@ -29,7 +29,7 @@ def setup(rank: int, config: Config):
     dist.init_process_group('nccl', rank=rank, world_size=config['world_size'])
     config['device'] = f'cuda:{rank}'
     torch.cuda.set_device(config['device'])
-    set_stdout(config['root_dir'] + 'job-' + config['job_id'])
+    set_stdout(os.path.join(config['base_path'], 'job-' + str(config['job_id'])))
     dist.barrier()
 
 
