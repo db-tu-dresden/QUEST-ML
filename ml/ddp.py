@@ -24,6 +24,7 @@ def setup(rank: int, config: Config):
     os.environ['MASTER_PORT'] = str(config['master_port'])
     os.environ['WORLD_SIZE'] = str(config['world_size'])
     os.environ['RANK'] = str(rank)
+    config['rank'] = rank
 
     dist.init_process_group('nccl', rank=rank, world_size=config['world_size'])
     config['device'] = f'cuda:{rank}'
