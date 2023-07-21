@@ -103,6 +103,7 @@ def train(tune_config: dict, config: Config):
         if torch.cuda.device_count() > 1:
             model = nn.DataParallel(model)
     model.to(device)
+    config['device'] = device
 
     Trainer.checkpoint = checkpoint
     Trainer.load_checkpoint = load_checkpoint
