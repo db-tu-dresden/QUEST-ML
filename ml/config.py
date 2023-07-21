@@ -23,6 +23,8 @@ class Config:
         'wandb_project': Use(str),
         'wandb_group': Use(str),
         'wandb_watch_model': Use(bool),
+        'wandb_table_name': Use(str),
+        'wandb_table_elements': And(Use(int), lambda x: x > 0),
         'verbose': Use(bool),
         'float_precision': And(Use(int), lambda x: x > 0),
 

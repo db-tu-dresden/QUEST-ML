@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from copy import copy
+
+import numpy as np
+import torch
 import wandb
 from torch import nn
 
@@ -20,6 +24,9 @@ class Logger:
 
         self._epoch = 0
 
+        self.data_table = wandb.Table(columns=['epoch', 'loss', 'accuracy', 'inputs', 'outputs', 'targets']) \
+            if self.config['wandb'] else None
+
     def epoch(self, epoch: int):
         self._epoch = epoch
         self.log(f'\n'
@@ -33,6 +40,17 @@ class Logger:
     def log_batch(self, mode: Mode, loss: float):
         if self.config['wandb']:
             wandb.log({f'{mode.value}/{mode.value}_loss': loss})
+
+    def log_data(self, inputs: torch.Tensor, outputs: torch.Tensor, targets: torch.Tensor,
+                 loss: float, accuracy: float):
+        if self.config['wandb'] is None:
+            return
+        n = self.config['wandb_table_elements']
+        self.data_table.add_data(self._epoch, loss, accuracy,
+                                 np.array2string(inputs[:n].numpy()),
+                                 np.array2string(outputs[:n].numpy()),
+                                 np.array2string(targets[:n].numpy()))
+        wandb.run.log({self.config['wandb_table_name']: copy(self.data_table)})
 
     def log(self, msg, to_wandb: bool = None, verbose: bool = None):
         if verbose is None:

@@ -149,7 +149,14 @@ class Trainer:
                 epoch_loss += batch_loss.item()
                 epoch_accuracy += batch_accuracy
 
-        return epoch_loss / num_batches, epoch_accuracy / num_batches
+            epoch_loss /= num_batches
+            epoch_accuracy /= num_batches
+
+            if mode == Mode.VALID:
+                self.logger.log_data(inputs.detach(), outputs.detach().round(), targets.detach(),
+                                     epoch_loss, epoch_accuracy)
+
+        return epoch_loss, epoch_accuracy
 
     def _train(self):
         return self._train_epoch(Mode.TRAIN, self.train_dataloader)

@@ -8,6 +8,8 @@ wandb: True
 wandb_project: 'carQUEST-ML'
 wandb_group: ''
 wandb_watch_model: False
+wandb_table_name: 'data_table'
+wandb_table_elements: 5
 verbose: True
 float_precision: 6
 
