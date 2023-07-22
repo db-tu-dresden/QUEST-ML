@@ -17,9 +17,10 @@ from ml.models.fnn import MLP
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
                                          'a graph_description.note describing the process graph lie.')
-parser.add_argument('-s', '--samples', help='Number of times to sample from the hyperparameter space.', default=10)
-parser.add_argument('-e', '--max-epochs', help='Max number of epochs per trail.', default=10)
-parser.add_argument('-g', '--gpus', help='GPUs used per trail.', default=0)
+parser.add_argument('-s', '--samples', type=int,
+                    help='Number of times to sample from the hyperparameter space.', default=10)
+parser.add_argument('-e', '--max-epochs', type=int, help='Max number of epochs per trail.', default=10)
+parser.add_argument('-g', '--gpus', type=float, help='GPUs used per trail.', default=0)
 
 
 TUNE_CONFIG = {
@@ -31,7 +32,7 @@ TUNE_CONFIG = {
 
 
 def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_num_epochs: int = 10,
-                gpus_per_trial: int = 2):
+                gpus_per_trial: float = 2):
     scheduler = ASHAScheduler(
         max_t=max_num_epochs,
         grace_period=1,
