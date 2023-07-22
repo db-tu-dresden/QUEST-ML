@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser(description='ML model for sequence to sequence 
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
                                          'a graph_description.note describing the process graph lie.')
 parser.add_argument('-g', '--gpu', action='store_true', help='Enable GPU usage')
-parser.add_argument('-n', '--n_gpus', type=int, help='How many GPUs to use.If not set, all GPUs are used')
+parser.add_argument('-n', '--n_gpus', type=int, metavar='N', help='How many GPUs to use.If not set, all GPUs are used')
 parser.add_argument('--wandb', type=bool, default=True, help='Whether to use wandb is used for logging.')
 parser.add_argument('--arch', type=str, help='Model architecture')
 
