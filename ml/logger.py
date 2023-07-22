@@ -34,16 +34,17 @@ class Logger:
                  f'-------------------------\n'
                  f'Epoch {epoch + 1} / {self.config["epochs"]}\n'
                  f'-------------------------\n')
-        if self.config['wandb']:
+        if self.config['wandb'] and wandb.run is not None:
             wandb.log({'epoch': self._epoch})
 
     def log_batch(self, mode: Mode, loss: float):
-        if self.config['wandb']:
-            wandb.log({f'{mode.value}/{mode.value}_loss': loss})
+        if self.config['wandb'] is None or wandb.run is None:
+            return
+        wandb.log({f'{mode.value}/{mode.value}_loss': loss})
 
     def log_data(self, inputs: torch.Tensor, outputs: torch.Tensor, targets: torch.Tensor,
                  loss: float, accuracy: float):
-        if self.config['wandb'] is None:
+        if self.config['wandb'] is None or wandb.run is None:
             return
         n = self.config['wandb_table_elements']
         self.data_table.add_data(self._epoch, loss, accuracy,
@@ -58,7 +59,7 @@ class Logger:
         if to_wandb is None:
             to_wandb = self.config['wandb']
         if isinstance(msg, dict):
-            if to_wandb:
+            if to_wandb and wandb.run is not None:
                 wandb.log(msg)
             if verbose:
                 print(' | '.join([f'{k}: {v:{self.float_formatter}}' for k, v in msg.items()]))
@@ -67,7 +68,7 @@ class Logger:
                 print(msg)
 
     def watch(self, model: nn.Module, *args, **kwargs):
-        if self.config['wandb']:
+        if self.config['wandb'] and wandb.run is not None:
             wandb.watch(model, *args, **kwargs)
 
     def __call__(self, config: Config):
