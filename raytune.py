@@ -48,6 +48,7 @@ def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_nu
             mode='min',
             scheduler=scheduler,
             num_samples=num_samples,
+            reuse_actors=False,
         ),
         param_space=tune_config,
     )
