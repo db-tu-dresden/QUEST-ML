@@ -1,6 +1,6 @@
 # general
 on_gpu: False
-world_size: 0
+world_size: 1
 job_id: -1
 
 # logging
