@@ -1,4 +1,6 @@
 import logging
+import os
+
 from schema import Schema, And, Use, SchemaError, Or
 import yaml
 
@@ -88,6 +90,11 @@ class Config:
             self.data = yaml.full_load(f)
 
         self.validate()
+
+    def set_base_path(self, base_path: str):
+        self.data['base_path'] = base_path
+        self.data['data_path'] = os.path.join(base_path, 'data')
+        self.data['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
 
     def validate(self):
         self.data = validate_yaml(self.data, self.schema)

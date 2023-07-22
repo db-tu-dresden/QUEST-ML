@@ -23,9 +23,7 @@ def get_datasets(path: str, scaling_factor: int):
 def run(args):
     base_path = args.path
     config = Config('ml/config.yaml')
-    config['base_path'] = base_path
-    config['data_path'] = os.path.join(base_path, 'data')
-    config['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
+    config.set_base_path(base_path)
 
     config['on_gpu'] = args.gpu
     config['world_size'] = args.n_gpus
