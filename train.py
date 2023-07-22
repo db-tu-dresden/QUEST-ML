@@ -2,7 +2,7 @@ import argparse
 import os
 
 from ml import Config, ProcessDataset, Trainer
-from ml.models.fnn import MLP
+from ml.models.mlp import MLP
 
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
