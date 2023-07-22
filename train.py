@@ -1,8 +1,9 @@
 import argparse
 import os
 
+import ml
 from ml import Config, ProcessDataset, Trainer
-from ml.models.mlp import MLP
+from ml.models import build_model
 
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
@@ -10,6 +11,7 @@ parser.add_argument('-p', '--path', help='Path where a config.yaml describing th
 parser.add_argument('-g', '--gpu', action='store_true', help='Enable GPU usage')
 parser.add_argument('-n', '--n_gpus', type=int, help='How many GPUs to use.If not set, all GPUs are used')
 parser.add_argument('--wandb', type=bool, default=True, help='Whether to use wandb is used for logging.')
+parser.add_argument('--arch', type=str, help='Model architecture')
 
 
 def get_datasets(path: str, scaling_factor: int):
@@ -34,15 +36,14 @@ def run(args):
     config['processes'] = test_ds.get_sample_shape()[0]
     config['jobs'] = test_ds.get_sample_shape()[1]
 
-    input_size = config['processes'] * config['jobs']  # num processes * num jobs
-    hidden_size = config['hidden_size']
-    output_size = input_size
+    args.input_size = config['processes'] * config['jobs']
+    args.output_size = args.input_size
 
-    model = MLP(input_size, hidden_size, output_size)
+    model = build_model(args)
 
     Trainer.run(config, model)
 
 
 if __name__ == '__main__':
-    args = parser.parse_args()
+    args = ml.models.parse_arch(parser)
     run(args)
