@@ -82,18 +82,19 @@ class Trainer:
 
         self.load_checkpoint()
 
-    def checkpoint(self, valid_loss: float, file_name: str = None):
+    def checkpoint(self, valid_loss: float, valid_accuracy: float, file_name: str = None):
         if ddp.is_main_process():
             os.makedirs(self.config['checkpoint_path'], exist_ok=True)
             torch.save({
                 'model': self.model.state_dict(),
                 'optimizer': self.optimizer.state_dict(),
                 'valid_loss': valid_loss,
+                'valid_accuracy': valid_accuracy,
             }, os.path.join(self.config['checkpoint_path'], file_name or self.config['checkpoint_file']))
 
             if valid_loss < self.checkpoint_stats['min_valid_loss']:
                 self.checkpoint_stats['min_valid_loss'] = valid_loss
-                self.checkpoint(valid_loss, 'best.pt')
+                self.checkpoint(valid_loss, valid_accuracy, 'best.pt')
 
     def load_checkpoint(self):
         if not self.config['from_checkpoint']:
@@ -188,7 +189,7 @@ class Trainer:
                 }, to_wandb=False)
 
                 valid_loss, valid_acc = self.valid()
-                self.checkpoint(valid_loss)
+                self.checkpoint(valid_loss, valid_acc)
 
                 self.logger.log({'learning_rate': self.optimizer.param_groups[0]['lr']})
                 self.lr_scheduler.step(valid_loss)

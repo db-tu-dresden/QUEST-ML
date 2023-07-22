@@ -64,13 +64,13 @@ def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_nu
     test(config)
 
 
-def checkpoint(trainer: Trainer, valid_loss: float, file_name: str = None):
+def checkpoint(trainer: Trainer, valid_loss: float, valid_accuracy: float, file_name: str = None):
     os.makedirs(trainer.config['checkpoint_path'], exist_ok=True)
     torch.save(
         (trainer.model.state_dict(), trainer.optimizer.state_dict()),
         os.path.join(trainer.config['checkpoint_path'], trainer.config['checkpoint_file']))
     checkpoint = Checkpoint.from_directory(trainer.config['checkpoint_path'])
-    session.report({'loss': valid_loss}, checkpoint=checkpoint)
+    session.report({'loss': valid_loss, 'accuracy': valid_accuracy}, checkpoint=checkpoint)
 
 
 def load_checkpoint(trainer: Trainer):
