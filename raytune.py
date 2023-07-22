@@ -41,7 +41,7 @@ def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_nu
     tuner = tune.Tuner(
         tune.with_resources(
             tune.with_parameters(train, config=config),
-            resources={'cpu': 2, 'gpu': gpus_per_trial}
+            resources={'cpu': 1, 'gpu': gpus_per_trial}
         ),
         tune_config=tune.TuneConfig(
             metric='loss',
