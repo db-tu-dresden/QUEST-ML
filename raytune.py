@@ -109,8 +109,7 @@ def train(tune_config: dict, config: Config):
     Trainer.checkpoint = checkpoint
     Trainer.load_checkpoint = load_checkpoint
 
-    trainer = Trainer.run(config, model, train_data, valid_data, test_data)
-    trainer.train()
+    Trainer.run(config, model, train_data, valid_data, test_data)
 
 
 def test(config: Config):
