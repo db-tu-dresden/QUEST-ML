@@ -14,7 +14,7 @@ ARCH_CONFIG_REGISTRY = {}
 
 def build_model(cfg):
     model = None
-    model_type = getattr(cfg, 'arch', None)
+    model_type = cfg['arch'] if 'arch' in cfg else None
 
     model = ARCH_MODEL_REGISTRY[model_type]
     ARCH_CONFIG_REGISTRY[model_type](cfg)

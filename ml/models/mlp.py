@@ -28,8 +28,8 @@ class MLP(Model):
         parser.add_argument('--hidden_layers', type=int, metavar='N', help='Number of hidden layers')
 
     @classmethod
-    def build_model(cls, args):
-        return cls(args.input_size, args.hidden_size, args.output_size, args.hidden_layers)
+    def build_model(cls, cfg):
+        return cls(cfg['input_size'], cfg['hidden_size'], cfg['output_size'], cfg['hidden_layers'])
 
     def forward(self, x: torch.Tensor):
         shape = x.shape
@@ -40,8 +40,8 @@ class MLP(Model):
 
 
 @register_model_architecture('mlp', 'mlp')
-def mlp(args):
-    args.input_size = getattr(args, 'input_size', 16)
-    args.hidden_size = getattr(args, 'hidden_size', 32)
-    args.output_size = getattr(args, 'output_size', args.input_size)
-    args.hidden_layers = getattr(args, 'hidden_layers', 2)
+def mlp(cfg):
+    cfg['input_size'] = cfg['input_size'] if 'input_size' in cfg else 16
+    cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 32
+    cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
+    cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 2
