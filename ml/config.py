@@ -96,7 +96,7 @@ class Config:
         self.data['data_path'] = os.path.join(base_path, 'data')
         self.data['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
 
-    def set_from_args(self, args):
+    def add_from_args(self, args):
         d = vars(args)
         for k, v in d.items():
             self.data[k] = v

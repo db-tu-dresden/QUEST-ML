@@ -18,7 +18,7 @@ def run(args):
     base_path = args.path
     config = Config('ml/config.yaml')
     config.set_base_path(base_path)
-    config.set_from_args(args)
+    config.add_from_args(args)
 
     _, _, test_ds = get_datasets(base_path, config['scaling_factor'])
 
