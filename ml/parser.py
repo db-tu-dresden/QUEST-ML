@@ -37,7 +37,7 @@ def override_format_help(parser):
         if parser_id not in vars(ml.models):
             return msg
 
-        return vars(ml.models)[parser_id + '_parser'].format_help()
+        return vars(ml.models)[parser_id].format_help()
 
     parser.format_help = format_help
 
