@@ -4,8 +4,8 @@ import ml
 from ml import Config, ProcessDataset, Trainer, parser
 from ml.models import build_model
 
-parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
-                                         'a graph_description.note describing the process graph lie.')
+parser.add_argument('-p', '--path', required=True, help='Path where a config.yaml describing the system and '
+                                                        'a graph_description.note describing the process graph lie.')
 
 
 def get_datasets(path: str, scaling_factor: int):
