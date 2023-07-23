@@ -118,7 +118,6 @@ def import_models(models_dir, namespace):
             model_name = file[: file.find('.py')] if file.endswith('.py') else file
             importlib.import_module(namespace + '.' + model_name)
 
-            # extra `model_parser` for sphinx
             if model_name in MODEL_REGISTRY:
                 parser = argparse.ArgumentParser(add_help=False)
                 group_archs = parser.add_argument_group('Named architectures')
