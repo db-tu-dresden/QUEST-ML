@@ -1,6 +1,9 @@
+import argparse
+
 import torch
 from torch import nn
 
+from ml import Config
 from ml.models import register_model, register_model_architecture
 from ml.models.base import Model
 
@@ -21,14 +24,14 @@ class MLP(Model):
         self.model.add_module(f'dense{hidden_layers + 2}',  nn.Linear(hidden_size, output_size))
 
     @staticmethod
-    def add_args(parser):
+    def add_args(parser: argparse.ArgumentParser):
         parser.add_argument('--input_size', type=int, metavar='N', help='Input size')
         parser.add_argument('--hidden_size', type=int, metavar='N', help='Hidden size')
         parser.add_argument('--output_size', type=int, metavar='N', help='Output size')
         parser.add_argument('--hidden_layers', type=int, metavar='N', help='Number of hidden layers')
 
     @classmethod
-    def build_model(cls, cfg):
+    def build_model(cls, cfg: Config):
         return cls(cfg['input_size'], cfg['hidden_size'], cfg['output_size'], cfg['hidden_layers'])
 
     def forward(self, x: torch.Tensor):
@@ -40,7 +43,7 @@ class MLP(Model):
 
 
 @register_model_architecture('mlp', 'mlp')
-def mlp(cfg):
+def mlp(cfg: Config):
     cfg['input_size'] = cfg['input_size'] if 'input_size' in cfg else 16
     cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 32
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
