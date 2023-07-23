@@ -1,8 +1,7 @@
 import os
 
-import ml
 from ml import Config, ProcessDataset, Trainer, parser
-from ml.models import build_model
+from ml.models import build_model, parse_arch
 
 parser.add_argument('-p', '--path', required=True, help='Path where a config.yaml describing the system and '
                                                         'a graph_description.note describing the process graph lie.')
@@ -34,5 +33,5 @@ def run(args):
 
 
 if __name__ == '__main__':
-    args = ml.models.parse_arch(parser)
+    args = parse_arch(parser)
     run(args)
