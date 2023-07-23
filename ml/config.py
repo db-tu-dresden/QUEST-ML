@@ -97,10 +97,9 @@ class Config:
         self.data['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
 
     def set_from_args(self, args):
-        self.data['arch'] = args.arch
-        self.data['on_gpu'] = args.gpu
-        self.data['world_size'] = args.n_gpus
-        self.data['wandb'] = args.wandb
+        d = vars(args)
+        for k, v in d.items():
+            self.data[k] = v
 
     def validate(self):
         self.data = validate_yaml(self.data, self.schema)
