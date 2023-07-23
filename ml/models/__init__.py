@@ -68,13 +68,13 @@ def register_model_architecture(model_name, arch_name):
 
     For example::
 
-        @register_model_architecture('lstm', 'lstm_luong_wmt_en_de')
-        def lstm_luong_wmt_en_de(cfg):
-            args.encoder_embed_dim = getattr(cfg.model, 'encoder_embed_dim', 1000)
+        @register_model_architecture('mlp', 'mlp_10_layers')
+        def mlp_10_layers(cfg):
+            cfg['layers'] = cfg['layers'] if 'layers' in cfg else 10
             (...)
 
     The decorated function should take a single argument *cfg*, which is a
-    :class:`omegaconf.DictConfig`. The decorated function should modify these
+    :class:`ml.Config`. The decorated function should modify these
     arguments in-place to match the desired architecture.
 
     Args:
