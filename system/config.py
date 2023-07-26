@@ -1,6 +1,7 @@
 import logging
-from schema import Schema, And, Use, SchemaError, Or
+
 import yaml
+from schema import Schema, And, Use, SchemaError
 
 
 def validate_yaml(data: dict, schema: Schema):
