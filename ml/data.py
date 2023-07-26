@@ -11,7 +11,6 @@ class ProcessDataset(Dataset):
         self.scaling_factor = scaling_factor
         self.offset = prediction_gap
 
-        self.orig_da = self.da
         self.da = self.da[::scaling_factor]
 
     @classmethod
