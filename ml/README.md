@@ -4,11 +4,13 @@
 
 To use the module import the following:
 ```python
-from ml import Config, Trainer, parser
-from ml.models import build_model, parse_arch
+from ml import Config, Trainer, Parser
+from ml.models import build_model
 ```
 
-`parser` is an `argparse.ArgumentParser` instance containing the relevant arguments.  
+
+
+`Parser` is a subclass from `argparse.ArgumentParser` containing the relevant arguments.  
 It is explained in more detail in section [Parser](#parser).  
 Additional arguments can be added to the parser as usual.
 
@@ -22,21 +24,30 @@ Load the config by providing a location to the respective `.yaml` file.
 config = Config('ml/config.yaml')
 ```
 
+Create a parser based on the config values with
+```python
+parser = Parser(config)
+```
+The provided config supplies the argument names and default values to the parser.  
+Every single value can then be changed by prepending `--`, e.g. set the hidden size with `--hidden_size 8`.  
+The only argument differing in name to the respective entry in the config is `base_path`.  
+This can be shortend to `--path MY-BASE_PATH`.  
 Provide a path to a directory where the respective `DataArrays` can be found.  
 The directory should contain a directory called `data`.  
 This then should contain three directories called `train`, `valid`, and `test`, 
-where each contains a respective `da.pkl` file.  
-The base path can be set as follows:
-```python
-config.set_base_path(base_path)
-```
+where each contains a respective `da.pkl` file.
 
 Optionally, the datasets can be provided directly to the `Trainer` instance 
 by passing them as arguments to the `run` methode.
 
-To pass the cli arguments to the config run:
+Parse the arguments like usual
 ```python
-config.add_from_args(args)
+args = parser.parse_args()
+```
+
+To update the config with the arguments run
+```python
+config.update_from_args(args)
 ```
 
 To build the model use:
@@ -51,12 +62,9 @@ Trainer.run(config, model)
 
 
 ## Parser
-To display all possible parser arguments use the `--help` argument.
-Possible arguments are:  
-`--gpu`, whether to use GPUs, default `False`.  
-`--n_gpu`, how many GPUs to use, default all present.  
-`--wandb`, whether to use wandb for logging, default `True`.  
-`--arch`, what architecture to use, required.
+To display all possible parser arguments use the `--help` argument.  
+The arguments are all entries in the config file provided to `Config` (see [config.yaml](config.yaml)).  
+Additionally, the `base_path` can be set with the shorter argument name `--path`.
 
 To display all available arguments to a specific architecture use `--arch SOME_REGISTERED_ARCHITECTURE --help`.
 

@@ -1,10 +1,7 @@
 import os
 
-from ml import Config, ProcessDataset, Trainer, parser
-from ml.models import build_model, parse_arch
-
-parser.add_argument('-p', '--path', required=True, help='Path where a config.yaml describing the system and '
-                                                        'a graph_description.note describing the process graph lie.')
+from ml import Config, ProcessDataset, Trainer, Parser
+from ml.models import build_model
 
 
 def get_datasets(path: str, scaling_factor: int):
@@ -13,13 +10,15 @@ def get_datasets(path: str, scaling_factor: int):
         ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'da.pkl'), scaling_factor)
 
 
-def run(args):
-    base_path = args.path
+def run():
     config = Config('ml/config.yaml')
-    config.set_base_path(base_path)
-    config.add_from_args(args)
 
-    _, _, test_ds = get_datasets(base_path, config['scaling_factor'])
+    parser = Parser(config)
+    args = parser.parse_args()
+
+    config.update_from_args(args)
+
+    _, _, test_ds = get_datasets(config['base_path'], config['scaling_factor'])
 
     config['processes'] = test_ds.get_sample_shape()[0]
     config['jobs'] = test_ds.get_sample_shape()[1]
@@ -33,5 +32,4 @@ def run(args):
 
 
 if __name__ == '__main__':
-    args = parse_arch(parser)
-    run(args)
+    run()
