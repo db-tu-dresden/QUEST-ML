@@ -1,6 +1,6 @@
 import atexit
-from time import time, strftime, localtime
 from datetime import timedelta
+from time import time, strftime, localtime
 
 
 def seconds_to_str(elapsed: float = None):

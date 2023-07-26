@@ -3,14 +3,14 @@ import math
 import os.path
 
 import numpy as np
+import torch
 from ray import tune
 from ray.air import session
 from ray.air.checkpoint import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
-import torch
 from torch import nn
-import wandb
 
+import wandb
 from ml import Trainer, Config
 from ml.models.mlp import MLP
 
