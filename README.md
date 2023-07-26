@@ -24,14 +24,13 @@ In the given root directory an image is created describing the structure of the 
 ## Training
 To use the created data for training, simply run: `python train.py --path PATH-TO-YOUR-DIR`.
 This will start the training.  
-If the ml config value `wandb` is `True` and a user is logged into wandb, 
-training metrics can be seen on the given website.  
-At the end of the training the model is saved.
+Check the `ml` package [README](ml/README.md) for a detailed description of the arguments.
 
-Optional arguments are:  
+Some optional arguments are:  
 `--gpu`, if set, the training uses GPUs.  
-`--n_gpus N`, where `N` is the number of GPUs to use, default is all available.  
-`--wandb B`, where `B` is either `True` or `False`, whether to use wandb for logging, default is `True`.
+`--world_size N`, where `N` is the number of GPUs to use, default is all available.  
+`--wandb B`, where `B` is either `True` or `False`, whether to use wandb for logging, default is `True`.  
+`--save_model`, to save the model at the end of training.
 
 
 ## Hyperparameter search
