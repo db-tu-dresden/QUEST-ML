@@ -119,8 +119,8 @@ class Config:
         if base_path is None:
             base_path = self['base_path']
         self.data['base_path'] = base_path
-        self.data['data_path'] = os.path.join(base_path, 'data')
-        self.data['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
+        self.data['data_path'] = self.data['data_path'] or os.path.join(base_path, 'data')
+        self.data['checkpoint_path'] = self.data['checkpoint_path'] or os.path.join(base_path, 'checkpoint')
         self.data['system_config_path'] = self.data['system_config_path'] or \
                                           os.path.join(base_path, 'config.yaml')
         self.data['graph_notation_path'] = self.data['graph_notation_path'] or \
