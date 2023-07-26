@@ -196,9 +196,7 @@ class Trainer:
 
             test_loss, test_acc = self.test()
 
-        if self.config['save_model']:
-            self.model.save(path=self.config['model_save_path'])
-        self.logger.log_artifacts()
+        self.save()
         self.cleanup()
 
     def valid(self):
@@ -216,6 +214,13 @@ class Trainer:
             'test/test_accuracy': test_acc,
         })
         return test_loss, test_acc
+
+    def save(self):
+        if ddp.is_main_process():
+            if self.config['save_model']:
+                torch.save(self.model.state_dict(), self.config['model_save_path'])
+            self.logger.log_system_config()
+            self.logger.log_graph_notation()
 
     @staticmethod
     def cleanup():
