@@ -7,7 +7,10 @@ To enable this, create a directory with a config.yaml describing the configurati
 ([README.md](system/README.md) explains how this is done) and a graph_description.note describing the structure of the system 
 ([README.md](notation/README.md) explains how this is done).
 
-When these two files are present in a directory run: `python create_data.py --path PATH-TO-YOUR-DIR`.  
+When these two files are present in a directory run: 
+```shell
+python create_data.py --path PATH-TO-YOUR-DIR
+```  
 Optional arguments are:  
 `--train N`, where `N` is the number of steps the simulation runs for the training data creation, the default is 10000.  
 `--valid N`, where `N` is the number of steps the simulation runs for the validation data creation, the default is 2000.  
@@ -22,7 +25,10 @@ In the given root directory an image is created describing the structure of the 
 
 
 ## Training
-To use the created data for training, simply run: `python train.py --path PATH-TO-YOUR-DIR`.
+To use the created data for training, simply run: 
+```shell
+python train.py --path PATH-TO-YOUR-DIR
+```
 This will start the training.  
 Check the `ml` package [README](ml/README.md) for a detailed description of the arguments.
 
@@ -36,7 +42,10 @@ Some optional arguments are:
 ## Hyperparameter search
 For hyperparameter search [ray-tune](https://www.ray.io/ray-tune) is used. 
 It is necessary to first create a dataset, see [Data creation](#data-creation).  
-After this, simply run: `python raytune.py --path PATH-TO-YOUR-DIR`.  
+After this, simply run: 
+```shell
+python raytune.py --path PATH-TO-YOUR-DIR
+```  
 
 Optional cli arguments are:  
 `--samples`: This is the number of times to sample from the hyperparameter space, defaults to 10.  
