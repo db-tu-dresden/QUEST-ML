@@ -12,74 +12,96 @@ def validate_yaml(data: dict, schema: Schema):
         logging.exception(e)
 
 
-class Config:
+def true(*args, **kwargs):
+    return True
 
-    default_schema = Schema({
+
+def greater_zero(x):
+    return x > 0
+
+
+def greater_equal_zero(x):
+    return x > 0
+
+
+def length_greater_zero(x):
+    return len(x) > 0
+
+
+class Config:
+    config_dict = {
         # general
-        'on_gpu': Use(bool),
-        'world_size': And(Use(int), lambda x: x >= 0),
-        'job_id': Use(int),
+        'on_gpu': {'type': bool, 'lambda': true},
+        'world_size': {'type': int, 'lambda': greater_equal_zero},
+        'job_id': {'type': int, 'lambda': true},
 
         # logging
-        'wandb': Use(bool),
-        'wandb_project': Use(str),
-        'wandb_group': Use(str),
-        'wandb_watch_model': Use(bool),
-        'wandb_table_name': Use(str),
-        'wandb_table_elements': And(Use(int), lambda x: x > 0),
-        'verbose': Use(bool),
-        'float_precision': And(Use(int), lambda x: x > 0),
+        'wandb': {'type': bool, 'lambda': true},
+        'wandb_project': {'type': str, 'lambda': true},
+        'wandb_group': {'type': str, 'lambda': true},
+        'wandb_watch_model': {'type': bool, 'lambda': true},
+        'wandb_table_name': {'type': str, 'lambda': true},
+        'wandb_table_elements': {'type': int, 'lambda': greater_zero},
+        'verbose': {'type': bool, 'lambda': true},
+        'float_precision': {'type': int, 'lambda': greater_zero},
 
         # training hyperparameters
-        'epochs': And(Use(int), lambda x: x > 0),
-        'learning_rate': And(Use(float), lambda x: x > 0),
-        'momentum': And(Use(float), lambda x: x > 0),
-        'batch_size': And(Use(int), lambda x: x > 0),
+        'epochs': {'type': int, 'lambda': greater_zero},
+        'learning_rate': {'type': float, 'lambda': greater_zero},
+        'momentum': {'type': float, 'lambda': greater_zero},
+        'batch_size': {'type': int, 'lambda': greater_zero},
 
         # model parameters
-        'hidden_size': And(Use(int), lambda x: x > 0),
-        'layers': And(Use(int), lambda x: x > 0),
+        'hidden_size': {'type': int, 'lambda': greater_zero},
+        'layers': {'type': int, 'lambda': greater_zero},
 
         # learning rate scheduler
-        'lr_scheduler_factor': And(Use(float), lambda x: x > 0),
-        'lr_scheduler_patience': And(Use(int), lambda x: x > 0),
+        'lr_scheduler_factor': {'type': float, 'lambda': greater_zero},
+        'lr_scheduler_patience': {'type': int, 'lambda': greater_zero},
 
         # training configuration
-        'set_gradients_none': Use(bool),
-        'fp16': Use(bool),
-        'allow_tf32': Use(bool),
+        'set_gradients_none': {'type': bool, 'lambda': true},
+        'fp16': {'type': bool, 'lambda': true},
+        'allow_tf32': {'type': bool, 'lambda': true},
 
         # dataloader parameters
-        'shuffle': Use(bool),
-        'drop_last': Use(bool),
-        'pin_memory': Use(bool),
-        'num_workers_dataloader': Use(int),
+        'shuffle': {'type': bool, 'lambda': true},
+        'drop_last': {'type': bool, 'lambda': true},
+        'pin_memory': {'type': bool, 'lambda': true},
+        'num_workers_dataloader': {'type': int, 'lambda': true},
 
         # data
-        'pickle_file_name': And(Use(str), lambda x: len(x) > 0),
-        'processes': Use(int),
-        'jobs': Use(int),
-        'scaling_factor': And(Use(int), lambda x: x > 0),
+        'pickle_file_name': {'type': str, 'lambda': length_greater_zero},
+        'processes': {'type': int, 'lambda': true},
+        'jobs': {'type': int, 'lambda': true},
+        'scaling_factor': {'type': int, 'lambda': greater_zero},
 
         # distributed training
-        'master_addr': Or(None, And(Use(str), lambda x: len(x) > 0)),
-        'master_port': Or(None, Use(int)),
-        'device': Or(None, Use(int)),
+        'master_addr': {'type': str, 'lambda': length_greater_zero, 'can_be_none': True},
+        'master_port': {'type': int, 'lambda': true, 'can_be_none': True},
+        'device': {'type': int, 'lambda': true, 'can_be_none': True},
 
         # model checkpoint
-        'from_checkpoint': Use(bool),
-        'min_checkpoint_epoch': Use(int),
-        'min_checkpoint_epoch_dist': Use(int),
+        'from_checkpoint': {'type': int, 'lambda': true},
+        'min_checkpoint_epoch': {'type': int, 'lambda': true},
+        'min_checkpoint_epoch_dist': {'type': int, 'lambda': true},
 
         # model save
-        'save_model': Use(bool),
+        'save_model': {'type': bool, 'lambda': true},
 
         # paths
-        'base_path': Use(str),
-        'data_path': Use(str),
-        'checkpoint_path': Use(str),
-        'checkpoint_file': Use(str),
-        'model_save_path': Use(str),
+        'base_path': {'type': str, 'lambda': true},
+        'data_path': {'type': str, 'lambda': true},
+        'checkpoint_path': {'type': str, 'lambda': true},
+        'checkpoint_file': {'type': str, 'lambda': true},
+        'model_save_path': {'type': str, 'lambda': true},
+    }
+
+    default_schema = Schema({
+        k:
+            Or(None, And(Use(v['type']), v['lambda'])) if 'can_be_none' in v and v['can_be_none'] else
+            And(Use(v['type']), v['lambda'])
+        for k, v in config_dict.items()
     })
 
     def __init__(self, path: str, schema: Schema = default_schema):
@@ -91,15 +113,19 @@ class Config:
 
         self.validate()
 
-    def set_base_path(self, base_path: str):
+    def set_base_path(self, base_path: str = None):
+        if base_path is None:
+            base_path = self['base_path']
         self.data['base_path'] = base_path
         self.data['data_path'] = os.path.join(base_path, 'data')
         self.data['checkpoint_path'] = os.path.join(base_path, 'checkpoint')
 
-    def add_from_args(self, args):
+    def update_from_args(self, args):
         d = vars(args)
         for k, v in d.items():
             self.data[k] = v
+
+        self.set_base_path()
 
     def validate(self):
         self.data = validate_yaml(self.data, self.schema)
