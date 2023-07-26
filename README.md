@@ -27,10 +27,10 @@ This will start the training.
 Check the `ml` package [README](ml/README.md) for a detailed description of the arguments.
 
 Some optional arguments are:  
-`--gpu`, if set, the training uses GPUs.  
+`--gpu`, if set, the training uses GPUs, `--no-gpu` disables GPU usage. It is disabled by default.  
 `--world_size N`, where `N` is the number of GPUs to use, default is all available.  
-`--wandb B`, where `B` is either `True` or `False`, whether to use wandb for logging, default is `True`.  
-`--save_model`, to save the model at the end of training.
+`--wandb`, enables wandb logging, `--no-wand` disables wandb logging. It is activated by default.  
+`--save_model`, to save the model at the end of training, `--no-save_models` to explicitly don't save the model.
 
 
 ## Hyperparameter search

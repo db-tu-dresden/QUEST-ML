@@ -14,6 +14,12 @@ class Parser(argparse.ArgumentParser):
         self.add_model_args()
 
         for name, v in self.config.config_dict.items():
+            if v['type'] == bool:
+                self.add_argument(f'--{name}',
+                                  default=self.config[name],
+                                  action=argparse.BooleanOptionalAction)
+                continue
+
             self.add_argument(f'--{name}',
                               type=v['type'],
                               metavar='N' if v['type'] == int else None,

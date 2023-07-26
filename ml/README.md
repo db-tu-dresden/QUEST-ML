@@ -64,6 +64,8 @@ Trainer.run(config, model)
 ## Parser
 To display all possible parser arguments use the `--help` argument.  
 The arguments are all entries in the config file provided to `Config` (see [config.yaml](config.yaml)).  
+To set boolean values prepend `no` to set to false,  
+e.g. for GPU usage, use `--gpu` to set it to `True` and `--no-gpu` to set it to `False`.  
 Additionally, the `base_path` can be set with the shorter argument name `--path`.
 
 To display all available arguments to a specific architecture use `--arch SOME_REGISTERED_ARCHITECTURE --help`.
