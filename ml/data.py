@@ -6,18 +6,18 @@ from torch.utils.data import Dataset
 
 
 class ProcessDataset(Dataset):
-    def __init__(self, da: xr.DataArray, scaling_factor: int = 1, prediction_gap: int = 1):
+    def __init__(self, da: xr.DataArray, scaling_factor: int = 1, offset: int = 1):
         self.da = da
         self.scaling_factor = scaling_factor
-        self.offset = prediction_gap
+        self.offset = offset
 
         self.da = self.da[::scaling_factor]
 
     @classmethod
-    def from_path(cls, path: str, scaling_factor: int = 1):
+    def from_path(cls, path: str, scaling_factor: int = 1, offset: int = 1):
         with open(path, 'rb') as f:
             da = pickle.load(f)
-        return cls(da, scaling_factor)
+        return cls(da, scaling_factor, offset)
 
     def get_sample_shape(self):
         return self[0][0].shape

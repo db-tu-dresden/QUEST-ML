@@ -75,6 +75,7 @@ class Config:
         'processes': {'type': int, 'lambda': true},
         'jobs': {'type': int, 'lambda': true},
         'scaling_factor': {'type': int, 'lambda': greater_zero},
+        'offset': {'type': int, 'lambda': greater_zero},
 
         # distributed training
         'master_addr': {'type': str, 'lambda': length_greater_zero, 'can_be_none': True},

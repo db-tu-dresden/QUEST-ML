@@ -222,10 +222,10 @@ class Trainer:
         ddp.cleanup()
 
     @staticmethod
-    def get_datasets_from_path(path: str, scaling_factor: int = 1, pickle_file_name: str = 'da.pkl'):
-        return ProcessDataset.from_path(os.path.join(path, 'train', pickle_file_name), scaling_factor), \
-            ProcessDataset.from_path(os.path.join(path, 'valid', pickle_file_name), scaling_factor), \
-            ProcessDataset.from_path(os.path.join(path, 'test', pickle_file_name), scaling_factor)
+    def get_datasets_from_path(path: str, scaling_factor: int = 1, offset: int = 1, pickle_file_name: str = 'da.pkl'):
+        return ProcessDataset.from_path(os.path.join(path, 'train', pickle_file_name), scaling_factor, offset), \
+            ProcessDataset.from_path(os.path.join(path, 'valid', pickle_file_name), scaling_factor, offset), \
+            ProcessDataset.from_path(os.path.join(path, 'test', pickle_file_name), scaling_factor, offset)
 
     @classmethod
     def _run(cls, rank: int | None, config: Config, model,
@@ -245,6 +245,7 @@ class Trainer:
         if not train_data and not valid_data and not test_data:
             train_data, valid_data, test_data = cls.get_datasets_from_path(config['data_path'],
                                                                            config['scaling_factor'],
+                                                                           config['offset'],
                                                                            config['pickle_file_name'])
 
         if config['gpu']:
