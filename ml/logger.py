@@ -23,6 +23,7 @@ class Logger:
         self.float_formatter = f'.{config["float_precision"]}f'
 
         self._epoch = 0
+        self.metrics = {}
 
         self.data_table = wandb.Table(columns=['epoch', 'loss', 'accuracy', 'inputs', 'outputs', 'targets']) \
             if self.config['wandb'] else None
@@ -66,6 +67,12 @@ class Logger:
         else:
             if verbose:
                 print(msg)
+
+    def log_metric(self, mode: Mode, type: str, value: float, optim, **kwargs):
+        name = f'{mode.value}/{mode.value}_{type}'
+        self.metrics[name] = optim(self.metrics[name], value) if name in self.metrics else value
+        self.log({name: value}, **kwargs)
+        self.log({f'{name}_{optim.__name__}': self.metrics[name]}, verbose=False, **kwargs)
 
     def log_artifact(self, name: str, type: str, path: str):
         artifact = wandb.Artifact(name=name, type=type)

@@ -183,10 +183,8 @@ class Trainer:
                     self.valid_sampler.set_epoch(epoch)
 
                 train_loss, train_acc = self._train()
-                self.logger.log({
-                    'train_loss': train_loss,
-                    'train_acc': train_acc,
-                }, to_wandb=False)
+                self.logger.log_metric(Mode.TRAIN, 'loss', train_loss, min, to_wandb=False)
+                self.logger.log_metric(Mode.TRAIN, 'accuracy', train_acc, max, to_wandb=False)
 
                 valid_loss, valid_acc = self.valid()
                 self.checkpoint(valid_loss, valid_acc)
@@ -201,18 +199,14 @@ class Trainer:
 
     def valid(self):
         valid_loss, valid_acc = self._valid()
-        self.logger.log({
-            'valid/valid_loss': valid_loss,
-            'valid/valid_accuracy': valid_acc,
-        })
+        self.logger.log_metric(Mode.VALID, 'loss', valid_loss, min)
+        self.logger.log_metric(Mode.VALID, 'accuracy', valid_acc, max)
         return valid_loss, valid_acc
 
     def test(self):
         test_loss, test_acc = self._test()
-        self.logger.log({
-            'test/test_loss': test_loss,
-            'test/test_accuracy': test_acc,
-        })
+        self.logger.log_metric(Mode.TEST, 'loss', test_loss, min)
+        self.logger.log_metric(Mode.TEST, 'accuracy', test_acc, max)
         return test_loss, test_acc
 
     def save(self):
