@@ -246,7 +246,7 @@ class Trainer:
                                                                            config['scaling_factor'],
                                                                            config['pickle_file_name'])
 
-        if config['on_gpu']:
+        if config['gpu']:
             ddp.run(cls._run, config, model, train_data, valid_data, test_data)
         else:
             cls._run(None, config, model, train_data, valid_data, test_data)

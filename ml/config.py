@@ -31,7 +31,7 @@ def length_greater_zero(x):
 class Config:
     config_dict = {
         # general
-        'on_gpu': {'type': bool, 'lambda': true},
+        'gpu': {'type': bool, 'lambda': true},
         'world_size': {'type': int, 'lambda': greater_equal_zero},
         'job_id': {'type': int, 'lambda': true},
 
