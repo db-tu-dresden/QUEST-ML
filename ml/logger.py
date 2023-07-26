@@ -67,6 +67,21 @@ class Logger:
             if verbose:
                 print(msg)
 
+    def log_artifact(self, name: str, type: str, path: str):
+        artifact = wandb.Artifact(name=name, type=type)
+        artifact.add_dir(local_path=path)
+        wandb.run.log_artifact(artifact)
+
+    def log_system_config(self):
+        self.log_artifact('System-Config', 'system_config', self.config['system_config_path'])
+
+    def log_graph_notation(self):
+        self.log_artifact('Graph-Notation', 'graph_notation', self.config['graph_notation_path'])
+
+    def log_artifacts(self):
+        self.log_system_config()
+        self.log_graph_notation()
+
     def watch(self, model: nn.Module, *args, **kwargs):
         if self.config['wandb'] and wandb.run is not None:
             wandb.watch(model, *args, **kwargs)

@@ -198,6 +198,7 @@ class Trainer:
 
         if self.config['save_model']:
             self.model.save(path=self.config['model_save_path'])
+        self.logger.log_artifacts()
         self.cleanup()
 
     def valid(self):
