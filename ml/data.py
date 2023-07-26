@@ -1,8 +1,8 @@
 import pickle
 
 import torch
-from torch.utils.data import Dataset
 import xarray as xr
+from torch.utils.data import Dataset
 
 
 class ProcessDataset(Dataset):

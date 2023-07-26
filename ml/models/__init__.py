@@ -4,7 +4,6 @@ import os
 
 from ml.models.base import Model
 
-
 MODEL_REGISTRY = {}
 ARCH_MODEL_REGISTRY = {}
 ARCH_MODEL_NAME_REGISTRY = {}

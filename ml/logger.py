@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import copy
+from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
@@ -10,7 +11,6 @@ from torch import nn
 from ml.config import Config
 from ml.utils import optional
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ml.trainer import Mode
 

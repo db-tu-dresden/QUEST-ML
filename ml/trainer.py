@@ -3,11 +3,11 @@ import sys
 from enum import Enum
 
 import torch
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from tqdm import tqdm
 from torch import optim, nn
 from torch.nn.parallel import DistributedDataParallel
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from ml import ddp
 from ml.config import Config
