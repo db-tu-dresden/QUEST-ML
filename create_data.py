@@ -3,8 +3,7 @@ import os
 
 from notation import Notation
 from system import Config, Environment, System
-import timing
-
+from timing import log_runtime
 
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
@@ -33,6 +32,7 @@ def run_simulation(config: Config, notation: Notation, path: str):
     system.logger.save(os.path.join(path, 'da.pkl'))
 
 
+@log_runtime
 def run(args):
     base_path = args.path
     notation = get_notation(base_path)

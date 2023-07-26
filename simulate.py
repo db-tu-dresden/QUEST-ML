@@ -3,8 +3,7 @@ import os.path
 
 from notation import Notation
 from system import Config, Environment, System
-import timing
-
+from timing import log_runtime
 
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
@@ -12,6 +11,7 @@ parser.add_argument('-p', '--path', help='Path where a config.yaml describing th
                     default='./save/<>')
 
 
+@log_runtime
 def run(args):
     base_path = args.path
 

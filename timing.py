@@ -3,6 +3,12 @@ from datetime import timedelta
 from time import time, strftime, localtime
 
 
+TIME = {
+    'start': 0.0,
+    'end': 0.0,
+}
+
+
 def seconds_to_str(elapsed: float = None):
     if elapsed is None:
         return strftime('%Y-%m-%d %H:%M:%S', localtime())
@@ -21,11 +27,16 @@ def log(s, elapsed: str = None):
 
 
 def end_log():
-    end = time()
-    elapsed = end - start
+    TIME['end'] = time()
+    elapsed = TIME['end'] - TIME['start']
     log('End Program', seconds_to_str(elapsed))
 
 
-start = time()
-atexit.register(end_log)
-log('Start Program')
+def log_runtime(func):
+    def inner(*args, **kwargs):
+        TIME['start'] = time()
+        atexit.register(end_log)
+        log('Start Program')
+        func(*args, **kwargs)
+
+    return inner
