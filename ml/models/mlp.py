@@ -77,7 +77,6 @@ class EmbeddingMLP(Model):
         out = self.dropout(out)
         out = F.max_unpool2d(out, indices, kernel, output_size=size[1:])    # NxPxE
         out = self.embedding_out(out)                                       # NxPxO
-        out = self.activation(out)
         return out
 
     @staticmethod
