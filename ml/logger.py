@@ -76,7 +76,7 @@ class Logger:
 
     def log_artifact(self, name: str, type: str, path: str):
         artifact = wandb.Artifact(name=name, type=type)
-        artifact.add_dir(local_path=path)
+        artifact.add_file(local_path=path)
         wandb.run.log_artifact(artifact)
 
     def log_system_config(self):
