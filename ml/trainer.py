@@ -3,6 +3,7 @@ import sys
 from enum import Enum
 
 import torch
+import torch.nn.functional as F
 from torch import optim, nn
 from torch.nn.parallel import DistributedDataParallel
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -110,6 +111,12 @@ class Trainer:
     def get_accuracy(outputs: [torch.Tensor], targets: [torch.Tensor]):
         return (outputs.round() == targets).all(axis=2).all(axis=1).sum().item() / outputs.shape[0]
 
+    @staticmethod
+    def get_kl_divergence(outputs: torch.Tensor, targets: torch.Tensor):
+        out_dist = F.log_softmax(outputs, dim=-1)
+        target_dist = F.softmax(targets, dim=-1)
+        return F.kl_div(out_dist, target_dist, reduction='batchmean')
+
     def batch_data_to_device(self, batch):
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
 
@@ -119,6 +126,8 @@ class Trainer:
 
         epoch_loss = 0
         epoch_accuracy = 0
+        epoch_kl = 0
+        epoch_kl_rounded = 0
 
         if mode == Mode.TRAIN:
             self.model.train()
@@ -148,15 +157,24 @@ class Trainer:
 
                     self.logger.log_batch_loss(mode, batch_loss.item())
 
+                if mode == Mode.VALID:
+                    epoch_kl += self.get_kl_divergence(outputs, targets).item()
+                    epoch_kl_rounded += self.get_kl_divergence(outputs.round(), targets).item()
+
                 epoch_loss += batch_loss.item()
                 epoch_accuracy += batch_accuracy
 
             epoch_loss /= num_batches
             epoch_accuracy /= num_batches
+            epoch_kl /= num_batches
+            epoch_kl_rounded /= num_batches
 
             if mode == Mode.VALID:
                 self.logger.log_data(inputs.detach().cpu(), outputs.detach().round().cpu(), targets.detach().cpu(),
                                      epoch_loss, epoch_accuracy)
+
+                self.logger.log_metric(mode.VALID, 'kl_divergence', epoch_kl, min)
+                self.logger.log_metric(mode.VALID, 'kl_divergence_rounded', epoch_kl_rounded, min)
 
         return epoch_loss, epoch_accuracy
 
