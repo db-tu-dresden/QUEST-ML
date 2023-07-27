@@ -38,7 +38,7 @@ class MLP(Model):
         shape = x.shape
         out = x.view(shape[0], -1)
         out = self.model(out)
-        out = out.view(shape[0], shape[1], -1)
+        out = out.view(*shape)
         return out
 
 
