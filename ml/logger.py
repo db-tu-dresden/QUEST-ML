@@ -82,12 +82,12 @@ class Logger:
     def log_system_config(self):
         self.log_artifact('System-Config', 'system_config', self.config['system_config_path'])
 
-    def log_graph_notation(self):
-        self.log_artifact('Graph-Notation', 'graph_notation', self.config['graph_notation_path'])
+    def log_graph_description(self):
+        self.log_artifact('Graph-Description', 'graph_description', self.config['graph_description_path'])
 
     def log_artifacts(self):
         self.log_system_config()
-        self.log_graph_notation()
+        self.log_graph_description()
 
     def watch(self, model: nn.Module, *args, **kwargs):
         if self.config['wandb'] and wandb.run is not None:

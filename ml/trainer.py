@@ -232,7 +232,7 @@ class Trainer:
             if self.config['save_model']:
                 torch.save(self.model.state_dict(), self.config['model_save_path'])
             self.logger.log_system_config()
-            self.logger.log_graph_notation()
+            self.logger.log_graph_description()
 
     @staticmethod
     def cleanup():

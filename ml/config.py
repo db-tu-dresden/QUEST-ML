@@ -97,7 +97,7 @@ class Config:
         'checkpoint_file': {'type': str, 'lambda': true},
         'model_save_path': {'type': str, 'lambda': true},
         'system_config_path': {'type': str, 'lambda': true},
-        'graph_notation_path': {'type': str, 'lambda': true},
+        'graph_description_path': {'type': str, 'lambda': true},
     }
 
     default_schema = Schema({
@@ -124,8 +124,8 @@ class Config:
         self.data['checkpoint_path'] = self.data['checkpoint_path'] or os.path.join(base_path, 'checkpoint')
         self.data['system_config_path'] = self.data['system_config_path'] or \
                                           os.path.join(base_path, 'config.yaml')
-        self.data['graph_notation_path'] = self.data['graph_notation_path'] or \
-                                           os.path.join(base_path, 'graph_notation.note')
+        self.data['graph_description_path'] = self.data['graph_description_path'] or \
+                                           os.path.join(base_path, 'graph_description.note')
 
     def update_from_args(self, args):
         d = vars(args)
