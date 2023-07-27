@@ -1,9 +1,10 @@
 # Results
 
-| Model | Validation Loss | Validation Accuracy | Hidden Layers | Hidden Size | Epochs | GPUs | Process Graph | Data Offset |                              wandb                              |
-|:-----:|:---------------:|:-------------------:|:-------------:|:-----------:|:------:|:----:|:-------------:|:-----------:|:---------------------------------------------------------------:|
-|  MLP  |     0.03407     |        0.845        |       2       |     32      |   50   |  1   |       -       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/keb7dita) |
-|  MLP  |     0.0339      |        0.839        |       3       |     32      |   50   |  1   |       -       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/yhdyz8mg) |
-|  MLP  |     0.05391     |       0.6704        |       2       |     32      |   50   |  1   |       -       |      2      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/c6j0tsrm) |
-|  MLP  |     0.05354     |       0.6724        |       3       |     32      |   50   |  1   |       -       |      2      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/9odr3re0) |
+| Model | Min Validation Loss | Max Validation Accuracy | Min KL Div | Hidden Layers | Hidden Size | Epochs | Criterion | GPUs | Process Graph | Data Offset |                              wandb                              |
+|:-----:|:-------------------:|:-----------------------:|:----------:|:-------------:|:-----------:|:------:|:---------:|:----:|:-------------:|:-----------:|:---------------------------------------------------------------:|
+|  MLP  |       0.03407       |          0.845          |            |       2       |     32      |   50   |    MSE    |  1   |       -       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/keb7dita) |
+|  MLP  |       0.0339        |          0.839          |            |       3       |     32      |   50   |    MSE    |  1   |       -       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/yhdyz8mg) |
+|  MLP  |       0.05391       |         0.6704          |            |       2       |     32      |   50   |    MSE    |  1   |       -       |      2      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/c6j0tsrm) |
+|  MLP  |       0.05354       |         0.6724          |            |       3       |     32      |   50   |    MSE    |  1   |       -       |      2      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/9odr3re0) |
+|  MLP  |       0.03759       |          0.292          |  0.03759   |       2       |     32      |   50   |   KLDiv   |  1   |       -       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/r17tc0k5) |
 
