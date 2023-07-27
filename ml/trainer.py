@@ -212,8 +212,8 @@ class Trainer:
 
             test_loss, test_acc = self.test()
 
-        self.save()
-        self.cleanup()
+            self.save()
+            self.cleanup()
 
     def valid(self):
         valid_loss, valid_acc = self._valid()
