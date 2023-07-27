@@ -23,9 +23,6 @@ def run():
     config['processes'] = test_ds.get_sample_shape()[0]
     config['jobs'] = test_ds.get_sample_shape()[1]
 
-    config['input_size'] = config['processes'] * config['jobs']
-    config['output_size'] = config['input_size']
-
     model = build_model(config)
 
     Trainer.run(config, model)
