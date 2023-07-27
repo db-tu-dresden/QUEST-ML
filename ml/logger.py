@@ -38,7 +38,7 @@ class Logger:
         if self.config['wandb'] and wandb.run is not None:
             wandb.log({'epoch': self._epoch})
 
-    def log_batch(self, mode: Mode, loss: float):
+    def log_batch_loss(self, mode: Mode, loss: float):
         if self.config['wandb'] is None or wandb.run is None:
             return
         wandb.log({f'{mode.value}/{mode.value}_loss': loss})

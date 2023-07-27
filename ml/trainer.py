@@ -146,7 +146,7 @@ class Trainer:
                         batch_loss.backward()
                         self.optimizer.step()
 
-                    self.logger.log_batch(mode, batch_loss.item())
+                    self.logger.log_batch_loss(mode, batch_loss.item())
 
                 epoch_loss += batch_loss.item()
                 epoch_accuracy += batch_accuracy
