@@ -44,6 +44,7 @@ processes: 0
 jobs: 0
 scaling_factor: 10
 offset: 1
+only_process: False
 
 # distributed training
 master_addr: localhost

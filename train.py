@@ -4,10 +4,13 @@ from ml import Config, ProcessDataset, Trainer, Parser
 from ml.models import build_model
 
 
-def get_datasets(path: str, scaling_factor: int, offset: int):
-    return ProcessDataset.from_path(os.path.join(path, 'data', 'train', 'da.pkl'), scaling_factor, offset), \
-        ProcessDataset.from_path(os.path.join(path, 'data', 'valid', 'da.pkl'), scaling_factor, offset), \
-        ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'da.pkl'), scaling_factor, offset)
+def get_datasets(path: str, scaling_factor: int, offset: int, only_process: bool):
+    return ProcessDataset.from_path(os.path.join(path, 'data', 'train', 'da.pkl'),
+                                    scaling_factor, offset, only_process), \
+        ProcessDataset.from_path(os.path.join(path, 'data', 'valid', 'da.pkl'),
+                                 scaling_factor, offset, only_process), \
+        ProcessDataset.from_path(os.path.join(path, 'data', 'test', 'da.pkl'),
+                                 scaling_factor, offset, only_process)
 
 
 def run():
@@ -18,7 +21,8 @@ def run():
 
     config.update_from_args(args)
 
-    _, _, test_ds = get_datasets(config['base_path'], config['scaling_factor'], config['offset'])
+    _, _, test_ds = get_datasets(config['base_path'], config['scaling_factor'], config['offset'],
+                                 config['only_process'])
 
     config['processes'] = test_ds.get_sample_shape()[0]
     config['jobs'] = test_ds.get_sample_shape()[1]
