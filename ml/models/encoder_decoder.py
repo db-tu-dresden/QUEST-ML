@@ -2,8 +2,8 @@ import argparse
 
 import torch
 
-from ml import Model, Config
-from ml.models import get_model_from_type
+from ml import Config
+from ml.models import get_model_from_type, Model
 
 
 class EncoderDecoder(Model):
