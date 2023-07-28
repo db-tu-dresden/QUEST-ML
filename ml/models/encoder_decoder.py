@@ -24,10 +24,12 @@ class EncoderDecoder(Model):
     @classmethod
     def build_model(cls, config: Config):
         encoder_type = config['encoder'] if 'encoder' in config else None
-        encoder = get_model_from_type(encoder_type, config)
+        encoder_model = get_model_from_type(encoder_type, config)
+        encoder = encoder_model.build_model(config)
 
         decoder_type = config['decoder'] if 'decoder' in config else None
-        decoder = get_model_from_type(decoder_type, config)
+        decoder_model = get_model_from_type(decoder_type, config)
+        decoder = decoder_model.build_model(config)
 
         return cls(encoder, decoder)
 
@@ -55,12 +57,15 @@ class EncoderFusionDecoder(Model):
     @classmethod
     def build_model(cls, config: Config):
         encoder_type = config['encoder'] if 'encoder' in config else None
-        encoder = get_model_from_type(encoder_type, config)
+        encoder_model = get_model_from_type(encoder_type, config)
+        encoder = encoder_model.build_model(config)
 
         fusion_type = config['fusion'] if 'fusion' in config else None
-        fusion = get_model_from_type(fusion_type, config)
+        fusion_model = get_model_from_type(fusion_type, config)
+        fusion = fusion_model.build_model(config)
 
         decoder_type = config['decoder'] if 'decoder' in config else None
-        decoder = get_model_from_type(decoder_type, config)
+        decoder_model = get_model_from_type(decoder_type, config)
+        decoder = decoder_model.build_model(config)
 
         return cls(encoder, fusion, decoder)
