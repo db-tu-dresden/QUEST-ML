@@ -2,6 +2,7 @@ import argparse
 import importlib
 import os
 
+from ml import Config
 from ml.models.base import Model
 
 MODEL_REGISTRY = {}
@@ -11,20 +12,22 @@ ARCH_MODEL_INV_REGISTRY = {}
 ARCH_CONFIG_REGISTRY = {}
 
 
-def build_model(cfg):
-    model = None
-    model_type = cfg['arch'] if 'arch' in cfg else None
-
+def get_model_from_type(model_type: str, config: Config):
     model = ARCH_MODEL_REGISTRY[model_type]
-    ARCH_CONFIG_REGISTRY[model_type](cfg)
+    ARCH_CONFIG_REGISTRY[model_type](config)
 
     assert model is not None, (
-            f'Could not infer model type from {cfg}. '
-            f'Available models: {MODEL_REGISTRY.keys()}'
-            f'Requested model type: {model_type}'
+        f'Could not infer model type from {config}. '
+        f'Available models: {MODEL_REGISTRY.keys()}'
+        f'Requested model type: {model_type}'
     )
+    return model
 
-    return model.build_model(cfg)
+
+def build_model(config: Config):
+    model_type = config['arch'] if 'arch' in config else None
+    model = get_model_from_type(model_type, config)
+    return model.build_model(config)
 
 
 def register_model(name):
