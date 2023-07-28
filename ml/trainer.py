@@ -109,7 +109,7 @@ class Trainer:
 
     @staticmethod
     def get_accuracy(outputs: [torch.Tensor], targets: [torch.Tensor]):
-        return (outputs.round() == targets).all(axis=2).all(axis=1).sum().item() / outputs.shape[0]
+        return (outputs.round() == targets).all(dim=2).all(dim=1).sum().item() / outputs.shape[0]
 
     @staticmethod
     def get_kl_divergence(outputs: torch.Tensor, targets: torch.Tensor):
