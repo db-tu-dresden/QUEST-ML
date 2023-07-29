@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 
@@ -128,7 +129,7 @@ class Config:
         self.data['graph_description_path'] = self.data['graph_description_path'] or \
                                            os.path.join(base_path, 'graph_description.note')
 
-    def update_from_args(self, args):
+    def update_from_args(self, args: argparse.Namespace):
         d = vars(args)
         for k, v in d.items():
             self.data[k] = v
