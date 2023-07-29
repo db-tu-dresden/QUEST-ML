@@ -38,7 +38,7 @@ class Parser(argparse.ArgumentParser):
                            required=True,
                            help='model architecture')
 
-    def format_help(self):
+    def format_help(self) -> str:
         msg = super().format_help()
         args = sys.argv[1:]
 
@@ -61,5 +61,5 @@ class Parser(argparse.ArgumentParser):
 
         return vars(ml.models)[parser_id].format_help()
 
-    def parse_args(self, *args, **kwargs):
+    def parse_args(self, *args, **kwargs) -> argparse.Namespace:
         return parse_arch(super(Parser, self))
