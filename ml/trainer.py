@@ -109,7 +109,7 @@ class Trainer:
 
     @staticmethod
     def get_accuracy(outputs: [torch.Tensor], targets: [torch.Tensor]):
-        return (outputs.round() == targets).all(dim=2).all(dim=1).sum().item() / outputs.shape[0]
+        return (outputs.round() == targets).flatten(start_dim=1).all(dim=1).float().mean()
 
     @staticmethod
     def get_kl_divergence(outputs: torch.Tensor, targets: torch.Tensor):
@@ -162,7 +162,7 @@ class Trainer:
                     epoch_kl_rounded += self.get_kl_divergence(outputs.round(), targets).item()
 
                 epoch_loss += batch_loss.item()
-                epoch_accuracy += batch_accuracy
+                epoch_accuracy += batch_accuracy.item()
 
             epoch_loss /= num_batches
             epoch_accuracy /= num_batches
