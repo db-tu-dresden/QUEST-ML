@@ -230,7 +230,7 @@ class Trainer:
     def save(self):
         if ddp.is_main_process():
             if self.config['save_model']:
-                torch.save(self.model.state_dict(), self.config['model_save_path'])
+                torch.save({'model': self.model.state_dict()}, self.config['model_save_path'])
             self.logger.log_system_config()
             self.logger.log_graph_description()
 
