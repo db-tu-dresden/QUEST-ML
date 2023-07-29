@@ -33,13 +33,15 @@ class EncoderDecoder(Model):
         encoder_model = get_model_from_type(encoder_type, config)
         encoder = encoder_model.build_model(config)
         if config['encoder_state_path']:
-            encoder.load_state_dict(torch.load(config['encoder_state_path']))
+            checkpoint = torch.load(config['encoder_state_path'])
+            encoder.load_state_dict(checkpoint['model'])
 
         decoder_type = config['decoder'] if 'decoder' in config else None
         decoder_model = get_model_from_type(decoder_type, config)
         decoder = decoder_model.build_model(config)
         if config['decoder_state_path']:
-            encoder.load_state_dict(torch.load(config['decoder_state_path']))
+            checkpoint = torch.load(config['decoder_state_path'])
+            encoder.load_state_dict(checkpoint['model'])
 
         return cls(encoder, decoder)
 
@@ -76,18 +78,21 @@ class EncoderFusionDecoder(Model):
         encoder_model = get_model_from_type(encoder_type, config)
         encoder = encoder_model.build_model(config)
         if config['encoder_state_path']:
-            encoder.load_state_dict(torch.load(config['encoder_state_path']))
+            checkpoint = torch.load(config['encoder_state_path'])
+            encoder.load_state_dict(checkpoint['model'])
 
         fusion_type = config['fusion'] if 'fusion' in config else None
         fusion_model = get_model_from_type(fusion_type, config)
         fusion = fusion_model.build_model(config)
         if config['fusion_state_path']:
-            encoder.load_state_dict(torch.load(config['fusion_state_path']))
+            checkpoint = torch.load(config['fusion_state_path'])
+            encoder.load_state_dict(checkpoint['model'])
 
         decoder_type = config['decoder'] if 'decoder' in config else None
         decoder_model = get_model_from_type(decoder_type, config)
         decoder = decoder_model.build_model(config)
         if config['decoder_state_path']:
-            encoder.load_state_dict(torch.load(config['decoder_state_path']))
+            checkpoint = torch.load(config['decoder_state_path'])
+            encoder.load_state_dict(checkpoint['model'])
 
         return cls(encoder, fusion, decoder)
