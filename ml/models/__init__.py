@@ -1,6 +1,7 @@
 import argparse
 import importlib
 import os
+import typing
 
 from ml import Config
 from ml.models.base import Model
@@ -12,7 +13,7 @@ ARCH_MODEL_INV_REGISTRY = {}
 ARCH_CONFIG_REGISTRY = {}
 
 
-def get_model_from_type(model_type: str, config: Config):
+def get_model_from_type(model_type: str, config: Config) -> typing.Type[Model]:
     model = ARCH_MODEL_REGISTRY[model_type]
     ARCH_CONFIG_REGISTRY[model_type](config)
 
@@ -24,13 +25,13 @@ def get_model_from_type(model_type: str, config: Config):
     return model
 
 
-def build_model(config: Config):
+def build_model(config: Config) -> Model:
     model_type = config['arch'] if 'arch' in config else None
     model = get_model_from_type(model_type, config)
     return model.build_model(config)
 
 
-def register_model(name):
+def register_model(name: str) -> typing.Callable:
     """
     New model types can be added to fairseq with the :func:`register_model`
     function decorator.
@@ -47,7 +48,7 @@ def register_model(name):
         name (str): the name of the model
     """
 
-    def register_model_cls(cls):
+    def register_model_cls(cls: typing.Type[Model]):
         if name in MODEL_REGISTRY:
             raise ValueError('Cannot register duplicate model ({})'.format(name))
         if not issubclass(cls, Model):
@@ -61,7 +62,7 @@ def register_model(name):
     return register_model_cls
 
 
-def register_model_architecture(model_name, arch_name):
+def register_model_architecture(model_name: str, arch_name: str) -> typing.Callable:
     """
     New model architectures can be added to fairseq with the
     :func:`register_model_architecture` function decorator. After registration,
@@ -85,7 +86,7 @@ def register_model_architecture(model_name, arch_name):
         arch_name (str): the name of the model architecture (``--arch``)
     """
 
-    def register_model_arch_fn(fn):
+    def register_model_arch_fn(fn: typing.Callable) -> typing.Callable:
         if model_name not in MODEL_REGISTRY:
             raise ValueError(
                 'Cannot register model architecture for unknown model type ({})'.format(
@@ -109,7 +110,7 @@ def register_model_architecture(model_name, arch_name):
     return register_model_arch_fn
 
 
-def import_models(models_dir, namespace):
+def import_models(models_dir, namespace: str):
     for file in os.listdir(models_dir):
         path = os.path.join(models_dir, file)
         if (
@@ -133,7 +134,7 @@ def import_models(models_dir, namespace):
                 globals()[model_name + '_parser'] = parser
 
 
-def parse_arch(parser):
+def parse_arch(parser: argparse.ArgumentParser) -> argparse.Namespace:
     args, _ = parser.parse_known_args()
 
     # Add model-specific args to parser.
