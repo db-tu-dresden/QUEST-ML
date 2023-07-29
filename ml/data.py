@@ -10,11 +10,12 @@ class ProcessDataset(Dataset):
         self.da = da
         self.scaling_factor = scaling_factor
         self.offset = offset
+        self.only_process = only_process
 
         self.da = self.da[::scaling_factor]
 
-        if only_process:
-            self.da = xr.concat(self.da, dim='process')
+        if self.only_process:
+            self.da = xr.concat(self.da[::, 1::-2], dim='process')
 
     @classmethod
     def from_path(cls, path: str, scaling_factor: int = 1, offset: int = 1, only_process: bool = False):
@@ -31,13 +32,17 @@ class ProcessDataset(Dataset):
     def __getitem__(self, item):
         jobs = sorted(self.da['job'].data)
 
-        diff = self.da.sel(job=jobs)[item + self.offset].to_numpy() - self.da.sel(job=jobs)[item].to_numpy()
-
         dist_source = self.da.sel(job=jobs)[item].to_numpy()
+        dist_target = self.da.sel(job=jobs)[item + self.offset].to_numpy()
+
+        if self.only_process:
+            return torch.tensor(dist_source, dtype=torch.float), torch.tensor(dist_target, dtype=torch.float)
+
+        diff = dist_target - dist_source
+
         dist_source[0] = diff[0]
         dist_source[-1].fill(0)
 
-        dist_target = self.da.sel(job=jobs)[item + self.offset].to_numpy()
         dist_target[0].fill(0)
         dist_target[-1] = diff[-1]
 
