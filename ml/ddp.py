@@ -44,7 +44,7 @@ def run(fn, config: Config, *args):
              nprocs=config['world_size'], join=True)
 
 
-def is_dist_avail_and_initialized():
+def is_dist_avail_and_initialized() -> bool:
     if not dist.is_available():
         return False
 
@@ -54,21 +54,21 @@ def is_dist_avail_and_initialized():
     return True
 
 
-def get_rank():
+def get_rank() -> int:
     if not is_dist_avail_and_initialized():
         return 0
 
     return dist.get_rank()
 
 
-def get_world_size():
+def get_world_size() -> int:
     if not is_dist_avail_and_initialized():
         return 0
 
     return dist.get_world_size()
 
 
-def is_main_process():
+def is_main_process() -> bool:
     return get_rank() == 0
 
 
