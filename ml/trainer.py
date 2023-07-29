@@ -1,6 +1,7 @@
 import os
 import sys
 from enum import Enum
+from typing import Iterable
 
 import torch
 import torch.nn.functional as F
@@ -108,16 +109,16 @@ class Trainer:
             pass
 
     @staticmethod
-    def get_accuracy(outputs: [torch.Tensor], targets: [torch.Tensor]):
+    def get_accuracy(outputs: [torch.Tensor], targets: [torch.Tensor]) -> torch.Tensor:
         return (outputs.round() == targets).flatten(start_dim=1).all(dim=1).float().mean()
 
     @staticmethod
-    def get_kl_divergence(outputs: torch.Tensor, targets: torch.Tensor):
+    def get_kl_divergence(outputs: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
         out_dist = F.log_softmax(outputs, dim=-1)
         target_dist = F.softmax(targets, dim=-1)
         return F.kl_div(out_dist, target_dist, reduction='batchmean')
 
-    def batch_data_to_device(self, batch):
+    def batch_data_to_device(self, batch: Iterable) -> tuple:
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
 
     def _train_epoch(self, mode: Mode, dataloader: DataLoader):
