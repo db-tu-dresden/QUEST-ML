@@ -9,3 +9,20 @@
 |      MLP      |       0.03759       |          0.292          |  0.03759   |       2       |     32      |   50   |   KLDiv   |  1   |       -       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/r17tc0k5) |
 | Embedding MLP |        0.164        |          0.25           |   0.1445   |       2       |     32      |   50   |    MSE    |  1   |       -       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/tecj2bvw) |
 
+
+
+## Process State Autoencoder
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/1jept3vh (MLP, 99.95% accuracy)
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/95t5rv7j (MLP, 100% accuracy)
+
+
+## System State Autoencoder
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv (MLP, 100% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/95t5rv7j
+
+
+## System State Encoder-Decoder Offset 1
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/m2rayhyp (MLP, 2.55% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv
