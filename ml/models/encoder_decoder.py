@@ -3,9 +3,10 @@ import argparse
 import torch
 
 from ml import Config, ddp
-from ml.models import get_model_from_type, Model
+from ml.models import get_model_from_type, Model, register_model_architecture, register_model
 
 
+@register_model('encoder_decoder')
 class EncoderDecoder(Model):
     def __init__(self, encoder: Model, decoder: Model):
         super().__init__()
@@ -68,6 +69,7 @@ class EncoderDecoder(Model):
             self.decoder.load_state_dict(checkpoint['decoder'])
 
 
+@register_model('encoder_fusion_decoder')
 class EncoderFusionDecoder(Model):
     def __init__(self, encoder: Model, fusion: Model, decoder: Model):
         super().__init__()
@@ -144,3 +146,16 @@ class EncoderFusionDecoder(Model):
             self.encoder.load_state_dict(checkpoint['fusion'])
         if config['load_decoder']:
             self.decoder.load_state_dict(checkpoint['decoder'])
+
+
+@register_model_architecture('encoder_decoder', 'encoder_decoder_mlp')
+def encoder_decoder(cfg: Config):
+    cfg['encoder'] = cfg['encoder'] if 'encoder' in cfg else 'mlp'
+    cfg['decoder'] = cfg['decoder'] if 'decoder' in cfg else 'mlp'
+
+
+@register_model_architecture('encoder_fusion_decoder', 'encoder_fusion_decoder_mlp')
+def encoder_fusion_decoder(cfg: Config):
+    cfg['encoder'] = cfg['encoder'] if 'encoder' in cfg else 'mlp'
+    cfg['fusion'] = cfg['fusion'] if 'fusion' in cfg else 'mlp'
+    cfg['decoder'] = cfg['decoder'] if 'decoder' in cfg else 'mlp'
