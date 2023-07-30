@@ -13,16 +13,16 @@
 
 ## Process State Autoencoder
 
-https://wandb.ai/eriknikulski/carQUEST-ML/runs/1jept3vh (MLP, 99.95% accuracy)
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/1jept3vh (<>, MLP, 99.95% accuracy)
 
-https://wandb.ai/eriknikulski/carQUEST-ML/runs/95t5rv7j (MLP, 100% accuracy)
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/95t5rv7j (<>, MLP, 100% accuracy)
 
 
 ## System State Autoencoder
 
-https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv (MLP, 100% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/95t5rv7j
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv (<>, MLP, 100% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/95t5rv7j
 
 
 ## System State Encoder-Decoder Offset 1
 
-https://wandb.ai/eriknikulski/carQUEST-ML/runs/m2rayhyp (MLP, 2.55% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/m2rayhyp (<>, MLP, 2.55% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv
