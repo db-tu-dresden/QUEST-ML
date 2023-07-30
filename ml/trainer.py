@@ -83,6 +83,7 @@ class Trainer:
                                               patience=config['lr_scheduler_patience'])
 
         self.load_checkpoint()
+        self.model.load(self.config)
 
     def checkpoint(self, valid_loss: float, valid_accuracy: float, file_name: str = None):
         if ddp.is_main_process():
@@ -230,8 +231,7 @@ class Trainer:
 
     def save(self):
         if ddp.is_main_process():
-            if self.config['save_model']:
-                torch.save({'model': self.model.state_dict()}, self.config['model_save_path'])
+            self.model.save(self.config)
             self.logger.log_system_config()
             self.logger.log_graph_description()
 

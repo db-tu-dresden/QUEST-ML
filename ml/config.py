@@ -91,6 +91,7 @@ class Config:
 
         # model save
         'save_model': {'type': bool, 'lambda': true},
+        'load_model': {'type': bool, 'lambda': true},
 
         # paths
         'base_path': {'type': str, 'lambda': true},
@@ -98,6 +99,7 @@ class Config:
         'checkpoint_path': {'type': str, 'lambda': true},
         'checkpoint_file': {'type': str, 'lambda': true},
         'model_save_path': {'type': str, 'lambda': true},
+        'model_load_path': {'type': str, 'lambda': true},
         'system_config_path': {'type': str, 'lambda': true},
         'graph_description_path': {'type': str, 'lambda': true},
     }
@@ -122,6 +124,8 @@ class Config:
         if base_path is None:
             base_path = self['base_path']
         self.data['base_path'] = base_path
+        self.data['model_save_path'] = self.data['model_save_path'] or os.path.join(base_path, 'model.pt')
+        self.data['model_load_path'] = self.data['model_save_path'] or os.path.join(base_path, 'model.pt')
         self.data['data_path'] = self.data['data_path'] or os.path.join(base_path, 'data')
         self.data['checkpoint_path'] = self.data['checkpoint_path'] or os.path.join(base_path, 'checkpoint')
         self.data['system_config_path'] = self.data['system_config_path'] or \

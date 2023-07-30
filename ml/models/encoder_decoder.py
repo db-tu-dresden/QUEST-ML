@@ -2,7 +2,7 @@ import argparse
 
 import torch
 
-from ml import Config
+from ml import Config, ddp
 from ml.models import get_model_from_type, Model
 
 
@@ -27,6 +27,9 @@ class EncoderDecoder(Model):
         parser.add_argument('--decoder_state_path', type=str,
                             help='Path to the state dict of a pretrained decoder model')
 
+        parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction)
+        parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction)
+
     @classmethod
     def build_model(cls, config: Config):
         encoder_type = config['encoder'] if 'encoder' in config else None
@@ -44,6 +47,25 @@ class EncoderDecoder(Model):
             encoder.load_state_dict(checkpoint['model'])
 
         return cls(encoder, decoder)
+
+    def save(self, config: Config):
+        if ddp.is_main_process():
+            if config['save_model']:
+                torch.save({
+                    'model': self.state_dict(),
+                    'encoder': self.encoder,
+                    'decoder': self.decoder,
+                }, config['model_save_path'])
+
+    def load(self, config: Config):
+        checkpoint = torch.load(config['model_load_path'])
+        if config['load_model']:
+            self.load_state_dict(checkpoint['model'])
+            return
+        if config['load_encoder']:
+            self.encoder.load_state_dict(checkpoint['encoder'])
+        if config['load_decoder']:
+            self.decoder.load_state_dict(checkpoint['decoder'])
 
 
 class EncoderFusionDecoder(Model):
@@ -72,6 +94,10 @@ class EncoderFusionDecoder(Model):
         parser.add_argument('--decoder_state_path', type=str,
                             help='Path to the state dict of a pretrained decoder model')
 
+        parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction)
+        parser.add_argument('--load_fusion', default=False, action=argparse.BooleanOptionalAction)
+        parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction)
+
     @classmethod
     def build_model(cls, config: Config):
         encoder_type = config['encoder'] if 'encoder' in config else None
@@ -96,3 +122,25 @@ class EncoderFusionDecoder(Model):
             encoder.load_state_dict(checkpoint['model'])
 
         return cls(encoder, fusion, decoder)
+
+    def save(self, config: Config):
+        if ddp.is_main_process():
+            if config['save_model']:
+                torch.save({
+                    'model': self.state_dict(),
+                    'encoder': self.encoder,
+                    'fusion': self.fusion,
+                    'decoder': self.decoder,
+                }, config['model_save_path'])
+
+    def load(self, config: Config):
+        checkpoint = torch.load(config['model_load_path'])
+        if config['load_model']:
+            self.load_state_dict(checkpoint['model'])
+            return
+        if config['load_encoder']:
+            self.encoder.load_state_dict(checkpoint['encoder'])
+        if config['load_fusion']:
+            self.encoder.load_state_dict(checkpoint['fusion'])
+        if config['load_decoder']:
+            self.decoder.load_state_dict(checkpoint['decoder'])

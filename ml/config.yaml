@@ -58,6 +58,7 @@ min_checkpoint_epoch_dist: 0
 
 # model save
 save_model: False
+load_model: False
 
 # paths
 base_path: ''
@@ -65,5 +66,6 @@ data_path: ''
 checkpoint_path: ''
 checkpoint_file: 'checkpoint.pt'
 model_save_path: ''
+model_load_path: ''
 system_config_path: ''
 graph_description_path: ''
