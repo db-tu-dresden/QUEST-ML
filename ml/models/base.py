@@ -14,3 +14,7 @@ class Model(nn.Module):
     @classmethod
     def build_model(cls, cfg: Config):
         pass
+
+
+class DistributedDataParallel(nn.parallel.DistributedDataParallel, Model):
+    pass

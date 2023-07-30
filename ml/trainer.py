@@ -6,7 +6,6 @@ from typing import Iterable
 import torch
 import torch.nn.functional as F
 from torch import optim, nn
-from torch.nn.parallel import DistributedDataParallel
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -15,6 +14,7 @@ from ml import ddp
 from ml.config import Config
 from ml.data import ProcessDataset
 from ml.logger import Logger
+from ml.models import DistributedDataParallel
 from ml.utils import optional
 
 

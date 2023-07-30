@@ -4,7 +4,7 @@ import os
 import typing
 
 from ml import Config
-from ml.models.base import Model
+from ml.models.base import Model, DistributedDataParallel
 
 MODEL_REGISTRY = {}
 ARCH_MODEL_REGISTRY = {}
