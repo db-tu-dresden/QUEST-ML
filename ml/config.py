@@ -85,7 +85,6 @@ class Config:
         'device': {'type': int, 'lambda': true, 'can_be_none': True},
 
         # model checkpoint
-        'from_checkpoint': {'type': int, 'lambda': true},
         'min_checkpoint_epoch': {'type': int, 'lambda': true},
         'min_checkpoint_epoch_dist': {'type': int, 'lambda': true},
 
