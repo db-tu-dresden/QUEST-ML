@@ -40,13 +40,13 @@ class EncoderDecoder(Model):
         return cls(encoder, decoder)
 
     def save(self, config: Config):
-        if ddp.is_main_process():
-            if config['save_model']:
-                torch.save({
-                    'model': self.state_dict(),
-                    'encoder': self.encoder,
-                    'decoder': self.decoder,
-                }, config['model_save_path'])
+        if not ddp.is_main_process() or not config['save_model']:
+            return
+        torch.save({
+            'model': self.state_dict(),
+            'encoder': self.encoder,
+            'decoder': self.decoder,
+        }, config['model_save_path'])
 
     def load(self, config: Config):
         if not config['load_model'] and not config['load_encoder'] and not config['load_decoder']:
@@ -103,14 +103,14 @@ class EncoderFusionDecoder(Model):
         return cls(encoder, fusion, decoder)
 
     def save(self, config: Config):
-        if ddp.is_main_process():
-            if config['save_model']:
-                torch.save({
-                    'model': self.state_dict(),
-                    'encoder': self.encoder,
-                    'fusion': self.fusion,
-                    'decoder': self.decoder,
-                }, config['model_save_path'])
+        if not ddp.is_main_process() or not config['save_model']:
+            return
+        torch.save({
+            'model': self.state_dict(),
+            'encoder': self.encoder,
+            'fusion': self.fusion,
+            'decoder': self.decoder,
+        }, config['model_save_path'])
 
     def load(self, config: Config):
         if not config['load_model'] and not config['load_encoder'] and not config['fusion'] \

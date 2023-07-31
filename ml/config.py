@@ -89,15 +89,20 @@ class Config:
         'min_checkpoint_epoch': {'type': int, 'lambda': true},
         'min_checkpoint_epoch_dist': {'type': int, 'lambda': true},
 
-        # model save
+        # save/load
+        'save': {'type': bool, 'lambda': true},
+        'load': {'type': bool, 'lambda': true},
         'save_model': {'type': bool, 'lambda': true},
         'load_model': {'type': bool, 'lambda': true},
 
         # paths
         'base_path': {'type': str, 'lambda': true},
         'data_path': {'type': str, 'lambda': true},
-        'checkpoint_path': {'type': str, 'lambda': true},
+        'save_dir': {'type': str, 'lambda': true},
         'checkpoint_file': {'type': str, 'lambda': true},
+        'checkpoint_save_path': {'type': str, 'lambda': true},
+        'checkpoint_load_path': {'type': str, 'lambda': true},
+        'model_file': {'type': str, 'lambda': true},
         'model_save_path': {'type': str, 'lambda': true},
         'model_load_path': {'type': str, 'lambda': true},
         'system_config_path': {'type': str, 'lambda': true},
@@ -124,10 +129,19 @@ class Config:
         if base_path is None:
             base_path = self['base_path']
         self.data['base_path'] = base_path
-        self.data['model_save_path'] = self.data['model_save_path'] or os.path.join(base_path, 'model.pt')
-        self.data['model_load_path'] = self.data['model_save_path'] or os.path.join(base_path, 'model.pt')
         self.data['data_path'] = self.data['data_path'] or os.path.join(base_path, 'data')
-        self.data['checkpoint_path'] = self.data['checkpoint_path'] or os.path.join(base_path, 'checkpoint')
+        self.data['save_dir'] = self.data['save_dir'] or os.path.join(base_path, 'save')
+
+        self.data['model_save_path'] = self.data['model_save_path'] or \
+                                       os.path.join(self.data['save_dir'], self.data['model_file'])
+        self.data['model_load_path'] = self.data['model_save_path'] or \
+                                       os.path.join(self.data['save_dir'], self.data['model_file'])
+
+        self.data['checkpoint_save_path'] = self.data['checkpoint_save_path'] or \
+                                            os.path.join(self.data['save_dir'], self.data['checkpoint_file'])
+        self.data['checkpoint_load_path'] = self.data['checkpoint_load_path'] or \
+                                            os.path.join(self.data['save_dir'], self.data['checkpoint_file'])
+
         self.data['system_config_path'] = self.data['system_config_path'] or \
                                           os.path.join(base_path, 'config.yaml')
         self.data['graph_description_path'] = self.data['graph_description_path'] or \

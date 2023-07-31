@@ -56,15 +56,20 @@ from_checkpoint: False
 min_checkpoint_epoch: 10
 min_checkpoint_epoch_dist: 0
 
-# model save
-save_model: False
+# save/load
+save: True
+load: False
+save_model: True
 load_model: False
 
 # paths
 base_path: ''
 data_path: ''
-checkpoint_path: ''
+save_dir: ''
 checkpoint_file: 'checkpoint.pt'
+checkpoint_save_path: ''
+checkpoint_load_path: ''
+model_file: 'model.pt'
 model_save_path: ''
 model_load_path: ''
 system_config_path: ''

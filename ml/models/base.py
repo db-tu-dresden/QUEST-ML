@@ -17,16 +17,17 @@ class Model(nn.Module):
         pass
 
     def save(self, config: Config):
-        if ddp.is_main_process():
-            if config['save_model']:
-                torch.save({
-                    'model': self.state_dict()
-                }, config['model_save_path'])
+        if not ddp.is_main_process() or not config['save_model']:
+            return
+        torch.save({
+            'model': self.state_dict()
+        }, config['model_save_path'])
 
     def load(self, config: Config):
-        if config['load_model']:
-            checkpoint = torch.load(config['model_load_path'])
-            self.load_state_dict(checkpoint['model'])
+        if not config['load_model']:
+            return
+        checkpoint = torch.load(config['model_load_path'])
+        self.load_state_dict(checkpoint['model'])
 
 
 class DistributedDataParallel(nn.parallel.DistributedDataParallel, Model):

@@ -82,32 +82,28 @@ class Trainer:
                                               factor=config['lr_scheduler_factor'],
                                               patience=config['lr_scheduler_patience'])
 
-        self.load_checkpoint()
-        self.model.load(self.config)
+        self.load()
 
-    def checkpoint(self, valid_loss: float, valid_accuracy: float, file_name: str = None):
-        if ddp.is_main_process():
-            os.makedirs(self.config['checkpoint_path'], exist_ok=True)
-            torch.save({
-                'model': self.model.state_dict(),
-                'optimizer': self.optimizer.state_dict(),
-                'valid_loss': valid_loss,
-                'valid_accuracy': valid_accuracy,
-            }, os.path.join(self.config['checkpoint_path'], file_name or self.config['checkpoint_file']))
+    def save_checkpoint(self, valid_loss: float, valid_accuracy: float):
+        if not ddp.is_main_process() or valid_loss >= self.checkpoint_stats['min_valid_loss']:
+            return
 
-            if valid_loss < self.checkpoint_stats['min_valid_loss']:
-                self.checkpoint_stats['min_valid_loss'] = valid_loss
-                self.checkpoint(valid_loss, valid_accuracy, 'best.pt')
+        os.makedirs(self.config['save_dir'], exist_ok=True)
+        torch.save({
+            'model': self.model.state_dict(),
+            'optimizer': self.optimizer.state_dict(),
+            'valid_loss': valid_loss,
+            'valid_accuracy': valid_accuracy,
+        }, self.config['checkpoint_save_path'])
+
+        self.model.save(self.config)
 
     def load_checkpoint(self):
-        if not self.config['from_checkpoint']:
+        if not self.config['load']:
             return
-        try:
-            checkpoint = torch.load(os.path.join(self.config['checkpoint_path'], self.config['checkpoint_file']))
-            self.model.load_state_dict(checkpoint['model'])
-            self.optimizer.load_state_dict(checkpoint['optimizer'])
-        except FileNotFoundError:
-            pass
+        checkpoint = torch.load(self.config['checkpoint_load_path'])
+        self.model.load_state_dict(checkpoint['model'])
+        self.optimizer.load_state_dict(checkpoint['optimizer'])
 
     @staticmethod
     def get_accuracy(outputs: [torch.Tensor], targets: [torch.Tensor]) -> torch.Tensor:
@@ -207,7 +203,7 @@ class Trainer:
                 self.logger.log_metric(Mode.TRAIN, 'accuracy', train_acc, max, to_wandb=False)
 
                 valid_loss, valid_acc = self.valid()
-                self.checkpoint(valid_loss, valid_acc)
+                self.save_checkpoint(valid_loss, valid_acc)
 
                 self.logger.log({'learning_rate': self.optimizer.param_groups[0]['lr']})
                 self.lr_scheduler.step(valid_loss)
@@ -230,10 +226,15 @@ class Trainer:
         return test_loss, test_acc
 
     def save(self):
-        if ddp.is_main_process():
-            self.model.save(self.config)
-            self.logger.log_system_config()
-            self.logger.log_graph_description()
+        if not ddp.is_main_process():
+            return
+        self.logger.log_system_config()
+        self.logger.log_graph_description()
+        self.logger.log_model()
+
+    def load(self):
+        self.load_checkpoint()
+        self.model.load(self.config)
 
     @staticmethod
     def cleanup():
