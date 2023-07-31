@@ -122,10 +122,10 @@ class Trainer:
         data_size = len(dataloader.dataset) / self.config['world_size']
         num_batches = int(data_size / self.config['batch_size'])
 
-        epoch_loss = torch.tensor(0.)
-        epoch_accuracy = torch.tensor(0.)
-        epoch_kl = torch.tensor(0.)
-        epoch_kl_rounded = torch.tensor(0.)
+        epoch_loss = torch.tensor(0., device=self.config['device'])
+        epoch_accuracy = torch.tensor(0., device=self.config['device'])
+        epoch_kl = torch.tensor(0., device=self.config['device'])
+        epoch_kl_rounded = torch.tensor(0., device=self.config['device'])
 
         if mode == Mode.TRAIN:
             self.model.train()
