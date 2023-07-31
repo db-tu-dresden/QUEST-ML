@@ -54,7 +54,7 @@ class Config:
 
         # model parameters
         'hidden_size': {'type': int, 'lambda': greater_zero},
-        'layers': {'type': int, 'lambda': greater_zero},
+        'hidden_layers': {'type': int, 'lambda': greater_zero},
 
         # learning rate scheduler
         'lr_scheduler_factor': {'type': float, 'lambda': greater_zero},

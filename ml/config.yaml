@@ -21,7 +21,7 @@ batch_size: 16
 
 # model parameters
 hidden_size: 32
-layers: 2
+hidden_layers: 2
 
 # learning rate scheduler
 lr_scheduler_factor: 0.1
