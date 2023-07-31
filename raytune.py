@@ -130,6 +130,7 @@ def run():
     args = parser.parse_args()
 
     args.base_path = os.path.abspath(args.base_path)
+    args.save_dir = args.save_dir or os.path.join(args.base_path, 'raytune')
     trainer_config.update_from_args(args)
 
     _, _, test_ds = get_datasets(trainer_config['base_path'], trainer_config['scaling_factor'],
