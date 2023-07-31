@@ -12,6 +12,7 @@
 |      MLP      |        0.235        |         0.0255          |   0.3332   |       3       |     32      |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/hwhzb5zz) | without reshaping  |
 |      MLP      |       0.05008       |         0.5804          |  0.08038   |       3       |    2048     |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/jku2i3lb) |                    |
 |      MLP      |       0.02294       |         0.8115          |  0.03523   |       3       |    2048     |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/to6ivw8w) | scaling_factor = 1 |
+|      MLP      |         0.          |           0.            |     0.     |       5       |    1024     |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/5xfzw710) |                    |
 
 
 
@@ -35,7 +36,7 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/m2rayhyp (<>, MLP, 2.55% accuracy
 # Raytune
 
 # <>
-MLP without: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-84utx1bp (best accuracy 2.57%)
+MLP without reshaping: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-84utx1bp (best accuracy 2.57%)
 MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-p4urg11i (best accuracy 57.01%)
 MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-0wg0ogg5 (best accuracy 55.25%)
 MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-l9p7icvk (best accuracy 57.87%)
