@@ -146,7 +146,7 @@ class Trainer:
                 with optional(self.config['fp16'] and self.scaler, torch.cuda.amp.autocast):
                     outputs = self.model(inputs)
                 batch_loss = self.criterion(outputs, targets)
-                batch_accuracy = self.get_accuracy(outputs, targets)
+                batch_accuracy = self.get_accuracy(outputs.detach(), targets.detach())
 
                 if mode == Mode.TRAIN:
                     if self.scaler:
@@ -160,8 +160,8 @@ class Trainer:
                     self.logger.log_batch_loss(mode, batch_loss.item())
 
                 if mode == Mode.VALID:
-                    epoch_kl += self.get_kl_divergence(outputs, targets).item()
-                    epoch_kl_rounded += self.get_kl_divergence(outputs.round(), targets).item()
+                    epoch_kl += self.get_kl_divergence(outputs.detach(), targets.detach()).item()
+                    epoch_kl_rounded += self.get_kl_divergence(outputs.detach().round(), targets.detach()).item()
 
                 epoch_loss += batch_loss.item()
                 epoch_accuracy += batch_accuracy.item()
