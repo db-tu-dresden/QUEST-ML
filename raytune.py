@@ -2,20 +2,20 @@ import os.path
 
 import numpy as np
 import torch
-import wandb
 from ray import tune
 from ray.air import session
 from ray.air.checkpoint import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 from torch import nn
 
+import wandb
 from ml import Trainer, Config, Parser
 from ml.models import build_model
 from train import get_datasets
 
 TUNE_CONFIG = {
     'hidden_size': tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
-    'layers': tune.sample_from(lambda _: np.random.randint(2, 4)),
+    'hidden_layers': tune.sample_from(lambda _: np.random.randint(2, 4)),
     'learning_rate': tune.loguniform(1e-4, 1e-1),
     'batch_size': tune.choice([2, 4, 8, 16])
 }
