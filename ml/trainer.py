@@ -122,14 +122,14 @@ class Trainer:
     def batch_data_to_device(self, batch: Iterable) -> tuple:
         return tuple(elem.to(self.device, non_blocking=True) if torch.is_tensor(elem) else elem for elem in batch)
 
-    def _train_epoch(self, mode: Mode, dataloader: DataLoader):
+    def _train_epoch(self, mode: Mode, dataloader: DataLoader) -> (float, float):
         data_size = len(dataloader.dataset) / self.config['world_size']
         num_batches = int(data_size / self.config['batch_size'])
 
-        epoch_loss = 0
-        epoch_accuracy = 0
-        epoch_kl = 0
-        epoch_kl_rounded = 0
+        epoch_loss = torch.tensor(0.)
+        epoch_accuracy = torch.tensor(0.)
+        epoch_kl = torch.tensor(0.)
+        epoch_kl_rounded = torch.tensor(0.)
 
         if mode == Mode.TRAIN:
             self.model.train()
@@ -160,11 +160,11 @@ class Trainer:
                     self.logger.log_batch_loss(mode, batch_loss.item())
 
                 if mode == Mode.VALID:
-                    epoch_kl += self.get_kl_divergence(outputs.detach(), targets.detach()).item()
-                    epoch_kl_rounded += self.get_kl_divergence(outputs.detach().round(), targets.detach()).item()
+                    epoch_kl += self.get_kl_divergence(outputs.detach(), targets.detach())
+                    epoch_kl_rounded += self.get_kl_divergence(outputs.detach().round(), targets.detach())
 
-                epoch_loss += batch_loss.item()
-                epoch_accuracy += batch_accuracy.item()
+                epoch_loss += batch_loss
+                epoch_accuracy += batch_accuracy
 
             epoch_loss /= num_batches
             epoch_accuracy /= num_batches
@@ -173,12 +173,12 @@ class Trainer:
 
             if mode == Mode.VALID:
                 self.logger.log_data(inputs.detach().cpu(), outputs.detach().round().cpu(), targets.detach().cpu(),
-                                     epoch_loss, epoch_accuracy)
+                                     epoch_loss.item(), epoch_accuracy.item())
 
-                self.logger.log_metric(mode.VALID, 'kl_divergence', epoch_kl, min)
-                self.logger.log_metric(mode.VALID, 'kl_divergence_rounded', epoch_kl_rounded, min)
+                self.logger.log_metric(mode.VALID, 'kl_divergence', epoch_kl.item(), min)
+                self.logger.log_metric(mode.VALID, 'kl_divergence_rounded', epoch_kl_rounded.item(), min)
 
-        return epoch_loss, epoch_accuracy
+        return epoch_loss.item(), epoch_accuracy.item()
 
     def _train(self):
         return self._train_epoch(Mode.TRAIN, self.train_dataloader)
