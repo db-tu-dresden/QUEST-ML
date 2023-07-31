@@ -2,13 +2,13 @@ import os.path
 
 import numpy as np
 import torch
+import wandb
 from ray import tune
 from ray.air import session
 from ray.air.checkpoint import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 from torch import nn
 
-import wandb
 from ml import Trainer, Config, Parser
 from ml.models import build_model
 from train import get_datasets
@@ -111,6 +111,7 @@ def test(config: Config):
     # move model to device if on gpu
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
     model.to(device)
+    config['device'] = device
 
     trainer = Trainer(config, model, train_data, valid_data, test_data)
 
