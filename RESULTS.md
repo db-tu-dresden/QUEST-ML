@@ -35,3 +35,4 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/m2rayhyp (<>, MLP, 2.55% accuracy
 # <>
 MLP without: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-84utx1bp
 MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-p4urg11i/
+MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-0wg0ogg5
