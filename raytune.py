@@ -1,5 +1,3 @@
-import argparse
-import math
 import os.path
 
 import numpy as np
@@ -11,17 +9,9 @@ from ray.tune.schedulers import ASHAScheduler
 from torch import nn
 
 import wandb
-from ml import Trainer, Config
-from ml.models.mlp import MLP
-
-parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
-parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
-                                         'a graph_description.note describing the process graph lie.')
-parser.add_argument('-s', '--samples', type=int,
-                    help='Number of times to sample from the hyperparameter space.', default=10)
-parser.add_argument('-e', '--max-epochs', type=int, help='Max number of epochs per trail.', default=10)
-parser.add_argument('-g', '--gpus', type=float, help='GPUs used per trail.', default=0)
-
+from ml import Trainer, Config, Parser
+from ml.models import build_model
+from train import get_datasets
 
 TUNE_CONFIG = {
     'hidden_size': tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
@@ -66,12 +56,14 @@ def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_nu
     test(config)
 
 
-def checkpoint(trainer: Trainer, valid_loss: float, valid_accuracy: float, file_name: str = None):
-    os.makedirs(trainer.config['checkpoint_path'], exist_ok=True)
-    torch.save(
-        (trainer.model.state_dict(), trainer.optimizer.state_dict()),
-        os.path.join(trainer.config['checkpoint_path'], trainer.config['checkpoint_file']))
-    checkpoint = Checkpoint.from_directory(trainer.config['checkpoint_path'])
+def save_checkpoint(trainer: Trainer, valid_loss: float, valid_accuracy: float):
+    os.makedirs(trainer.config['save_dir'], exist_ok=True)
+    torch.save((
+        trainer.model.state_dict(),
+        trainer.optimizer.state_dict()
+    ), trainer.config['checkpoint_save_path'])
+
+    checkpoint = Checkpoint.from_directory(trainer.config['save_dir'])
     session.report({'loss': valid_loss, 'accuracy': valid_accuracy}, checkpoint=checkpoint)
 
 
@@ -89,16 +81,7 @@ def load_checkpoint(trainer: Trainer):
 def train(tune_config: dict, config: Config):
     config.update(tune_config)
 
-    train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'],
-                                                                       config['scaling_factor'],
-                                                                       config['offset'],
-                                                                       config['only_process'],
-                                                                       config['pickle_file_name'])
-
-    input_size = math.prod(test_data.get_sample_shape())  # num processes * num jobs
-    hidden_size = config['hidden_size']
-    output_size = input_size
-    model = MLP(input_size, hidden_size, output_size)
+    model = build_model(config)
 
     # move model to device if on gpu
     device = 'cpu'
@@ -109,10 +92,10 @@ def train(tune_config: dict, config: Config):
     model.to(device)
     config['device'] = device
 
-    Trainer.checkpoint = checkpoint
+    Trainer.save_checkpoint = save_checkpoint
     Trainer.load_checkpoint = load_checkpoint
 
-    Trainer.run(config, model, train_data, valid_data, test_data)
+    Trainer.run(config, model)
 
 
 def test(config: Config):
@@ -123,10 +106,7 @@ def test(config: Config):
                                                                        config['pickle_file_name'])
 
     # build model for test
-    input_size = math.prod(test_data.get_sample_shape())  # num processes * num jobs
-    hidden_size = config['hidden_size']
-    output_size = input_size
-    model = MLP(input_size, hidden_size, output_size)
+    model = build_model(config)
 
     # move model to device if on gpu
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
@@ -137,14 +117,27 @@ def test(config: Config):
     trainer.test()
 
 
-def run(args):
+def run():
     tune_config = TUNE_CONFIG
 
-    base_path = args.path
-    trainer_config = Config(os.path.abspath('ml/config.yaml'))
-    trainer_config['base_path'] = os.path.abspath(base_path)
-    trainer_config['data_path'] = os.path.abspath(os.path.join(base_path, 'data'))
-    trainer_config['checkpoint_path'] = os.path.abspath(os.path.join(base_path, 'checkpoint'))
+    trainer_config = Config('ml/config.yaml')
+
+    parser = Parser(trainer_config, 'Raytune for the task')
+    parser.add_argument('-s', '--samples', type=int,
+                        help='Number of times to sample from the hyperparameter space.', default=10)
+    parser.add_argument('-e', '--max-epochs', type=int, help='Max number of epochs per trail.', default=10)
+    parser.add_argument('-g', '--gpus', type=float, help='GPUs used per trail.', default=0)
+    args = parser.parse_args()
+
+    args.base_path = os.path.abspath(args.base_path)
+    trainer_config.update_from_args(args)
+
+    _, _, test_ds = get_datasets(trainer_config['base_path'], trainer_config['scaling_factor'],
+                                 trainer_config['offset'], trainer_config['only_process'])
+
+    trainer_config['processes'] = test_ds.get_sample_shape()[0]
+    trainer_config['jobs'] = test_ds.get_sample_shape()[-1]
+
     trainer_config['verbose'] = False
     trainer_config['wandb_group'] = 'ray-tune-' + wandb.util.generate_id()
 
@@ -152,5 +145,4 @@ def run(args):
 
 
 if __name__ == '__main__':
-    args = parser.parse_args()
-    run(args)
+    run()
