@@ -25,7 +25,7 @@ hidden_layers: 2
 
 # learning rate scheduler
 lr_scheduler_factor: 0.1
-lr_scheduler_patience: 3
+lr_scheduler_patience: 10
 
 # training configuration
 set_gradients_none: False
