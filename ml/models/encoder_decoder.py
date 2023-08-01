@@ -3,7 +3,8 @@ import argparse
 import torch
 
 from ml import Config, ddp
-from ml.models import get_model_from_type, Model, register_model_architecture, register_model
+from ml.models import get_model_from_type, Model, register_model_architecture, register_model, ARCH_CONFIG_REGISTRY, \
+    add_arch_args
 
 
 @register_model('encoder_decoder')
@@ -20,22 +21,27 @@ class EncoderDecoder(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
         parser.add_argument('--encoder', type=str, help='Encoder model name')
         parser.add_argument('--decoder', type=str, help='Decoder model name')
+
+        root_parser = getattr(parser, 'root_parser', None)
+        if root_parser:
+            add_arch_args(root_parser, 'encoder', 'Encoder model-specific configuration', prefix='encoder_')
+            add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
 
         parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction)
         parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction)
 
     @classmethod
-    def build_model(cls, config: Config):
+    def build_model(cls, config: Config, prefix: str = ''):
         encoder_type = config['encoder'] if 'encoder' in config else None
         encoder_model = get_model_from_type(encoder_type, config)
-        encoder = encoder_model.build_model(config)
+        encoder = encoder_model.build_model(config, 'encoder_')
 
         decoder_type = config['decoder'] if 'decoder' in config else None
         decoder_model = get_model_from_type(decoder_type, config)
-        decoder = decoder_model.build_model(config)
+        decoder = decoder_model.build_model(config, 'decoder_')
 
         return cls(encoder, decoder)
 
@@ -77,28 +83,34 @@ class EncoderFusionDecoder(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
         parser.add_argument('--encoder', type=str, help='Encoder model name')
         parser.add_argument('--fusion', type=str, help='Fusion model name')
         parser.add_argument('--decoder', type=str, help='Decoder model name')
+
+        root_parser = getattr(parser, 'root_parser', None)
+        if root_parser:
+            add_arch_args(root_parser, 'encoder', 'Encoder model-specific configuration', prefix='encoder_')
+            add_arch_args(root_parser, 'fusion', 'Fusion model-specific configuration', prefix='fusion_')
+            add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
 
         parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction)
         parser.add_argument('--load_fusion', default=False, action=argparse.BooleanOptionalAction)
         parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction)
 
     @classmethod
-    def build_model(cls, config: Config):
+    def build_model(cls, config: Config, prefix: str = ''):
         encoder_type = config['encoder'] if 'encoder' in config else None
         encoder_model = get_model_from_type(encoder_type, config)
-        encoder = encoder_model.build_model(config)
+        encoder = encoder_model.build_model(config, 'encoder_')
 
         fusion_type = config['fusion'] if 'fusion' in config else None
         fusion_model = get_model_from_type(fusion_type, config)
-        fusion = fusion_model.build_model(config)
+        fusion = fusion_model.build_model(config, 'fusion_')
 
         decoder_type = config['decoder'] if 'decoder' in config else None
         decoder_model = get_model_from_type(decoder_type, config)
-        decoder = decoder_model.build_model(config)
+        decoder = decoder_model.build_model(config, 'decoder_')
 
         return cls(encoder, fusion, decoder)
 
@@ -133,9 +145,16 @@ def encoder_decoder(cfg: Config):
     cfg['encoder'] = cfg['encoder'] if 'encoder' in cfg else 'mlp'
     cfg['decoder'] = cfg['decoder'] if 'decoder' in cfg else 'mlp'
 
+    ARCH_CONFIG_REGISTRY[cfg['encoder']](cfg, 'encoder_')
+    ARCH_CONFIG_REGISTRY[cfg['decoder']](cfg, 'decoder_')
+
 
 @register_model_architecture('encoder_fusion_decoder', 'encoder_fusion_decoder_mlp')
 def encoder_fusion_decoder(cfg: Config):
     cfg['encoder'] = cfg['encoder'] if 'encoder' in cfg else 'mlp'
     cfg['fusion'] = cfg['fusion'] if 'fusion' in cfg else 'mlp'
     cfg['decoder'] = cfg['decoder'] if 'decoder' in cfg else 'mlp'
+
+    ARCH_CONFIG_REGISTRY[cfg['encoder']](cfg, 'encoder_')
+    ARCH_CONFIG_REGISTRY[cfg['fusion']](cfg, 'fusion_')
+    ARCH_CONFIG_REGISTRY[cfg['decoder']](cfg, 'decoder_')

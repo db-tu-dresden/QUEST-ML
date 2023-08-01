@@ -134,24 +134,32 @@ def import_models(models_dir, namespace: str):
                 globals()[model_name + '_parser'] = parser
 
 
-def parse_arch(parser: argparse.ArgumentParser) -> argparse.Namespace:
+def add_arch_args(parser: argparse.ArgumentParser, key: str, title: str = None, prefix: str = ''):
     args, _ = parser.parse_known_args()
 
     # Add model-specific args to parser.
-    if hasattr(args, 'arch'):
+    if hasattr(args, key):
+        arch_name = getattr(args, key)
         model_specific_group = parser.add_argument_group(
-            'Model-specific configuration',
+            title,
             # Only include attributes which are explicitly given as command-line
             # arguments or which have default values.
             argument_default=argparse.SUPPRESS,
         )
-        if args.arch in ARCH_MODEL_REGISTRY:
-            ARCH_MODEL_REGISTRY[args.arch].add_args(model_specific_group)
-        elif args.arch in MODEL_REGISTRY:
-            MODEL_REGISTRY[args.arch].add_args(model_specific_group)
+
+        model_specific_group.root_parser = getattr(parser, 'root_parser', parser)
+
+        if arch_name in ARCH_MODEL_REGISTRY:
+            ARCH_MODEL_REGISTRY[arch_name].add_args(model_specific_group, prefix=prefix)
+        elif arch_name in MODEL_REGISTRY:
+            MODEL_REGISTRY[arch_name].add_args(model_specific_group, prefix=prefix)
         else:
             raise RuntimeError()
 
+
+def parse_arch(parser: argparse.ArgumentParser) -> argparse.Namespace:
+    args, _ = parser.parse_known_args()
+    add_arch_args(parser, 'arch', 'Model-specific configuration')
     return parser.parse_args()
 
 

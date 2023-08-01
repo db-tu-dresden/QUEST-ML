@@ -9,11 +9,11 @@ from ml import Config, ddp
 class Model(nn.Module):
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
         pass
 
     @classmethod
-    def build_model(cls, cfg: Config):
+    def build_model(cls, cfg: Config, prefix: str = ''):
         pass
 
     def save(self, config: Config):

@@ -25,15 +25,16 @@ class MLP(Model):
         self.model.add_module(f'dense{hidden_layers + 2}',  nn.Linear(hidden_size, output_size))
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser):
-        parser.add_argument('--input_size', type=int, metavar='N', help='Input size')
-        parser.add_argument('--hidden_size', type=int, metavar='N', help='Hidden size')
-        parser.add_argument('--output_size', type=int, metavar='N', help='Output size')
-        parser.add_argument('--hidden_layers', type=int, metavar='N', help='Number of hidden layers')
+    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
+        parser.add_argument(f'--{prefix}input_size', type=int, metavar='N', help='Input size')
+        parser.add_argument(f'--{prefix}hidden_size', type=int, metavar='N', help='Hidden size')
+        parser.add_argument(f'--{prefix}output_size', type=int, metavar='N', help='Output size')
+        parser.add_argument(f'--{prefix}hidden_layers', type=int, metavar='N', help='Number of hidden layers')
 
     @classmethod
-    def build_model(cls, cfg: Config):
-        return cls(cfg['input_size'], cfg['hidden_size'], cfg['output_size'], cfg['hidden_layers'])
+    def build_model(cls, cfg: Config, prefix: str = ''):
+        return cls(cfg[f'{prefix}input_size'], cfg[f'{prefix}hidden_size'], cfg[f'{prefix}output_size'],
+                   cfg[f'{prefix}hidden_layers'])
 
     def forward(self, x: torch.Tensor):
         shape = x.shape
@@ -80,26 +81,31 @@ class EmbeddingMLP(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser):
-        parser.add_argument('--input_size', type=int, metavar='N', help='Input size')
-        parser.add_argument('--embedding_size', type=int, metavar='N', help='Embedding size')
-        parser.add_argument('--hidden_size', type=int, metavar='N', help='Hidden size')
-        parser.add_argument('--output_size', type=int, metavar='N', help='Output size')
-        parser.add_argument('--hidden_layers', type=int, metavar='N', help='Number of hidden layers')
-        parser.add_argument('--dropout', type=float, metavar='N', help='Dropout value')
+    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
+        parser.add_argument(f'--{prefix}input_size', type=int, metavar='N', help='Input size')
+        parser.add_argument(f'--{prefix}embedding_size', type=int, metavar='N', help='Embedding size')
+        parser.add_argument(f'--{prefix}hidden_size', type=int, metavar='N', help='Hidden size')
+        parser.add_argument(f'--{prefix}output_size', type=int, metavar='N', help='Output size')
+        parser.add_argument(f'--{prefix}hidden_layers', type=int, metavar='N', help='Number of hidden layers')
+        parser.add_argument(f'--{prefix}dropout', type=float, metavar='N', help='Dropout value')
 
     @classmethod
-    def build_model(cls, cfg: Config):
+    def build_model(cls, cfg: Config, prefix: str = ''):
         return cls(cfg['input_size'], cfg['embedding_size'], cfg['hidden_size'], cfg['output_size'],
                    cfg['hidden_layers'], cfg['dropout'])
 
 
 @register_model_architecture('mlp', 'mlp')
-def mlp(cfg: Config):
+def mlp(cfg: Config, prefix: str = ''):
     cfg['input_size'] = cfg['jobs'] * cfg['processes'] if 'jobs' in cfg and 'processes' in cfg else 16
     cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 32
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
     cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 2
+
+    cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg else cfg['input_size']
+    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
+    cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg else cfg['output_size']
+    cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else cfg['hidden_layers']
 
 
 @register_model_architecture('embedding_mlp', 'embedding_mlp')
