@@ -12,7 +12,7 @@
 |      MLP      |        0.235        |         0.0255          |   0.3332   |       3       |     32      |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/hwhzb5zz) | without reshaping  |
 |      MLP      |       0.05008       |         0.5804          |  0.08038   |       3       |    2048     |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/jku2i3lb) |                    |
 |      MLP      |       0.02294       |         0.8115          |  0.03523   |       3       |    2048     |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/to6ivw8w) | scaling_factor = 1 |
-|      MLP      |         0.          |           0.            |     0.     |       5       |    1024     |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/5xfzw710) |                    |
+|      MLP      |       0.08307       |         0.3066          |   0.1404   |       5       |    1024     |   50   |    MSE    |  1   |      <>       |      1      | [Link](https://wandb.ai/eriknikulski/carQUEST-ML/runs/5xfzw710) |                    |
 
 
 
@@ -30,7 +30,7 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv (<>, MLP, 100% accuracy)
 
 ## System State Encoder-Decoder Offset 1
 
-https://wandb.ai/eriknikulski/carQUEST-ML/runs/m2rayhyp (<>, MLP, 2.55% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv
+without reshaping: https://wandb.ai/eriknikulski/carQUEST-ML/runs/m2rayhyp (<>, MLP, 2.55% accuracy) based on https://wandb.ai/eriknikulski/carQUEST-ML/runs/ai4qm3xv
 
 
 # Raytune
