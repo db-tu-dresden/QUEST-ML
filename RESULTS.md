@@ -40,3 +40,7 @@ MLP without reshaping: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune
 MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-p4urg11i (best accuracy 57.01%)
 MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-0wg0ogg5 (best accuracy 55.25%)
 MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-l9p7icvk (best accuracy 57.87%)
+
+Autoencoder MLP (PSE): https://wandb.ai/eriknikulski/carQUEST-ML/runs/5uupf9fw (98.9%)
+Autoencoder MLP (SSE): https://wandb.ai/eriknikulski/carQUEST-ML/runs/cplc3upo (99.95%)
+Offset 1 E-D MLP (SSE): https://wandb.ai/eriknikulski/carQUEST-ML/runs/nznfxoz1 (2.55%)
