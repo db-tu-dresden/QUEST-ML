@@ -103,7 +103,7 @@ def mlp(cfg: Config):
 
 
 @register_model_architecture('embedding_mlp', 'embedding_mlp')
-def mlp(cfg: Config):
+def embedding_mlp(cfg: Config):
     cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
     cfg['embedding_size'] = cfg['embedding_size'] if 'embedding_size' in cfg else 16
     cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 32
