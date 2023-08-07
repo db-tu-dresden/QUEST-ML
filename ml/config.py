@@ -52,10 +52,6 @@ class Config:
         'momentum': {'type': float, 'lambda': greater_zero},
         'batch_size': {'type': int, 'lambda': greater_zero},
 
-        # model parameters
-        'hidden_size': {'type': int, 'lambda': greater_zero},
-        'hidden_layers': {'type': int, 'lambda': greater_zero},
-
         # learning rate scheduler
         'lr_scheduler_factor': {'type': float, 'lambda': greater_zero},
         'lr_scheduler_patience': {'type': int, 'lambda': greater_zero},

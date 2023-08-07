@@ -19,10 +19,6 @@ learning_rate: 0.01
 momentum: 0.9
 batch_size: 16
 
-# model parameters
-hidden_size: 32
-hidden_layers: 2
-
 # learning rate scheduler
 lr_scheduler_factor: 0.1
 lr_scheduler_patience: 10
