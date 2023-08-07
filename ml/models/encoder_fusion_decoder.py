@@ -90,7 +90,7 @@ class EncoderFusionDecoder(Model):
         if config['load_encoder']:
             self.encoder.load_state_dict(checkpoint['encoder'])
         if config['load_fusion']:
-            self.encoder.load_state_dict(checkpoint['fusion'])
+            self.fusion.load_state_dict(checkpoint['fusion'])
         if config['load_decoder']:
             self.decoder.load_state_dict(checkpoint['decoder'])
 
