@@ -22,16 +22,26 @@ class EncoderDecoder(Model):
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
-        parser.add_argument('--encoder', type=str, help='Encoder model name')
-        parser.add_argument('--decoder', type=str, help='Decoder model name')
+        parser.add_argument('--encoder', type=str, help='Encoder model name. '
+                                                        'To see encoder specific arguments, use --help on the encoder '
+                                                        'architecture. The default is mlp. Every encoder parameter can '
+                                                        'be set by --encoder_{PARAMETER}, '
+                                                        'e.g. --encoder_hidden_size 32')
+        parser.add_argument('--decoder', type=str, help='Decoder model name. '
+                                                        'To see decoder specific arguments, use --help on the decoder '
+                                                        'architecture. The default is mlp. Every decoder parameter can '
+                                                        'be set by --decoder_{PARAMETER}, '
+                                                        'e.g. --decoder_hidden_size 32')
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
             add_arch_args(root_parser, 'encoder', 'Encoder model-specific configuration', prefix='encoder_')
             add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
 
-        parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction)
-        parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction)
+        parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to load the encoder from the provided model state dict')
+        parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to load the decoder from the provided model state dict')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = ''):
@@ -84,9 +94,21 @@ class EncoderFusionDecoder(Model):
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
-        parser.add_argument('--encoder', type=str, help='Encoder model name')
-        parser.add_argument('--fusion', type=str, help='Fusion model name')
-        parser.add_argument('--decoder', type=str, help='Decoder model name')
+        parser.add_argument('--encoder', type=str, help='Encoder model name. '
+                                                        'To see encoder specific arguments, use --help on the encoder '
+                                                        'architecture. The default is mlp. Every encoder parameter can '
+                                                        'be set by --encoder_{PARAMETER}, '
+                                                        'e.g. --encoder_hidden_size 32')
+        parser.add_argument('--fusion', type=str, help='Fusion model name. '
+                                                       'To see fusion model specific arguments, use --help on the '
+                                                       'fusion model architecture. The default is mlp. Every '
+                                                       'fusion model parameter can be set by --fusion_{PARAMETER}, '
+                                                       'e.g. --fusion_hidden_size 32')
+        parser.add_argument('--decoder', type=str, help='Decoder model name. '
+                                                        'To see decoder specific arguments, use --help on the decoder '
+                                                        'architecture. The default is mlp. Every decoder parameter can '
+                                                        'be set by --decoder_{PARAMETER}, '
+                                                        'e.g. --decoder_hidden_size 32')
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
@@ -94,9 +116,12 @@ class EncoderFusionDecoder(Model):
             add_arch_args(root_parser, 'fusion', 'Fusion model-specific configuration', prefix='fusion_')
             add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
 
-        parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction)
-        parser.add_argument('--load_fusion', default=False, action=argparse.BooleanOptionalAction)
-        parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction)
+        parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to load the encoder from the provided model state dict')
+        parser.add_argument('--load_fusion', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to load the fusion model from the provided model state dict')
+        parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to load the decoder from the provided model state dict')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = ''):
