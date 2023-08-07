@@ -80,7 +80,7 @@ class EncoderFusionDecoder(Model):
         }, config['model_save_path'])
 
     def load(self, config: Config):
-        if not config['load_model'] and not config['load_encoder'] and not config['fusion'] \
+        if not config['load_model'] and not config['load_encoder'] and not config['load_fusion'] \
                 and not config['load_decoder']:
             return
         checkpoint = torch.load(config['model_load_path'])
