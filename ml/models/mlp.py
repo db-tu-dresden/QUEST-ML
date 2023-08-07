@@ -37,10 +37,8 @@ class MLP(Model):
                    cfg[f'{prefix}hidden_layers'])
 
     def forward(self, x: torch.Tensor):
-        shape = x.shape
-        out = x.view(shape[0], -1)
+        out = x
         out = self.model(out)
-        out = out.view(*shape)
         return out
 
 
@@ -97,7 +95,7 @@ class EmbeddingMLP(Model):
 
 @register_model_architecture('mlp', 'mlp')
 def mlp(cfg: Config, prefix: str = ''):
-    cfg['input_size'] = cfg['jobs'] * cfg['processes'] if 'jobs' in cfg and 'processes' in cfg else 16
+    cfg['input_size'] = cfg['input_size'] if 'input_size' in cfg else 16
     cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 32
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
     cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 2
