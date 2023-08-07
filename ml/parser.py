@@ -54,7 +54,8 @@ class Parser(argparse.ArgumentParser):
 
         import ml
         arch = args[args.index(ident) + 1]
-        parser_id = arch + '_parser'
+        model = vars(ml.models)['ARCH_MODEL_NAME_REGISTRY'][arch]
+        parser_id = model + '_parser'
 
         if parser_id not in vars(ml.models):
             return msg
