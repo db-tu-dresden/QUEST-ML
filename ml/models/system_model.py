@@ -247,17 +247,17 @@ class SystemModel(Model):
         parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the decoder from the provided model state dict')
 
-        parser.add_argument('--freeze', default=False, action=argparse.BooleanOptionalAction,
+        parser.add_argument('--freeze', default=None, action=argparse.BooleanOptionalAction,
                             help='Whether to freeze the model')
-        parser.add_argument('--freeze_process_encoder', default=False, action=argparse.BooleanOptionalAction,
+        parser.add_argument('--freeze_process_encoder', default=None, action=argparse.BooleanOptionalAction,
                             help='Whether to freeze the process state encoder')
-        parser.add_argument('--freeze_encoder', default=False, action=argparse.BooleanOptionalAction,
+        parser.add_argument('--freeze_encoder', default=None, action=argparse.BooleanOptionalAction,
                             help='Whether to freeze the encoder')
-        parser.add_argument('--freeze_transformation', default=False, action=argparse.BooleanOptionalAction,
+        parser.add_argument('--freeze_transformation', default=None, action=argparse.BooleanOptionalAction,
                             help='Whether to freeze the transformation model')
-        parser.add_argument('--freeze_process_decoder', default=False, action=argparse.BooleanOptionalAction,
+        parser.add_argument('--freeze_process_decoder', default=None, action=argparse.BooleanOptionalAction,
                             help='Whether to freeze the process state decoder')
-        parser.add_argument('--freeze_decoder', default=False, action=argparse.BooleanOptionalAction,
+        parser.add_argument('--freeze_decoder', default=None, action=argparse.BooleanOptionalAction,
                             help='Whether to freeze the decoder')
 
         parser.add_argument('--only_process', default=False, action=argparse.BooleanOptionalAction,
@@ -301,6 +301,7 @@ class SystemModel(Model):
                 not config['load_process_encoder'] and not config['load_encoder'] and
                 not config['load_process_decoder'] and not config['load_decoder']):
             return
+        self.parameters()
         checkpoint = torch.load(config['model_load_path'])
         if config['load_model']:
             self.load_state_dict(checkpoint['model'])
@@ -325,6 +326,10 @@ def process_encoder(cfg: Config, prefix: str = 'encoder_'):
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
+
+    cfg['freeze_process_encoder'] = (cfg['freeze_process_encoder'] if cfg['freeze_process_encoder'] is not None
+                                     else cfg['freeze_encoder']) \
+        if 'freeze_process_decoder' in cfg else False
 
 
 def fusion_model(cfg: Config, prefix: str = 'encoder_'):
@@ -358,9 +363,16 @@ def process_decoder(cfg: Config, prefix: str = 'decoder_'):
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
 
+    cfg['freeze_process_decoder'] = (cfg['freeze_process_decoder'] if cfg['freeze_process_decoder'] is not None
+                                     else cfg['freeze_decoder']) \
+        if 'freeze_process_decoder' in cfg else False
+
 
 def system_encoder(cfg: Config, prefix: str = 'encoder_'):
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else 0.25
+
+    cfg['freeze_encoder'] = (cfg['freeze_encoder'] if cfg['freeze_encoder'] is not None else cfg['freeze']) \
+        if 'freeze_encoder' in cfg else False
 
     process_encoder(cfg, prefix)
     fusion_model(cfg, prefix)
@@ -377,8 +389,15 @@ def system_transformation(cfg: Config, prefix: str = 'transformation_'):
     cfg[f'{prefix}model'] = cfg[f'{prefix}encoder'] if f'{prefix}encoder' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
 
+    cfg['freeze_transformation'] = (cfg['freeze_transformation'] if cfg['freeze_transformation'] is not None
+                                    else cfg['freeze']) \
+        if 'freeze_transformation' in cfg else False
+
 
 def system_decoder(cfg: Config, prefix: str = 'decoder_'):
+    cfg['freeze_decoder'] = (cfg['freeze_decoder'] if cfg['freeze_decoder'] is not None else cfg['freeze']) \
+        if 'freeze_decoder' in cfg else False
+
     process_decoder(cfg, prefix)
 
 
@@ -391,6 +410,8 @@ def system_model(cfg: Config):
     cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 256
     cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 5
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
+
+    cfg['freeze'] = cfg['freeze'] or False if 'freeze' in cfg else False
 
     system_encoder(cfg, 'encoder_')
     system_transformation(cfg, 'transformation_')
