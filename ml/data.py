@@ -1,5 +1,6 @@
 import pickle
 
+import numpy as np
 import torch
 import xarray as xr
 from torch.utils.data import Dataset
@@ -36,7 +37,8 @@ class ProcessDataset(Dataset):
         dist_target = self.da.sel(job=jobs)[item + self.offset].to_numpy()
 
         if self.only_process:
-            return torch.tensor(dist_source, dtype=torch.float), torch.tensor(dist_target, dtype=torch.float)
+            return (torch.tensor(np.expand_dims(dist_source, axis=0), dtype=torch.float),
+                    torch.tensor(np.expand_dims(dist_target, axis=0), dtype=torch.float))
 
         diff = dist_target - dist_source
 
