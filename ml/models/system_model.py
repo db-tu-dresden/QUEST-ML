@@ -243,13 +243,35 @@ class SystemModel(Model):
         parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the decoder from the provided model state dict')
 
+        parser.add_argument('--freeze', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to freeze the model')
+        parser.add_argument('--freeze_process_encoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to freeze the process state encoder')
+        parser.add_argument('--freeze_encoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to freeze the encoder')
+        parser.add_argument('--freeze_transformation', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to freeze the transformation model')
+        parser.add_argument('--freeze_process_decoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to freeze the process state decoder')
+        parser.add_argument('--freeze_decoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to freeze the decoder')
+
     @classmethod
     def build_model(cls, config: Config, prefix: str = '') -> Model:
         encoder = SystemStateEncoder.build_model(config)
         transformation = TransformationModel.build_model(config)
         decoder = SystemStateDecoder.build_model(config)
 
-        return cls(encoder, transformation, decoder)
+        model = cls(encoder, transformation, decoder)
+
+        model.requires_grad_(not config['freeze'])
+        model.encoder.requires_grad_(not config['freeze_encoder'])
+        model.decoder.requires_grad_(not config['freeze_decoder'])
+        model.transformation.requires_grad_(not config['freeze_transformation'])
+        model.encoder.encoder.requires_grad_(not config['freeze_process_encoder'])
+        model.decoder.decoder.requires_grad_(not config['freeze_process_decoder'])
+
+        return model
 
     def save(self, config: Config):
         if not ddp.is_main_process() or not config['save_model']:
