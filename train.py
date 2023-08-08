@@ -24,7 +24,7 @@ def run():
     _, _, test_ds = get_datasets(config['base_path'], config['scaling_factor'], config['offset'],
                                  config['only_process'])
 
-    config['processes'] = test_ds.get_sample_shape()[0]
+    config['processes'] = test_ds.get_sample_shape()[0] if not config['only_process'] else 1
     config['jobs'] = test_ds.get_sample_shape()[-1]
 
     model = build_model(config)
