@@ -9,16 +9,17 @@ from ml.models import get_model_from_type, Model, register_model_architecture, r
 
 
 class FusionModel(Model):
-    def __init__(self, input_size: int, hidden_size: int, model: Model, dropout: float):
+    def __init__(self, input_size: int, hidden_size: int, model: Model, dropout: float, only_process: bool):
         super().__init__()
 
-        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
-        self.model = model
-        self.dropout = nn.Dropout(dropout)
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True) if not only_process else None
+        self.model = model if not only_process else nn.Identity()
+        self.dropout = nn.Dropout(dropout) if not only_process else nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
-        _, (out, _) = self.lstm(out)
+        if self.lstm:
+            _, (out, _) = self.lstm(out)
         out = out.squeeze()
         out = self.model(out)
         out = self.dropout(out)
@@ -50,7 +51,7 @@ class FusionModel(Model):
         model = model.build_model(config, f'{prefix}fusion_model_')
 
         return cls(config[f'{prefix}fusion_input_size'], config[f'{prefix}fusion_hidden_size'], model,
-                   config[f'{prefix}fusion_dropout'])
+                   config[f'{prefix}fusion_dropout'], config['only_process'])
 
 
 class ProcessStateEncoder(Model):
@@ -110,21 +111,18 @@ class ProcessStateDecoder(Model):
 
 
 class SystemStateEncoder(Model):
-    def __init__(self, encoder: Model, fusion: Model, dropout: float, config: Config):
+    def __init__(self, encoder: Model, fusion: Model, dropout: float, only_process: bool):
         super().__init__()
 
         self.encoder = encoder
-        self.dropout = nn.Dropout(dropout)
+        self.dropout = nn.Dropout(dropout) if not only_process else nn.Identity()
         self.fusion = fusion
-
-        self.config = config
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         out = self.encoder(out)
-        if not self.config['only_process']:
-            out = self.dropout(out)
-            out = self.fusion(out)
+        out = self.dropout(out)
+        out = self.fusion(out)
         return out
 
     @staticmethod
@@ -139,23 +137,18 @@ class SystemStateEncoder(Model):
         encoder = ProcessStateEncoder.build_model(config, prefix)
         fusion = FusionModel.build_model(config, prefix)
 
-        return cls(encoder, fusion, config[f'{prefix}dropout'], config)
+        return cls(encoder, fusion, config[f'{prefix}dropout'], config['only_process'])
 
 
 class SystemStateDecoder(Model):
-    def __init__(self, decoder: Model, processes: int, config: Config):
+    def __init__(self, decoder: Model, processes: int):
         super().__init__()
 
         self.decoder = decoder
         self.processes = processes
 
-        self.config = config
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
-
-        if self.config['only_process']:
-            return self.decoder(out)
 
         out = torch.stack([self.decoder(out + i / self.processes) for i in range(self.processes)])
         out = out.transpose(0, 1)
@@ -169,7 +162,7 @@ class SystemStateDecoder(Model):
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
         decoder = ProcessStateDecoder.build_model(config, prefix)
 
-        return cls(decoder, config['processes'], config)
+        return cls(decoder, config['processes'])
 
 
 class TransformationModel(Model):
