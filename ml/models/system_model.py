@@ -232,10 +232,14 @@ class SystemModel(Model):
                           prefix='transformation_')
             add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
 
+        parser.add_argument('--load_process_encoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to load the process state encoder from the provided model state dict')
         parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the encoder from the provided model state dict')
         parser.add_argument('--load_transformation', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the transformation model from the provided model state dict')
+        parser.add_argument('--load_process_decoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to load the process state decoder from the provided model state dict')
         parser.add_argument('--load_decoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the decoder from the provided model state dict')
 
@@ -252,25 +256,33 @@ class SystemModel(Model):
             return
         torch.save({
             'model': self.state_dict(),
-            'encoder': self.encoder,
-            'transformation': self.transformation,
-            'decoder': self.decoder,
+            'process_state_encoder': self.encoder.encoder.state_dict(),
+            'system_state_encoder': self.encoder.state_dict(),
+            'transformation': self.transformation.state_dict(),
+            'process_state_decoder': self.decoder.decoder.state_dict(),
+            'system_state_decoder': self.decoder.state_dict(),
         }, config['model_save_path'])
 
     def load(self, config: Config):
-        if not config['load_model'] and not config['load_encoder'] and not config['load_transformation'] \
-                and not config['load_decoder']:
+        if (not config['load_model'] and not config['load_transformation'] and
+                not config['load_process_encoder'] and not config['load_encoder'] and
+                not config['load_process_decoder'] and not config['load_decoder']):
             return
         checkpoint = torch.load(config['model_load_path'])
         if config['load_model']:
             self.load_state_dict(checkpoint['model'])
             return
+        if config['load_process_encoder']:
+            self.encoder.encoder.load_state_dict(checkpoint['process_state_encoder'])
+            print('Process encoder loaded')
         if config['load_encoder']:
-            self.encoder.load_state_dict(checkpoint['encoder'])
+            self.encoder.load_state_dict(checkpoint['system_state_encoder'])
         if config['load_transformation']:
             self.transformation.load_state_dict(checkpoint['fusion'])
+        if config['load_process_decoder']:
+            self.decoder.decoder.load_state_dict(checkpoint['process_state_decoder'])
         if config['load_decoder']:
-            self.decoder.load_state_dict(checkpoint['decoder'])
+            self.decoder.load_state_dict(checkpoint['system_state_decoder'])
 
 
 def process_encoder(cfg: Config, prefix: str = 'encoder_'):
