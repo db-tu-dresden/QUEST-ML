@@ -110,18 +110,21 @@ class ProcessStateDecoder(Model):
 
 
 class SystemStateEncoder(Model):
-    def __init__(self, encoder: Model, fusion: Model, dropout: float):
+    def __init__(self, encoder: Model, fusion: Model, dropout: float, config: Config):
         super().__init__()
 
         self.encoder = encoder
         self.dropout = nn.Dropout(dropout)
         self.fusion = fusion
 
+        self.config = config
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         out = self.encoder(out)
-        out = self.dropout(out)
-        out = self.fusion(out)
+        if not self.config['only_process']:
+            out = self.dropout(out)
+            out = self.fusion(out)
         return out
 
     @staticmethod
@@ -136,18 +139,23 @@ class SystemStateEncoder(Model):
         encoder = ProcessStateEncoder.build_model(config, prefix)
         fusion = FusionModel.build_model(config, prefix)
 
-        return cls(encoder, fusion, config[f'{prefix}dropout'])
+        return cls(encoder, fusion, config[f'{prefix}dropout'], config)
 
 
 class SystemStateDecoder(Model):
-    def __init__(self, decoder: Model, processes: int):
+    def __init__(self, decoder: Model, processes: int, config: Config):
         super().__init__()
 
         self.decoder = decoder
         self.processes = processes
 
+        self.config = config
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
+
+        if self.config['only_process']:
+            return self.decoder(out)
 
         out = torch.stack([self.decoder(out + i / self.processes) for i in range(self.processes)])
         out = out.transpose(0, 1)
@@ -161,7 +169,7 @@ class SystemStateDecoder(Model):
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
         decoder = ProcessStateDecoder.build_model(config, prefix)
 
-        return cls(decoder, config['processes'])
+        return cls(decoder, config['processes'], config)
 
 
 class TransformationModel(Model):
@@ -194,16 +202,19 @@ class TransformationModel(Model):
 
 @register_model('system_model')
 class SystemModel(Model):
-    def __init__(self, encoder: Model, transformation: Model, decoder: Model):
+    def __init__(self, encoder: Model, transformation: Model, decoder: Model, config: Config):
         super().__init__()
         self.encoder = encoder
         self.transformation = transformation
         self.decoder = decoder
 
+        self.config = config
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         out = self.encoder(out)
-        out = self.transformation(out)
+        if not self.config['only_process'] and not self.config['only_system']:
+            out = self.transformation(out)
         out = self.decoder(out)
         return out
 
@@ -256,13 +267,20 @@ class SystemModel(Model):
         parser.add_argument('--freeze_decoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to freeze the decoder')
 
+        parser.add_argument('--only_process', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to only encode and decode process states')
+        parser.add_argument('--only_system', default=False, action=argparse.BooleanOptionalAction,
+                            help='Whether to only encode and decode system states')
+
     @classmethod
     def build_model(cls, config: Config, prefix: str = '') -> Model:
+        assert not (config['only_process'] and config['only_system'])
+
         encoder = SystemStateEncoder.build_model(config)
         transformation = TransformationModel.build_model(config)
         decoder = SystemStateDecoder.build_model(config)
 
-        model = cls(encoder, transformation, decoder)
+        model = cls(encoder, transformation, decoder, config)
 
         model.requires_grad_(not config['freeze'])
         model.encoder.requires_grad_(not config['freeze_encoder'])
