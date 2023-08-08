@@ -42,6 +42,16 @@ class MLP(Model):
         return out
 
 
+@register_model('flat_mlp')
+class FlatMLP(MLP):
+    def forward(self, x: torch.Tensor):
+        shape = x.shape
+        out = x.view(shape[0], -1)
+        out = super().forward(out)
+        out = out.view(*shape)
+        return out
+
+
 @register_model('embedding_mlp')
 class EmbeddingMLP(Model):
     def __init__(self, input_size: int, embed_size: int, hidden_size: int, output_size: int,
@@ -104,6 +114,12 @@ def mlp(cfg: Config, prefix: str = ''):
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
     cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg else cfg['output_size']
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else cfg['hidden_layers']
+
+
+@register_model_architecture('flat_mlp', 'flat_mlp')
+def flat_mlp(cfg: Config, prefix: str = ''):
+    cfg['input_size'] = cfg['jobs'] * cfg['processes'] if 'jobs' in cfg and 'processes' in cfg else 16
+    mlp(cfg, prefix)
 
 
 @register_model_architecture('embedding_mlp', 'embedding_mlp')
