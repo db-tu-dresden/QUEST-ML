@@ -60,8 +60,8 @@ class EncoderDecoder(Model):
             return
         torch.save({
             'model': self.state_dict(),
-            'encoder': self.encoder,
-            'decoder': self.decoder,
+            'encoder': self.encoder.state_dict(),
+            'decoder': self.decoder.state_dict(),
         }, config['model_save_path'])
 
     def load(self, config: Config):

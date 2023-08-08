@@ -74,9 +74,9 @@ class EncoderFusionDecoder(Model):
             return
         torch.save({
             'model': self.state_dict(),
-            'encoder': self.encoder,
-            'fusion': self.fusion,
-            'decoder': self.decoder,
+            'encoder': self.encoder.state_dict(),
+            'fusion': self.fusion.state_dict(),
+            'decoder': self.decoder.state_dict(),
         }, config['model_save_path'])
 
     def load(self, config: Config):
