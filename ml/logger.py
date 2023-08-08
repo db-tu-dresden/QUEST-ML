@@ -75,9 +75,10 @@ class Logger:
         self.log({f'{name}_{optim.__name__}': self.metrics[name]}, verbose=False, **kwargs)
 
     def log_artifact(self, name: str, type: str, path: str):
-        artifact = wandb.Artifact(name=name, type=type)
-        artifact.add_file(local_path=path)
-        wandb.run.log_artifact(artifact)
+        if wandb.run is not None:
+            artifact = wandb.Artifact(name=name, type=type)
+            artifact.add_file(local_path=path)
+            wandb.run.log_artifact(artifact)
 
     def log_system_config(self):
         self.log_artifact('System-Config', 'system_config', self.config['system_config_path'])
