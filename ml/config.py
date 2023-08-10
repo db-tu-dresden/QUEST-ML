@@ -45,6 +45,7 @@ class Config:
         'wandb_table_elements': {'type': int, 'lambda': greater_zero},
         'verbose': {'type': bool, 'lambda': true},
         'float_precision': {'type': int, 'lambda': greater_zero},
+        'log_to_file': {'type': bool, 'lambda': true},
 
         # training hyperparameters
         'epochs': {'type': int, 'lambda': greater_zero},
@@ -102,6 +103,7 @@ class Config:
         'model_load_path': {'type': str, 'lambda': true},
         'system_config_path': {'type': str, 'lambda': true},
         'graph_description_path': {'type': str, 'lambda': true},
+        'output_file': {'type': str, 'lambda': true},
     }
 
     default_schema = Schema({
@@ -141,6 +143,9 @@ class Config:
                                           os.path.join(base_path, 'config.yaml')
         self.data['graph_description_path'] = self.data['graph_description_path'] or \
                                            os.path.join(base_path, 'graph_description.note')
+
+        self.data['output_file'] = (self.data['output_file'] or
+                                    os.path.join(base_path, 'job-' + str(self.data['job_id']) + '.out'))
 
     def update_from_args(self, args: argparse.Namespace):
         d = vars(args)

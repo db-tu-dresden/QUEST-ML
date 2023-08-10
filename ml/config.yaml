@@ -12,6 +12,7 @@ wandb_table_name: 'data_table'
 wandb_table_elements: 5
 verbose: True
 float_precision: 6
+log_to_file: False
 
 # training hyperparameters
 epochs: 50
@@ -69,3 +70,4 @@ model_save_path: ''
 model_load_path: ''
 system_config_path: ''
 graph_description_path: ''
+output_file: ''

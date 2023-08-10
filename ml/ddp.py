@@ -29,7 +29,9 @@ def setup(rank: int, config: Config):
     dist.init_process_group('nccl', rank=rank, world_size=config['world_size'])
     config['device'] = f'cuda:{rank}'
     torch.cuda.set_device(config['device'])
-    set_stdout(os.path.join(config['base_path'], 'job-' + str(config['job_id'])))
+
+    if config['log_to_file']:
+        set_stdout(config['output_file'])
     dist.barrier()
 
 
@@ -79,6 +81,7 @@ def sync():
 
 def set_stdout(stdout_base: str):
     if is_dist_avail_and_initialized():
-        stdout = f'{stdout_base}-{dist.get_rank()}.out'
+        index = stdout_base.rindex('.')
+        stdout = stdout_base[:index] + f'-{dist.get_rank()}' + stdout_base[index:]
         sys.stdout = open(stdout, 'a')
         sys.stderr = open(stdout, 'a')
