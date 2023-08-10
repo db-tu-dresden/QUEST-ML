@@ -204,7 +204,8 @@ class SystemModel(Model):
     def __init__(self, encoder: Model, transformation: Model, decoder: Model, config: Config):
         super().__init__()
         self.encoder = encoder
-        self.transformation = transformation
+        self.transformation = transformation if not self.config['only_process'] and not self.config['only_system'] \
+            else nn.Identity()
         self.decoder = decoder
 
         self.config = config
@@ -212,8 +213,7 @@ class SystemModel(Model):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         out = self.encoder(out)
-        if not self.config['only_process'] and not self.config['only_system']:
-            out = self.transformation(out)
+        out = self.transformation(out)
         out = self.decoder(out)
         return out
 
