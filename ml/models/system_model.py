@@ -271,6 +271,13 @@ class SystemModel(Model):
         parser.add_argument('--only_system', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to only encode and decode system states')
 
+        parser.add_argument('--process_autoencoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Preset for --only_process --freeze --freeze_encoder --freeze_decoder '
+                                 '--no-freeze_process_encoder --no-freeze_process_decoder')
+        parser.add_argument('--system_autoencoder', default=False, action=argparse.BooleanOptionalAction,
+                            help='Preset for --only_system --freeze --no-freeze_encoder --no-freeze_decoder '
+                                 '--freeze_process_encoder --no-freeze_process_decoder')
+
     @classmethod
     def build_model(cls, config: Config, prefix: str = '') -> Model:
         assert not (config['only_process'] and config['only_system'])
@@ -417,6 +424,22 @@ def system_model(cfg: Config):
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
 
     cfg['freeze'] = cfg['freeze'] or False if 'freeze' in cfg else False
+
+    if cfg['process_autoencoder']:
+        cfg['only_process'] = True
+        cfg['freeze'] = True
+        cfg['freeze_encoder'] = True
+        cfg['freeze_decoder'] = True
+        cfg['freeze_process_encoder'] = False
+        cfg['freeze_process_decoder'] = False
+
+    if cfg['system_autoencoder']:
+        cfg['only_system'] = True
+        cfg['freeze'] = True
+        cfg['freeze_encoder'] = False
+        cfg['freeze_decoder'] = False
+        cfg['freeze_process_encoder'] = True
+        cfg['freeze_process_decoder'] = True
 
     system_encoder(cfg, 'encoder_')
     system_transformation(cfg, 'transformation_')
