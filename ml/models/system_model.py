@@ -375,7 +375,7 @@ def process_decoder(cfg: Config, prefix: str = 'decoder_'):
 
 
 def system_encoder(cfg: Config, prefix: str = 'encoder_'):
-    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else 0.25
+    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else cfg['dropout']
 
     cfg['freeze_encoder'] = (cfg['freeze_encoder'] if cfg['freeze_encoder'] is not None else cfg['freeze']) \
         if 'freeze_encoder' in cfg else False
