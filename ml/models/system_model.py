@@ -9,13 +9,13 @@ from ml.models import get_model_from_type, Model, register_model_architecture, r
 
 
 class FusionModel(Model):
-    def __init__(self, input_size: int, hidden_size: int, model: Model, dropout: float, only_process: bool):
+    def __init__(self, input_size: int, hidden_size: int, model: Model, dropout: float):
         super().__init__()
 
-        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True) if not only_process else None
-        self.model = model if not only_process else nn.Identity()
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
+        self.model = model
         self.activation = nn.ReLU()
-        self.dropout = nn.Dropout(dropout) if not only_process else nn.Identity()
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
@@ -53,7 +53,7 @@ class FusionModel(Model):
         model = model.build_model(config, f'{prefix}fusion_model_')
 
         return cls(config[f'{prefix}fusion_input_size'], config[f'{prefix}fusion_hidden_size'], model,
-                   config[f'{prefix}fusion_dropout'], config['only_process'])
+                   config[f'{prefix}fusion_dropout'])
 
 
 class ProcessStateEncoder(Model):
@@ -139,7 +139,7 @@ class SystemStateEncoder(Model):
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'encoder_') -> Model:
         encoder = ProcessStateEncoder.build_model(config, prefix)
-        fusion = FusionModel.build_model(config, prefix)
+        fusion = FusionModel.build_model(config, prefix) if not config['only_process'] else nn.Identity()
 
         return cls(encoder, fusion, config[f'{prefix}dropout'], config['only_process'])
 
