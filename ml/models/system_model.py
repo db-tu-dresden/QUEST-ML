@@ -14,6 +14,7 @@ class FusionModel(Model):
 
         self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True) if not only_process else None
         self.model = model if not only_process else nn.Identity()
+        self.activation = nn.ReLU()
         self.dropout = nn.Dropout(dropout) if not only_process else nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -22,6 +23,7 @@ class FusionModel(Model):
             _, (out, _) = self.lstm(out)
         out = out.squeeze()
         out = self.model(out)
+        out = self.activation(out)
         out = self.dropout(out)
         return out
 
@@ -59,10 +61,12 @@ class ProcessStateEncoder(Model):
         super().__init__()
 
         self.model = model
+        self.activation = nn.ReLU()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         out = self.model(out)
+        out = self.activation(out)
         return out
 
     @staticmethod
@@ -170,10 +174,12 @@ class TransformationModel(Model):
         super().__init__()
 
         self.transformation = transformation
+        self.activation = nn.ReLU()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         out = self.transformation(out)
+        out = self.activation(out)
         return out
 
     @staticmethod
