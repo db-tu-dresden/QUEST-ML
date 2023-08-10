@@ -314,7 +314,6 @@ class SystemModel(Model):
             return
         if config['load_process_encoder']:
             self.encoder.encoder.load_state_dict(checkpoint['process_state_encoder'])
-            print('Process encoder loaded')
         if config['load_encoder']:
             self.encoder.load_state_dict(checkpoint['system_state_encoder'])
         if config['load_transformation']:
