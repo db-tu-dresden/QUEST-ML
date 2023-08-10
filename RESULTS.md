@@ -45,3 +45,40 @@ MLP: https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-l9p7icvk (best ac
 Autoencoder MLP (PSE): https://wandb.ai/eriknikulski/carQUEST-ML/runs/5uupf9fw (98.9%)
 Autoencoder MLP (SSE): https://wandb.ai/eriknikulski/carQUEST-ML/runs/cplc3upo (99.95%)
 Offset 1 E-D MLP (SSE): https://wandb.ai/eriknikulski/carQUEST-ML/runs/nznfxoz1 (2.55%)
+
+
+# System Model
+### Process Autoencoder
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/0k6x5ht0
+scaling_factor: 10
+offset: 0
+accuracy: 100%
+converged after 1 epoch
+
+### System Autoencoder (loaded and frozen Process Autoencoder; process decoder not frozen!; transformation model frozen)
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/qjnrag9a
+scaling_factor: 10
+offset: 0
+accuracy: 76%
+converged after 10 epochs
+
+### System Autoencoder (loaded and frozen Process Autoencoder; process decoder not frozen!; transformation model frozen)
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/d124h6tj
+scaling_factor: 1
+offset: 0
+accuracy: 73.5%
+converged after 2 epochs
+
+### System Autoencoder (loaded and frozen Process Autoencoder; transformation model not frozen!)
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/vosqaes0
+scaling_factor: 10
+offset: 0
+accuracy: 33.55%
+converged after 1 epoch
+
+### System Model (Encoder and Decoder loaded; Encoder and Decoder frozen)
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/7ad5lys4
+scaling_factor: 10
+offset: 1
+accuracy: 0.0%
+converged after - epochs
