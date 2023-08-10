@@ -120,7 +120,7 @@ class SystemStateEncoder(Model):
 
         self.encoder = encoder
         self.dropout = nn.Dropout(dropout) if not only_process else nn.Identity()
-        self.fusion = fusion
+        self.fusion = fusion if not only_process else torch.squeeze
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
@@ -139,7 +139,7 @@ class SystemStateEncoder(Model):
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'encoder_') -> Model:
         encoder = ProcessStateEncoder.build_model(config, prefix)
-        fusion = FusionModel.build_model(config, prefix) if not config['only_process'] else nn.Identity()
+        fusion = FusionModel.build_model(config, prefix)
 
         return cls(encoder, fusion, config[f'{prefix}dropout'], config['only_process'])
 
