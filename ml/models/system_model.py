@@ -166,7 +166,7 @@ class SystemStateDecoder(Model):
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
         decoder = ProcessStateDecoder.build_model(config, prefix)
 
-        return cls(decoder, config['processes'])
+        return cls(decoder, config['processes'] if not config['only_process'] else 1)
 
 
 class TransformationModel(Model):
