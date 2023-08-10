@@ -152,7 +152,6 @@ class Config:
         for k, v in d.items():
             self.data[k] = v
 
-        self.data['verbose'] = False if self.data['gpu'] else self.data['verbose']
         self.set_base_path()
 
     def validate(self):
