@@ -39,7 +39,7 @@ def cleanup():
 
 
 def run(fn, config: Config, *args):
-    print(f'Spawning {config["world_size"]} processes...')
+    print(f'Spawning {config["world_size"]} process{"es" if config["world_size"] == 1 else ""}...')
     mp.spawn(fn, args=(config, *args),
              nprocs=config['world_size'], join=True)
 
