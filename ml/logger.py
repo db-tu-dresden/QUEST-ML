@@ -54,16 +54,18 @@ class Logger:
                                  np.array2string(targets[:n].numpy()))
         wandb.run.log({self.config['wandb_table_name']: copy(self.data_table)})
 
+    def log_dict(self, msg, to_wandb: bool = None, verbose: bool = None):
+        verbose = verbose or self.config['verbose']
+        to_wandb = to_wandb or self.config['wandb']
+        if to_wandb and wandb.run is not None:
+            wandb.log(msg)
+        if verbose:
+            print(' | '.join([f'{k}: {v:{self.float_formatter}}' for k, v in msg.items()]))
+
     def log(self, msg, to_wandb: bool = None, verbose: bool = None):
-        if verbose is None:
-            verbose = self.config['verbose']
-        if to_wandb is None:
-            to_wandb = self.config['wandb']
+        verbose = verbose or self.config['verbose']
         if isinstance(msg, dict):
-            if to_wandb and wandb.run is not None:
-                wandb.log(msg)
-            if verbose:
-                print(' | '.join([f'{k}: {v:{self.float_formatter}}' for k, v in msg.items()]))
+            self.log_dict(msg, to_wandb, verbose)
         else:
             if verbose:
                 print(msg)
