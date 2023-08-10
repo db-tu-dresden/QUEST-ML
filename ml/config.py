@@ -129,20 +129,20 @@ class Config:
         self.data['data_path'] = self.data['data_path'] or os.path.join(base_path, 'data')
         self.data['save_dir'] = self.data['save_dir'] or os.path.join(base_path, 'save')
 
-        self.data['model_save_path'] = self.data['model_save_path'] or \
-                                       os.path.join(self.data['save_dir'], self.data['model_file'])
-        self.data['model_load_path'] = self.data['model_save_path'] or \
-                                       os.path.join(self.data['save_dir'], self.data['model_file'])
+        self.data['model_save_path'] = (self.data['model_save_path'] or
+                                        os.path.join(self.data['save_dir'], self.data['model_file']))
+        self.data['model_load_path'] = (self.data['model_save_path'] or
+                                        os.path.join(self.data['save_dir'], self.data['model_file']))
 
-        self.data['checkpoint_save_path'] = self.data['checkpoint_save_path'] or \
-                                            os.path.join(self.data['save_dir'], self.data['checkpoint_file'])
-        self.data['checkpoint_load_path'] = self.data['checkpoint_load_path'] or \
-                                            os.path.join(self.data['save_dir'], self.data['checkpoint_file'])
+        self.data['checkpoint_save_path'] = (self.data['checkpoint_save_path'] or
+                                             os.path.join(self.data['save_dir'], self.data['checkpoint_file']))
+        self.data['checkpoint_load_path'] = (self.data['checkpoint_load_path'] or
+                                             os.path.join(self.data['save_dir'], self.data['checkpoint_file']))
 
-        self.data['system_config_path'] = self.data['system_config_path'] or \
-                                          os.path.join(base_path, 'config.yaml')
-        self.data['graph_description_path'] = self.data['graph_description_path'] or \
-                                           os.path.join(base_path, 'graph_description.note')
+        self.data['system_config_path'] = (self.data['system_config_path'] or
+                                           os.path.join(base_path, 'config.yaml'))
+        self.data['graph_description_path'] = (self.data['graph_description_path'] or
+                                               os.path.join(base_path, 'graph_description.note'))
 
         self.data['output_file'] = (self.data['output_file'] or
                                     os.path.join(base_path, 'job-' + str(self.data['job_id']) + '.out'))
