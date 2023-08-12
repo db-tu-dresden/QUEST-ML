@@ -58,6 +58,45 @@ class FusionModel(Model):
                    config[f'{prefix}fusion_dropout'])
 
 
+class DeFusionModel(Model):
+    def __init__(self, input_size: int, hidden_size: int, dropout: float, processes):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
+        self.dropout = nn.Dropout(dropout)
+
+        self.processes = processes
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        out = x
+        shape = out.shape
+
+        _input = torch.zeros((shape[0], 1, shape[1]))
+        h_0 = out.unsqueeze(dim=0)
+        c_0 = torch.zeros((1, shape[0], self.lstm.hidden_size))
+
+        _outs = []
+
+        for i in range(self.processes):
+            _out, (h_0, c_0) = self.lstm(_input, (h_0, c_0))
+            _input = _out.detach()
+            _outs.append(_out.squeeze())
+
+        out = torch.stack(_outs).transpose(0, 1)
+        out = self.dropout(out)
+        return out
+
+    @staticmethod
+    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
+        parser.add_argument(f'--{prefix}defusion_input_size', type=int, metavar='N', help='Input size')
+        parser.add_argument(f'--{prefix}defusion_hidden_size', type=int, metavar='N', help='Hidden size')
+        parser.add_argument(f'--{prefix}defusion_dropout', type=int, metavar='N', help='Dropout value')
+
+    @classmethod
+    def build_model(cls, config: Config, prefix: str = '') -> Model:
+        return cls(config[f'{prefix}defusion_input_size'], config[f'{prefix}defusion_hidden_size'],
+                   config[f'{prefix}defusion_dropout'], config[f'processes'])
+
+
 class ProcessStateEncoder(Model):
     def __init__(self, model: Model):
         super().__init__()
@@ -147,17 +186,16 @@ class SystemStateEncoder(Model):
 
 
 class SystemStateDecoder(Model):
-    def __init__(self, decoder: Model, processes: int):
+    def __init__(self, defusion: Model, decoder: Model):
         super().__init__()
 
+        self.defusion = defusion
         self.decoder = decoder
-        self.processes = processes
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
-
-        out = torch.stack([self.decoder(out + i / self.processes) for i in range(self.processes)])
-        out = out.transpose(0, 1)
+        out = self.defusion(out)
+        out = self.decoder(out)
         return out
 
     @staticmethod
@@ -166,9 +204,10 @@ class SystemStateDecoder(Model):
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
+        defusion = DeFusionModel.build_model(config, prefix)
         decoder = ProcessStateDecoder.build_model(config, prefix)
 
-        return cls(decoder, config['processes'] if not config['only_process'] else 1)
+        return cls(defusion, decoder)
 
 
 class TransformationModel(Model):
@@ -365,6 +404,15 @@ def fusion_model(cfg: Config, prefix: str = 'encoder_'):
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
 
 
+def defusion_model(cfg: Config, prefix: str = 'encoder_'):
+    prefix += 'defusion_'
+
+    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else cfg['dropout']
+
+    cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg else cfg['embedding_size']
+    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
+
+
 def process_decoder(cfg: Config, prefix: str = 'decoder_'):
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] \
         if f'{prefix}input_size' in cfg else cfg['embedding_size']
@@ -411,6 +459,7 @@ def system_decoder(cfg: Config, prefix: str = 'decoder_'):
     cfg['freeze_decoder'] = (cfg['freeze_decoder'] if cfg['freeze_decoder'] is not None else cfg['freeze']) \
         if 'freeze_decoder' in cfg else False
 
+    defusion_model(cfg, prefix)
     process_decoder(cfg, prefix)
 
 
