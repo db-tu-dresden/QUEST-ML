@@ -419,8 +419,8 @@ def system_model(cfg: Config):
     cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.25
 
     cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
-    cfg['embedding_size'] = cfg['embedding_size'] if 'embedding_size' in cfg else 16
-    cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 256
+    cfg['embedding_size'] = cfg['embedding_size'] if 'embedding_size' in cfg else 256
+    cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else cfg['embedding_size']
     cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 5
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
 
