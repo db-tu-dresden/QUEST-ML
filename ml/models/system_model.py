@@ -186,10 +186,10 @@ class SystemStateEncoder(Model):
 
 
 class SystemStateDecoder(Model):
-    def __init__(self, defusion: Model, decoder: Model):
+    def __init__(self, defusion: Model, decoder: Model, only_process: bool):
         super().__init__()
 
-        self.defusion = defusion
+        self.defusion = defusion if not only_process else nn.Identity()
         self.decoder = decoder
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -207,7 +207,7 @@ class SystemStateDecoder(Model):
         defusion = DeFusionModel.build_model(config, prefix)
         decoder = ProcessStateDecoder.build_model(config, prefix)
 
-        return cls(defusion, decoder)
+        return cls(defusion, decoder, config['only_process'])
 
 
 class TransformationModel(Model):
