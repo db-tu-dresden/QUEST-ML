@@ -69,10 +69,11 @@ class DeFusionModel(Model):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         shape = out.shape
+        device = out.device
 
-        _input = torch.zeros((shape[0], 1, shape[1]))
+        _input = torch.zeros((shape[0], 1, shape[1])).to(device)
         h_0 = out.unsqueeze(dim=0)
-        c_0 = torch.zeros((1, shape[0], self.lstm.hidden_size))
+        c_0 = torch.zeros((1, shape[0], self.lstm.hidden_size)).to(device)
 
         _outs = []
 
@@ -467,7 +468,7 @@ def system_decoder(cfg: Config, prefix: str = 'decoder_'):
 
 @register_model_architecture('system_model', 'system_model')
 def system_model(cfg: Config):
-    cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.25
+    cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.5
 
     cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
     cfg['embedding_size'] = cfg['embedding_size'] if 'embedding_size' in cfg else 256
