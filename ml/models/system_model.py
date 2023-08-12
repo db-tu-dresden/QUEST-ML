@@ -132,10 +132,12 @@ class ProcessStateDecoder(Model):
         super().__init__()
 
         self.model = model
+        self.activation = nn.ReLU()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         out = self.model(out)
+        out = self.activation(out)
         return out
 
     @staticmethod
