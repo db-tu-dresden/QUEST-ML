@@ -82,3 +82,11 @@ scaling_factor: 10
 offset: 1
 accuracy: 0.0%
 converged after - epochs
+
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/vajnesxx
+scaling_factor: 10
+offset: 1
+accuracy: 76.2%
+converged after 20 epochs
+Graph: -
