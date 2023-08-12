@@ -191,7 +191,7 @@ class SystemStateDecoder(Model):
     def __init__(self, defusion: Model, decoder: Model, only_process: bool):
         super().__init__()
 
-        self.defusion = defusion if not only_process else nn.Identity()
+        self.defusion = defusion if not only_process else lambda x: torch.unsqueeze(x, dim=1)
         self.decoder = decoder
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
