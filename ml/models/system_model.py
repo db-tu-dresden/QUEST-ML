@@ -9,10 +9,10 @@ from ml.models import get_model_from_type, Model, register_model_architecture, r
 
 
 class FusionModel(Model):
-    def __init__(self, input_size: int, hidden_size: int, model: Model, dropout: float):
+    def __init__(self, input_size: int, hidden_size: int, bidirectional: bool, model: Model, dropout: float):
         super().__init__()
 
-        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True, bidirectional=bidirectional)
         self.model = model
         self.activation = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
@@ -52,7 +52,8 @@ class FusionModel(Model):
         model = get_model_from_type(model_type, config)
         model = model.build_model(config, f'{prefix}fusion_model_')
 
-        return cls(config[f'{prefix}fusion_input_size'], config[f'{prefix}fusion_hidden_size'], model,
+        return cls(config[f'{prefix}fusion_input_size'], config[f'{prefix}fusion_hidden_size'],
+                   config[f'{prefix}fusion_bidirectional'], model,
                    config[f'{prefix}fusion_dropout'])
 
 
@@ -350,9 +351,10 @@ def fusion_model(cfg: Config, prefix: str = 'encoder_'):
 
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg else cfg['embedding_size']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
+    cfg[f'{prefix}bidirectional'] = cfg[f'{prefix}bidirectional'] if f'{prefix}bidirectional' in cfg else True
 
     cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
-        if f'{prefix}model_input_size' in cfg else cfg['hidden_size']
+        if f'{prefix}model_input_size' in cfg else 2**int(cfg[f'{prefix}bidirectional']) * cfg['hidden_size']
     cfg[f'{prefix}model_hidden_layers'] = cfg[f'{prefix}model_hidden_layers'] \
         if f'{prefix}model_hidden_layers' in cfg else 0
     cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
