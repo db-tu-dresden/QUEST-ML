@@ -59,8 +59,10 @@ class FusionModel(Model):
 
 
 class DeFusionModel(Model):
-    def __init__(self, input_size: int, hidden_size: int, dropout: float, processes):
+    def __init__(self, input_size: int, hidden_size: int, model: Model, dropout: float, processes):
         super().__init__()
+        self.model = model
+        self.activation = nn.ReLU()
         self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
         self.dropout = nn.Dropout(dropout)
 
@@ -70,6 +72,10 @@ class DeFusionModel(Model):
         out = x
         shape = out.shape
         device = out.device
+
+        out = self.model(out)
+        out = self.activation(out)
+        out = self.dropout(out)
 
         _input = torch.zeros((shape[0], 1, shape[1])).to(device)
         h_0 = out.unsqueeze(dim=0)
@@ -92,9 +98,26 @@ class DeFusionModel(Model):
         parser.add_argument(f'--{prefix}defusion_hidden_size', type=int, metavar='N', help='Hidden size')
         parser.add_argument(f'--{prefix}defusion_dropout', type=int, metavar='N', help='Dropout value')
 
+        parser.add_argument('--defusion_model', type=str, help='Defusion model name. '
+                                                               'To see defusion model specific arguments, use --help '
+                                                               'on the model architecture. The default is mlp. Every '
+                                                               'model parameter can be set by '
+                                                               '--defusion_model_{PARAMETER}, '
+                                                               'e.g. --defusion_model_hidden_size 32')
+
+        root_parser = getattr(parser, 'root_parser', None)
+        if root_parser:
+            add_arch_args(root_parser, f'{prefix}defusion_model',
+                          f'{prefix}defusion-model-specific configuration',
+                          prefix=f'{prefix}defusion_model_')
+
     @classmethod
     def build_model(cls, config: Config, prefix: str = '') -> Model:
-        return cls(config[f'{prefix}defusion_input_size'], config[f'{prefix}defusion_hidden_size'],
+        model_type = config[f'{prefix}defusion_model'] if f'{prefix}defusion_model' in config else None
+        model = get_model_from_type(model_type, config)
+        model = model.build_model(config, f'{prefix}defusion_model_')
+
+        return cls(config[f'{prefix}defusion_input_size'], config[f'{prefix}defusion_hidden_size'], model,
                    config[f'{prefix}defusion_dropout'], config[f'processes'])
 
 
@@ -414,6 +437,16 @@ def defusion_model(cfg: Config, prefix: str = 'encoder_'):
 
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg else cfg['embedding_size']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
+
+    cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
+        if f'{prefix}model_input_size' in cfg else cfg['hidden_size']
+    cfg[f'{prefix}model_hidden_layers'] = cfg[f'{prefix}model_hidden_layers'] \
+        if f'{prefix}model_hidden_layers' in cfg else 1
+    cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
+        if f'{prefix}model_output_size' in cfg else cfg['embedding_size']
+
+    cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
+    ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
 
 
 def process_decoder(cfg: Config, prefix: str = 'decoder_'):
