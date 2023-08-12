@@ -19,8 +19,9 @@ class FusionModel(Model):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
-        if self.lstm:
-            _, (out, _) = self.lstm(out)
+        shape = out.shape
+        out, _ = self.lstm(out)
+        out = nn.functional.max_pool2d(out, (shape[1], 1))
         out = out.squeeze()
         out = self.model(out)
         out = self.activation(out)
