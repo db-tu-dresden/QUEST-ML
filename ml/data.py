@@ -15,11 +15,11 @@ class ProcessDataset(Dataset):
         self.offset = offset
         self.only_process = only_process
 
-        self.da = self.da[::scaling_factor]
-        self.da = self.da[:int((1 - self.reduction_factor) * len(self.da))]
+        self.scale(self.scaling_factor)
+        self.reduce(self.reduction_factor)
 
         if self.only_process:
-            self.da = xr.concat(self.da[::, 1::-2], dim='process')
+            self.to_processes()
 
     @classmethod
     def from_path(cls, path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
@@ -27,6 +27,22 @@ class ProcessDataset(Dataset):
         with open(path, 'rb') as f:
             da = pickle.load(f)
         return cls(da, scaling_factor, reduction_factor, offset, only_process)
+
+    def scale(self, scaling_factor: int):
+        assert 1 <= scaling_factor
+
+        self.scaling_factor = scaling_factor
+        self.da = self.da[::self.scaling_factor]
+
+    def reduce(self, reduction_factor: float):
+        assert 0.0 <= reduction_factor <= 1.0
+
+        self.reduction_factor = reduction_factor
+        limit = int((1 - self.reduction_factor) * len(self.da))
+        self.da = self.da[:limit]
+
+    def to_processes(self):
+        self.da = xr.concat(self.da[::, 1::-2], dim='process')
 
     def get_sample_shape(self):
         return self[0][0].shape
