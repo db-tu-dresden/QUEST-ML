@@ -538,6 +538,8 @@ def system_model(cfg: Config):
         cfg['freeze_decoder'] = False
         cfg['freeze_process_encoder'] = True
         cfg['freeze_process_decoder'] = True
+        cfg['load_process_encoder'] = True
+        cfg['load_process_decoder'] = True
         cfg['offset'] = 0
 
     system_encoder(cfg, 'encoder_')
