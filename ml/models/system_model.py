@@ -8,6 +8,10 @@ from ml.models import get_model_from_type, Model, register_model_architecture, r
     add_arch_args
 
 
+def unsqueeze1(x: torch.Tensor):
+    return torch.unsqueeze(x, dim=1)
+
+
 class FusionModel(Model):
     def __init__(self, input_size: int, hidden_size: int, bidirectional: bool, model: Model, dropout: float):
         super().__init__()
@@ -215,7 +219,7 @@ class SystemStateDecoder(Model):
     def __init__(self, defusion: Model, decoder: Model, only_process: bool):
         super().__init__()
 
-        self.defusion = defusion if not only_process else lambda x: torch.unsqueeze(x, dim=1)
+        self.defusion = defusion if not only_process else unsqueeze1
         self.decoder = decoder
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
