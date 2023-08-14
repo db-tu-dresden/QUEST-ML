@@ -269,6 +269,7 @@ class Trainer:
         if not train_data and not valid_data and not test_data:
             train_data, valid_data, test_data = cls.get_datasets_from_path(config['data_path'],
                                                                            config['scaling_factor'],
+                                                                           config['reduction_factor'],
                                                                            config['offset'],
                                                                            config['only_process'],
                                                                            config['pickle_file_name'])
