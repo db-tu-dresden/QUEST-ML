@@ -74,12 +74,13 @@ class DeFusionModel(Model):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
-        shape = out.shape
         device = out.device
 
         out = self.model(out)
         out = self.activation(out)
         out = self.dropout(out)
+
+        shape = out.shape
 
         _input = torch.zeros((shape[0], 1, shape[1])).to(device)
         h_0 = out.unsqueeze(dim=0)
@@ -402,8 +403,10 @@ class SystemModel(Model):
 
 def process_encoder(cfg: Config, prefix: str = 'encoder_'):
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else 1
-    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['embedding_size']
-    cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg else cfg['embedding_size']
+    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
+        else cfg['process_embedding_size']
+    cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg \
+        else cfg['process_embedding_size']
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
@@ -419,16 +422,18 @@ def fusion_model(cfg: Config, prefix: str = 'encoder_'):
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] \
         if f'{prefix}dropout' in cfg else cfg['dropout']
 
-    cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg else cfg['embedding_size']
-    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
+    cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg \
+        else cfg['process_embedding_size']
+    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
+        else cfg['process_embedding_size']
     cfg[f'{prefix}bidirectional'] = cfg[f'{prefix}bidirectional'] if f'{prefix}bidirectional' in cfg else True
 
     cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
-        if f'{prefix}model_input_size' in cfg else 2**int(cfg[f'{prefix}bidirectional']) * cfg['hidden_size']
+        if f'{prefix}model_input_size' in cfg else 2**int(cfg[f'{prefix}bidirectional']) * cfg[f'{prefix}hidden_size']
     cfg[f'{prefix}model_hidden_layers'] = cfg[f'{prefix}model_hidden_layers'] \
         if f'{prefix}model_hidden_layers' in cfg else 1
     cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
-        if f'{prefix}model_output_size' in cfg else cfg['embedding_size']
+        if f'{prefix}model_output_size' in cfg else cfg['system_embedding_size']
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
@@ -439,15 +444,17 @@ def defusion_model(cfg: Config, prefix: str = 'encoder_'):
 
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else cfg['dropout']
 
-    cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg else cfg['embedding_size']
-    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
+    cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg \
+        else cfg['process_embedding_size']
+    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
+        else cfg['process_embedding_size']
 
     cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
         if f'{prefix}model_input_size' in cfg else cfg['hidden_size']
     cfg[f'{prefix}model_hidden_layers'] = cfg[f'{prefix}model_hidden_layers'] \
         if f'{prefix}model_hidden_layers' in cfg else 1
     cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
-        if f'{prefix}model_output_size' in cfg else cfg['embedding_size']
+        if f'{prefix}model_output_size' in cfg else cfg['process_embedding_size']
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
@@ -455,11 +462,11 @@ def defusion_model(cfg: Config, prefix: str = 'encoder_'):
 
 def process_decoder(cfg: Config, prefix: str = 'decoder_'):
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] \
-        if f'{prefix}input_size' in cfg else cfg['embedding_size']
+        if f'{prefix}input_size' in cfg else cfg['process_embedding_size']
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] \
         if f'{prefix}hidden_layers' in cfg else cfg['encoder_hidden_layers']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] \
-        if f'{prefix}hidden_size' in cfg else cfg['embedding_size']
+        if f'{prefix}hidden_size' in cfg else cfg['process_embedding_size']
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
@@ -481,11 +488,11 @@ def system_encoder(cfg: Config, prefix: str = 'encoder_'):
 
 def system_transformation(cfg: Config, prefix: str = 'transformation_'):
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] \
-        if f'{prefix}input_size' in cfg else cfg['embedding_size']
+        if f'{prefix}input_size' in cfg else cfg['system_embedding_size']
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] \
         if f'{prefix}hidden_layers' in cfg else cfg['hidden_layers']
     cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] \
-        if f'{prefix}output_size' in cfg else cfg['embedding_size']
+        if f'{prefix}output_size' in cfg else cfg['system_embedding_size']
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}encoder'] if f'{prefix}encoder' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
@@ -508,8 +515,9 @@ def system_model(cfg: Config):
     cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.5
 
     cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
-    cfg['embedding_size'] = cfg['embedding_size'] if 'embedding_size' in cfg else 256
-    cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else cfg['embedding_size']
+    cfg['process_embedding_size'] = cfg['process_embedding_size'] if 'process_embedding_size' in cfg else 16
+    cfg['system_embedding_size'] = cfg['system_embedding_size'] if 'system_embedding_size' in cfg else 64
+    cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else cfg['system_embedding_size']
     cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 5
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
 
