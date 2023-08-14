@@ -7,13 +7,16 @@ from torch.utils.data import Dataset
 
 
 class ProcessDataset(Dataset):
-    def __init__(self, da: xr.DataArray, scaling_factor: int = 1, offset: int = 1, only_process: bool = False):
+    def __init__(self, da: xr.DataArray, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
+                 only_process: bool = False):
         self.da = da
         self.scaling_factor = scaling_factor
+        self.reduction_factor = reduction_factor
         self.offset = offset
         self.only_process = only_process
 
         self.da = self.da[::scaling_factor]
+        self.da = self.da[:int((1 - self.reduction_factor) * len(self.da))]
 
         if self.only_process:
             self.da = xr.concat(self.da[::, 1::-2], dim='process')

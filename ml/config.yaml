@@ -40,6 +40,7 @@ pickle_file_name: da.pkl
 processes: 0
 jobs: 0
 scaling_factor: 10
+reduction_factor: 0.0
 offset: 1
 only_process: False
 

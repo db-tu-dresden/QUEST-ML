@@ -25,6 +25,10 @@ def greater_equal_zero(x):
     return x > 0
 
 
+def between_zero_one(x):
+    return  0 <= x <= 1
+
+
 def length_greater_zero(x):
     return len(x) > 0
 
@@ -73,6 +77,7 @@ class Config:
         'processes': {'type': int, 'lambda': true},
         'jobs': {'type': int, 'lambda': true},
         'scaling_factor': {'type': int, 'lambda': greater_zero},
+        'reduction_factor': {'type': float, 'lambda': between_zero_one},
         'offset': {'type': int, 'lambda': greater_zero},
         'only_process': {'type': bool, 'lambda': true},
 
