@@ -156,7 +156,7 @@ class Config:
 
     def set_system_data(self):
         sc = SystemConfig(self['system_config_path'])
-        self.data['processes'] = len(sc['processes'])
+        self.data['processes'] = len(sc['processes']) + 1
         self.data['jobs'] = len(sc['jobs'])
 
     def update_from_args(self, args: argparse.Namespace):
