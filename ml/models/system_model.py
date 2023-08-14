@@ -384,7 +384,6 @@ class SystemModel(Model):
                 not config['load_process_encoder'] and not config['load_encoder'] and
                 not config['load_process_decoder'] and not config['load_decoder']):
             return
-        self.parameters()
         checkpoint = torch.load(config['model_load_path'])
         if config['load_model']:
             self.load_state_dict(checkpoint['model'])
