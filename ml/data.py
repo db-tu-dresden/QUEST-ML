@@ -22,10 +22,11 @@ class ProcessDataset(Dataset):
             self.da = xr.concat(self.da[::, 1::-2], dim='process')
 
     @classmethod
-    def from_path(cls, path: str, scaling_factor: int = 1, offset: int = 1, only_process: bool = False):
+    def from_path(cls, path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
+                  only_process: bool = False):
         with open(path, 'rb') as f:
             da = pickle.load(f)
-        return cls(da, scaling_factor, offset, only_process)
+        return cls(da, scaling_factor, reduction_factor, offset, only_process)
 
     def get_sample_shape(self):
         return self[0][0].shape

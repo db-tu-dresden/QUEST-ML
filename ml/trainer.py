@@ -242,14 +242,14 @@ class Trainer:
         ddp.cleanup()
 
     @staticmethod
-    def get_datasets_from_path(path: str, scaling_factor: int = 1, offset: int = 1, only_process: bool = False,
-                               pickle_file_name: str = 'da.pkl'):
+    def get_datasets_from_path(path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
+                               only_process: bool = False, pickle_file_name: str = 'da.pkl'):
         return ProcessDataset.from_path(os.path.join(path, 'train', pickle_file_name),
-                                        scaling_factor, offset, only_process), \
+                                        scaling_factor, reduction_factor, offset, only_process), \
             ProcessDataset.from_path(os.path.join(path, 'valid', pickle_file_name),
-                                     scaling_factor, offset, only_process), \
+                                     scaling_factor, reduction_factor, offset, only_process), \
             ProcessDataset.from_path(os.path.join(path, 'test', pickle_file_name),
-                                     scaling_factor, offset, only_process)
+                                     scaling_factor, reduction_factor, offset, only_process)
 
     @classmethod
     def _run(cls, rank: int | None, config: Config, model,
