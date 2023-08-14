@@ -5,6 +5,8 @@ import os
 import yaml
 from schema import Schema, And, Use, SchemaError, Or
 
+from system.config import Config as SystemConfig
+
 
 def validate_yaml(data: dict, schema: Schema):
     try:
@@ -152,12 +154,18 @@ class Config:
         self.data['output_file'] = (self.data['output_file'] or
                                     os.path.join(base_path, 'job-' + str(self.data['job_id']) + '.out'))
 
+    def set_system_data(self):
+        sc = SystemConfig(self['system_config_path'])
+        self.data['processes'] = len(sc['processes'])
+        self.data['jobs'] = len(sc['jobs'])
+
     def update_from_args(self, args: argparse.Namespace):
         d = vars(args)
         for k, v in d.items():
             self.data[k] = v
 
         self.set_base_path()
+        self.set_system_data()
 
     def validate(self):
         self.data = validate_yaml(self.data, self.schema)

@@ -11,7 +11,6 @@ from torch import nn
 import wandb
 from ml import Trainer, Config, Parser
 from ml.models import build_model
-from train import get_datasets
 
 TUNE_CONFIG = {
     'hidden_size': tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
@@ -133,12 +132,6 @@ def run():
     args.base_path = os.path.abspath(args.base_path)
     args.save_dir = args.save_dir or os.path.join(args.base_path, 'raytune')
     trainer_config.update_from_args(args)
-
-    _, _, test_ds = get_datasets(trainer_config['base_path'], trainer_config['scaling_factor'],
-                                 trainer_config['offset'], trainer_config['only_process'])
-
-    trainer_config['processes'] = test_ds.get_sample_shape()[0]
-    trainer_config['jobs'] = test_ds.get_sample_shape()[-1]
 
     trainer_config['verbose'] = False
     trainer_config['wandb_group'] = 'ray-tune-' + wandb.util.generate_id()
