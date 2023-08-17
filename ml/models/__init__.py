@@ -134,8 +134,11 @@ def import_models(models_dir, namespace: str):
                 globals()[model_name + '_parser'] = parser
 
 
-def add_arch_args(parser: argparse.ArgumentParser, key: str, title: str = None, prefix: str = ''):
+def add_arch_args(parser: argparse.ArgumentParser, key: str, title: str = None, prefix: str = '', default=None):
     args, _ = parser.parse_known_args()
+
+    if default is not None and not hasattr(args, key):
+        setattr(args, key, default)
 
     # Add model-specific args to parser.
     if hasattr(args, key):

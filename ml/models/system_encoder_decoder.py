@@ -41,7 +41,7 @@ class FusionModel(Model):
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=f'{prefix}model_')
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'encoder_fusion_') -> Model:
@@ -84,7 +84,7 @@ class DeFusionModel(Model):
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=f'{prefix}model_')
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'decoder_defusion_') -> Model:
@@ -114,7 +114,7 @@ class ProcessStateEncoder(Model):
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=f'{prefix}model_')
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'process_encoder_') -> Model:
@@ -144,7 +144,7 @@ class ProcessStateDecoder(Model):
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=f'{prefix}process_decoder_')
+                          prefix=f'{prefix}process_decoder_', default='mlp')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'process_decoder_') -> Model:
@@ -172,8 +172,8 @@ class SystemStateEncoder(Model):
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = 'encoder_'):
-        ProcessStateEncoder.add_args(parser, prefix)
-        FusionModel.add_args(parser, prefix)
+        ProcessStateEncoder.add_args(parser)
+        FusionModel.add_args(parser)
 
         parser.add_argument(f'--{prefix}dropout', type=int, metavar='N', help='Dropout value')
 
@@ -200,7 +200,7 @@ class SystemStateDecoder(Model):
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = 'decoder_'):
-        ProcessStateDecoder.add_args(parser, prefix)
+        ProcessStateDecoder.add_args(parser)
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
@@ -229,7 +229,7 @@ class TransformationModel(Model):
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=prefix)
+                          prefix=prefix, default='mlp')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'transformation_') -> Model:
@@ -281,10 +281,9 @@ class SystemModel(Model):
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
-            add_arch_args(root_parser, 'encoder', 'Encoder model-specific configuration', prefix='encoder_')
-            add_arch_args(root_parser, 'transformation', 'Transformation model-specific configuration',
-                          prefix='transformation_')
-            add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
+            SystemStateEncoder.add_args(parser)
+            TransformationModel.add_args(parser)
+            SystemStateDecoder.add_args(parser)
 
         parser.add_argument('--load_process_encoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the process state encoder from the provided model state dict')
