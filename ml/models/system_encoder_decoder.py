@@ -139,7 +139,7 @@ class ProcessStateDecoder(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = 'decoder_'):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'process_decoder_'):
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
@@ -147,7 +147,7 @@ class ProcessStateDecoder(Model):
                           prefix=f'{prefix}process_decoder_')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
+    def build_model(cls, config: Config, prefix: str = 'process_decoder_') -> Model:
         decoder_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         decoder_model = get_model_from_type(decoder_type, config)
         decoder = decoder_model.build_model(config, prefix)
@@ -205,7 +205,7 @@ class SystemStateDecoder(Model):
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
         defusion = DeFusionModel.build_model(config, prefix)
-        decoder = ProcessStateDecoder.build_model(config, prefix)
+        decoder = ProcessStateDecoder.build_model(config)
 
         return cls(defusion, decoder, config['only_process'])
 
@@ -422,11 +422,11 @@ def defusion_model(cfg: Config, prefix: str = 'encoder_'):
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
 
 
-def process_decoder(cfg: Config, prefix: str = 'decoder_'):
+def process_decoder(cfg: Config, prefix: str = 'process_decoder_'):
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] \
         if f'{prefix}input_size' in cfg else cfg['process_embedding_size']
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] \
-        if f'{prefix}hidden_layers' in cfg else cfg['encoder_hidden_layers']
+        if f'{prefix}hidden_layers' in cfg else cfg['process_encoder_hidden_layers']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] \
         if f'{prefix}hidden_size' in cfg else cfg['process_embedding_size']
 
@@ -469,7 +469,7 @@ def system_decoder(cfg: Config, prefix: str = 'decoder_'):
         if 'freeze_decoder' in cfg else False
 
     defusion_model(cfg, prefix)
-    process_decoder(cfg, prefix)
+    process_decoder(cfg)
 
 
 @register_model_architecture('system_encoder_decoder', 'system_encoder_decoder')
