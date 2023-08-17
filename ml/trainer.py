@@ -169,7 +169,7 @@ class Trainer:
             epoch_kl /= num_batches
             epoch_kl_rounded /= num_batches
 
-            if mode == Mode.VALID and inputs and outputs and targets:
+            if mode == Mode.VALID and inputs is not None and outputs is not None and targets is not None:
                 self.logger.log_data(inputs.detach().cpu(), outputs.detach().round().cpu(), targets.detach().cpu(),
                                      epoch_loss.item(), epoch_accuracy.item())
 
