@@ -70,8 +70,8 @@ class DeFusionModel(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
-        parser.add_argument(f'--{prefix}defusion_dropout', type=int, metavar='N', help='Dropout value')
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'decoder_defusion_'):
+        parser.add_argument(f'--{prefix}dropout', type=int, metavar='N', help='Dropout value')
 
         parser.add_argument('--defusion_model', type=str, help='Defusion model name. '
                                                                'To see defusion model specific arguments, use --help '
@@ -82,17 +82,17 @@ class DeFusionModel(Model):
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
-            add_arch_args(root_parser, f'{prefix}defusion_model',
-                          f'{prefix}defusion-model-specific configuration',
-                          prefix=f'{prefix}defusion_model_')
+            add_arch_args(root_parser, f'{prefix}model',
+                          f'{prefix}model-specific configuration',
+                          prefix=f'{prefix}model_')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = '') -> Model:
-        model_type = config[f'{prefix}defusion_model'] if f'{prefix}defusion_model' in config else None
+    def build_model(cls, config: Config, prefix: str = 'decoder_defusion_') -> Model:
+        model_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         model = get_model_from_type(model_type, config)
-        model = model.build_model(config, f'{prefix}defusion_model_')
+        model = model.build_model(config, f'{prefix}model_')
 
-        return cls(model, config[f'{prefix}defusion_dropout'], config['processes'])
+        return cls(model, config[f'{prefix}dropout'], config['processes'])
 
 
 class ProcessStateEncoder(Model):
@@ -204,7 +204,7 @@ class SystemStateDecoder(Model):
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
-        defusion = DeFusionModel.build_model(config, prefix)
+        defusion = DeFusionModel.build_model(config)
         decoder = ProcessStateDecoder.build_model(config)
 
         return cls(defusion, decoder, config['only_process'])
@@ -404,9 +404,7 @@ def fusion_model(cfg: Config, prefix: str = 'encoder_fusion_'):
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
 
 
-def defusion_model(cfg: Config, prefix: str = 'encoder_'):
-    prefix += 'defusion_'
-
+def defusion_model(cfg: Config, prefix: str = 'decoder_defusion_'):
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else cfg['dropout']
 
     cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
@@ -466,7 +464,7 @@ def system_decoder(cfg: Config, prefix: str = 'decoder_'):
     cfg['freeze_decoder'] = (cfg['freeze_decoder'] if cfg['freeze_decoder'] is not None else cfg['freeze']) \
         if 'freeze_decoder' in cfg else False
 
-    defusion_model(cfg, prefix)
+    defusion_model(cfg)
     process_decoder(cfg)
 
 
