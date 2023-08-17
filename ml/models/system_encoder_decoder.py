@@ -395,7 +395,7 @@ def defusion_model(cfg: Config, prefix: str = 'decoder_defusion_'):
     cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
         if f'{prefix}model_input_size' in cfg else cfg['system_embedding_size']
     cfg[f'{prefix}model_hidden_layers'] = cfg[f'{prefix}model_hidden_layers'] \
-        if f'{prefix}model_hidden_layers' in cfg else 1
+        if f'{prefix}model_hidden_layers' in cfg else cfg['encoder_fusion_model_hidden_layers']
     cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
         if f'{prefix}model_output_size' in cfg else cfg['system_embedding_size']
 
