@@ -100,6 +100,7 @@ def train(tune_config: dict, config: Config):
 def test(config: Config):
     train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'],
                                                                        config['scaling_factor'],
+                                                                       config['reduction_factor'],
                                                                        config['offset'],
                                                                        config['only_process'],
                                                                        config['pickle_file_name'])
