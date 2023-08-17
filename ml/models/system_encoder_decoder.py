@@ -374,21 +374,6 @@ class SystemModel(Model):
             self.decoder.load_state_dict(checkpoint['system_state_decoder'])
 
 
-def process_encoder(cfg: Config, prefix: str = 'process_encoder_'):
-    cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else 0
-    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
-        else cfg['process_embedding_size']
-    cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg \
-        else cfg['process_embedding_size']
-
-    cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
-    ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
-
-    cfg['freeze_process_encoder'] = (cfg['freeze_process_encoder'] if cfg['freeze_process_encoder'] is not None
-                                     else cfg['freeze_encoder']) \
-        if 'freeze_process_decoder' in cfg else False
-
-
 def fusion_model(cfg: Config, prefix: str = 'encoder_fusion_'):
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] \
         if f'{prefix}dropout' in cfg else cfg['dropout']
@@ -416,6 +401,21 @@ def defusion_model(cfg: Config, prefix: str = 'decoder_defusion_'):
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
+
+
+def process_encoder(cfg: Config, prefix: str = 'process_encoder_'):
+    cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else 0
+    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
+        else cfg['process_embedding_size']
+    cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg \
+        else cfg['process_embedding_size']
+
+    cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
+    ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
+
+    cfg['freeze_process_encoder'] = (cfg['freeze_process_encoder'] if cfg['freeze_process_encoder'] is not None
+                                     else cfg['freeze_encoder']) \
+        if 'freeze_process_decoder' in cfg else False
 
 
 def process_decoder(cfg: Config, prefix: str = 'process_decoder_'):
