@@ -117,6 +117,8 @@ def test(config: Config):
 
     trainer.test()
 
+    model.save(config)
+
 
 def run():
     tune_config = TUNE_CONFIG
