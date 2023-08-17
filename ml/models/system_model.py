@@ -33,10 +33,10 @@ class FusionModel(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
-        parser.add_argument(f'--{prefix}fusion_input_size', type=int, metavar='N', help='Input size')
-        parser.add_argument(f'--{prefix}fusion_hidden_size', type=int, metavar='N', help='Hidden size')
-        parser.add_argument(f'--{prefix}fusion_dropout', type=int, metavar='N', help='Dropout value')
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'encoder_fusion_'):
+        parser.add_argument(f'--{prefix}input_size', type=int, metavar='N', help='Input size')
+        parser.add_argument(f'--{prefix}hidden_size', type=int, metavar='N', help='Hidden size')
+        parser.add_argument(f'--{prefix}dropout', type=int, metavar='N', help='Dropout value')
 
         parser.add_argument('--fusion_model', type=str, help='Fusion model name. '
                                                              'To see fusion model specific arguments, use --help on '
@@ -47,19 +47,18 @@ class FusionModel(Model):
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
-            add_arch_args(root_parser, f'{prefix}fusion_model',
-                          f'{prefix}fusion-model-specific configuration',
-                          prefix=f'{prefix}fusion_model_')
+            add_arch_args(root_parser, f'{prefix}model',
+                          f'{prefix}model-specific configuration',
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = '') -> Model:
-        model_type = config[f'{prefix}fusion_model'] if f'{prefix}fusion_model' in config else None
+    def build_model(cls, config: Config, prefix: str = 'encoder_fusion_') -> Model:
+        model_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         model = get_model_from_type(model_type, config)
-        model = model.build_model(config, f'{prefix}fusion_model_')
+        model = model.build_model(config, f'{prefix}model_')
 
-        return cls(config[f'{prefix}fusion_input_size'], config[f'{prefix}fusion_hidden_size'],
-                   config[f'{prefix}fusion_bidirectional'], model,
-                   config[f'{prefix}fusion_dropout'])
+        return cls(config[f'{prefix}input_size'], config[f'{prefix}hidden_size'],
+                   config[f'{prefix}bidirectional'], model, config[f'{prefix}dropout'])
 
 
 class DeFusionModel(Model):
@@ -98,10 +97,10 @@ class DeFusionModel(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
-        parser.add_argument(f'--{prefix}defusion_input_size', type=int, metavar='N', help='Input size')
-        parser.add_argument(f'--{prefix}defusion_hidden_size', type=int, metavar='N', help='Hidden size')
-        parser.add_argument(f'--{prefix}defusion_dropout', type=int, metavar='N', help='Dropout value')
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'decoder_defusion_'):
+        parser.add_argument(f'--{prefix}input_size', type=int, metavar='N', help='Input size')
+        parser.add_argument(f'--{prefix}hidden_size', type=int, metavar='N', help='Hidden size')
+        parser.add_argument(f'--{prefix}dropout', type=int, metavar='N', help='Dropout value')
 
         parser.add_argument('--defusion_model', type=str, help='Defusion model name. '
                                                                'To see defusion model specific arguments, use --help '
@@ -112,18 +111,18 @@ class DeFusionModel(Model):
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
-            add_arch_args(root_parser, f'{prefix}defusion_model',
-                          f'{prefix}defusion-model-specific configuration',
-                          prefix=f'{prefix}defusion_model_')
+            add_arch_args(root_parser, f'{prefix}model',
+                          f'{prefix}model-specific configuration',
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = '') -> Model:
-        model_type = config[f'{prefix}defusion_model'] if f'{prefix}defusion_model' in config else None
+    def build_model(cls, config: Config, prefix: str = 'decoder_defusion_') -> Model:
+        model_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         model = get_model_from_type(model_type, config)
-        model = model.build_model(config, f'{prefix}defusion_model_')
+        model = model.build_model(config, f'{prefix}model_')
 
-        return cls(config[f'{prefix}defusion_input_size'], config[f'{prefix}defusion_hidden_size'], model,
-                   config[f'{prefix}defusion_dropout'], config[f'processes'])
+        return cls(config[f'{prefix}input_size'], config[f'{prefix}hidden_size'], model,
+                   config[f'{prefix}dropout'], config[f'processes'])
 
 
 class ProcessStateEncoder(Model):
@@ -140,15 +139,15 @@ class ProcessStateEncoder(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = 'encoder_'):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'process_encoder_'):
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=f'{prefix}model_')
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = 'encoder_') -> Model:
+    def build_model(cls, config: Config, prefix: str = 'process_encoder_') -> Model:
         encoder_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         encoder_model = get_model_from_type(encoder_type, config)
         encoder = encoder_model.build_model(config, prefix)
@@ -170,15 +169,15 @@ class ProcessStateDecoder(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = 'decoder_'):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'process_decoder_'):
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=f'{prefix}process_decoder_')
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
+    def build_model(cls, config: Config, prefix: str = 'process_decoder_') -> Model:
         decoder_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         decoder_model = get_model_from_type(decoder_type, config)
         decoder = decoder_model.build_model(config, prefix)
@@ -203,15 +202,15 @@ class SystemStateEncoder(Model):
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = 'encoder_'):
-        ProcessStateEncoder.add_args(parser, prefix)
-        FusionModel.add_args(parser, prefix)
+        ProcessStateEncoder.add_args(parser)
+        FusionModel.add_args(parser)
 
         parser.add_argument(f'--{prefix}dropout', type=int, metavar='N', help='Dropout value')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'encoder_') -> Model:
-        encoder = ProcessStateEncoder.build_model(config, prefix)
-        fusion = FusionModel.build_model(config, prefix)
+        encoder = ProcessStateEncoder.build_model(config)
+        fusion = FusionModel.build_model(config)
 
         return cls(encoder, fusion, config[f'{prefix}dropout'], config['only_process'])
 
@@ -231,12 +230,12 @@ class SystemStateDecoder(Model):
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = 'decoder_'):
-        ProcessStateDecoder.add_args(parser, prefix)
+        ProcessStateDecoder.add_args(parser)
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'decoder_') -> Model:
-        defusion = DeFusionModel.build_model(config, prefix)
-        decoder = ProcessStateDecoder.build_model(config, prefix)
+        defusion = DeFusionModel.build_model(config)
+        decoder = ProcessStateDecoder.build_model(config)
 
         return cls(defusion, decoder, config['only_process'])
 
@@ -307,10 +306,9 @@ class SystemModel(Model):
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
-            add_arch_args(root_parser, 'encoder', 'Encoder model-specific configuration', prefix='encoder_')
-            add_arch_args(root_parser, 'transformation', 'Transformation model-specific configuration',
-                          prefix='transformation_')
-            add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
+            SystemStateEncoder.add_args(parser)
+            TransformationModel.add_args(parser)
+            SystemStateDecoder.add_args(parser)
 
         parser.add_argument('--load_process_encoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the process state encoder from the provided model state dict')
@@ -400,7 +398,7 @@ class SystemModel(Model):
             self.decoder.load_state_dict(checkpoint['system_state_decoder'])
 
 
-def process_encoder(cfg: Config, prefix: str = 'encoder_'):
+def process_encoder(cfg: Config, prefix: str = 'process_encoder_'):
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else 0
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
         else cfg['process_embedding_size']
@@ -415,9 +413,7 @@ def process_encoder(cfg: Config, prefix: str = 'encoder_'):
         if 'freeze_process_decoder' in cfg else False
 
 
-def fusion_model(cfg: Config, prefix: str = 'encoder_'):
-    prefix += 'fusion_'
-
+def fusion_model(cfg: Config, prefix: str = 'encoder_fusion_'):
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] \
         if f'{prefix}dropout' in cfg else cfg['dropout']
 
@@ -438,9 +434,7 @@ def fusion_model(cfg: Config, prefix: str = 'encoder_'):
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
 
 
-def defusion_model(cfg: Config, prefix: str = 'encoder_'):
-    prefix += 'defusion_'
-
+def defusion_model(cfg: Config, prefix: str = 'decoder_defusion_'):
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else cfg['dropout']
 
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg \
@@ -451,7 +445,7 @@ def defusion_model(cfg: Config, prefix: str = 'encoder_'):
     cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
         if f'{prefix}model_input_size' in cfg else cfg['hidden_size']
     cfg[f'{prefix}model_hidden_layers'] = cfg[f'{prefix}model_hidden_layers'] \
-        if f'{prefix}model_hidden_layers' in cfg else 1
+        if f'{prefix}model_hidden_layers' in cfg else cfg[f'encoder_fusion_model_hidden_layers']
     cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
         if f'{prefix}model_output_size' in cfg else cfg['process_embedding_size']
 
@@ -459,11 +453,11 @@ def defusion_model(cfg: Config, prefix: str = 'encoder_'):
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
 
 
-def process_decoder(cfg: Config, prefix: str = 'decoder_'):
+def process_decoder(cfg: Config, prefix: str = 'process_decoder_'):
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] \
         if f'{prefix}input_size' in cfg else cfg['process_embedding_size']
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] \
-        if f'{prefix}hidden_layers' in cfg else cfg['encoder_hidden_layers']
+        if f'{prefix}hidden_layers' in cfg else cfg['process_encoder_hidden_layers']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] \
         if f'{prefix}hidden_size' in cfg else cfg['process_embedding_size']
 
@@ -481,8 +475,8 @@ def system_encoder(cfg: Config, prefix: str = 'encoder_'):
     cfg['freeze_encoder'] = (cfg['freeze_encoder'] if cfg['freeze_encoder'] is not None else cfg['freeze']) \
         if 'freeze_encoder' in cfg else False
 
-    process_encoder(cfg, prefix)
-    fusion_model(cfg, prefix)
+    process_encoder(cfg)
+    fusion_model(cfg)
 
 
 def system_transformation(cfg: Config, prefix: str = 'transformation_'):
@@ -505,23 +499,12 @@ def system_decoder(cfg: Config, prefix: str = 'decoder_'):
     cfg['freeze_decoder'] = (cfg['freeze_decoder'] if cfg['freeze_decoder'] is not None else cfg['freeze']) \
         if 'freeze_decoder' in cfg else False
 
-    defusion_model(cfg, prefix)
-    process_decoder(cfg, prefix)
+    defusion_model(cfg)
+    process_decoder(cfg)
 
 
 @register_model_architecture('system_model', 'system_model')
 def system_model(cfg: Config):
-    cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.5
-
-    cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
-    cfg['process_embedding_size'] = cfg['process_embedding_size'] if 'process_embedding_size' in cfg else 16
-    cfg['system_embedding_size'] = cfg['system_embedding_size'] if 'system_embedding_size' in cfg else 16
-    cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else cfg['system_embedding_size']
-    cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 5
-    cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
-
-    cfg['freeze'] = cfg['freeze'] or False if 'freeze' in cfg else False
-
     if cfg['process_autoencoder']:
         cfg['only_process'] = True
         cfg['freeze'] = True
@@ -541,6 +524,17 @@ def system_model(cfg: Config):
         cfg['load_process_encoder'] = True
         cfg['load_process_decoder'] = True
         cfg['offset'] = 0
+
+    cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.5
+
+    cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
+    cfg['process_embedding_size'] = cfg['process_embedding_size'] if 'process_embedding_size' in cfg else 16
+    cfg['system_embedding_size'] = cfg['system_embedding_size'] if 'system_embedding_size' in cfg else 16
+    cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else cfg['system_embedding_size']
+    cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 5
+    cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
+
+    cfg['freeze'] = cfg['freeze'] or False if 'freeze' in cfg else False
 
     system_encoder(cfg, 'encoder_')
     system_transformation(cfg, 'transformation_')
