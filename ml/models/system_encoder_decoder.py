@@ -29,7 +29,7 @@ class FusionModel(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'encoder_fusion_'):
         parser.add_argument('--fusion_model', type=str, help='Fusion model name. '
                                                              'To see fusion model specific arguments, use --help on '
                                                              'the model architecture. The default is mlp. Every '
@@ -39,17 +39,17 @@ class FusionModel(Model):
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
-            add_arch_args(root_parser, f'{prefix}fusion_model',
-                          f'{prefix}fusion-model-specific configuration',
-                          prefix=f'{prefix}fusion_model_')
+            add_arch_args(root_parser, f'{prefix}model',
+                          f'{prefix}model-specific configuration',
+                          prefix=f'{prefix}model_')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = '') -> Model:
-        model_type = config[f'{prefix}fusion_model'] if f'{prefix}fusion_model' in config else None
+    def build_model(cls, config: Config, prefix: str = 'encoder_fusion_') -> Model:
+        model_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         model = get_model_from_type(model_type, config)
-        model = model.build_model(config, f'{prefix}fusion_model_')
+        model = model.build_model(config, f'{prefix}model_')
 
-        return cls(model, config[f'{prefix}fusion_dropout'])
+        return cls(model, config[f'{prefix}dropout'])
 
 
 class DeFusionModel(Model):
@@ -180,7 +180,7 @@ class SystemStateEncoder(Model):
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'encoder_') -> Model:
         encoder = ProcessStateEncoder.build_model(config)
-        fusion = FusionModel.build_model(config, prefix)
+        fusion = FusionModel.build_model(config)
 
         return cls(encoder, fusion, config[f'{prefix}dropout'], config['only_process'])
 
@@ -389,9 +389,7 @@ def process_encoder(cfg: Config, prefix: str = 'process_encoder_'):
         if 'freeze_process_decoder' in cfg else False
 
 
-def fusion_model(cfg: Config, prefix: str = 'encoder_'):
-    prefix += 'fusion_'
-
+def fusion_model(cfg: Config, prefix: str = 'encoder_fusion_'):
     cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] \
         if f'{prefix}dropout' in cfg else cfg['dropout']
 
@@ -445,7 +443,7 @@ def system_encoder(cfg: Config, prefix: str = 'encoder_'):
         if 'freeze_encoder' in cfg else False
 
     process_encoder(cfg)
-    fusion_model(cfg, prefix)
+    fusion_model(cfg)
 
 
 def system_transformation(cfg: Config, prefix: str = 'transformation_'):
