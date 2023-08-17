@@ -109,7 +109,7 @@ class ProcessStateEncoder(Model):
         return out
 
     @staticmethod
-    def add_args(parser: argparse.ArgumentParser, prefix: str = 'encoder_'):
+    def add_args(parser: argparse.ArgumentParser, prefix: str = 'process_encoder_'):
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
@@ -117,7 +117,7 @@ class ProcessStateEncoder(Model):
                           prefix=f'{prefix}model_')
 
     @classmethod
-    def build_model(cls, config: Config, prefix: str = 'encoder_') -> Model:
+    def build_model(cls, config: Config, prefix: str = 'process_encoder_') -> Model:
         encoder_type = config[f'{prefix}model'] if f'{prefix}model' in config else None
         encoder_model = get_model_from_type(encoder_type, config)
         encoder = encoder_model.build_model(config, prefix)
@@ -179,7 +179,7 @@ class SystemStateEncoder(Model):
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'encoder_') -> Model:
-        encoder = ProcessStateEncoder.build_model(config, prefix)
+        encoder = ProcessStateEncoder.build_model(config)
         fusion = FusionModel.build_model(config, prefix)
 
         return cls(encoder, fusion, config[f'{prefix}dropout'], config['only_process'])
@@ -374,7 +374,7 @@ class SystemModel(Model):
             self.decoder.load_state_dict(checkpoint['system_state_decoder'])
 
 
-def process_encoder(cfg: Config, prefix: str = 'encoder_'):
+def process_encoder(cfg: Config, prefix: str = 'process_encoder_'):
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else 0
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
         else cfg['process_embedding_size']
@@ -444,7 +444,7 @@ def system_encoder(cfg: Config, prefix: str = 'encoder_'):
     cfg['freeze_encoder'] = (cfg['freeze_encoder'] if cfg['freeze_encoder'] is not None else cfg['freeze']) \
         if 'freeze_encoder' in cfg else False
 
-    process_encoder(cfg, prefix)
+    process_encoder(cfg)
     fusion_model(cfg, prefix)
 
 
