@@ -258,6 +258,11 @@ class SystemModel(Model):
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
+        parser.add_argument('--process_embedding_size', type=int, metavar='N',
+                            help='Size of the process embedding')
+        parser.add_argument('--system_embedding_size', type=int, metavar='N',
+                            help='Size of the system embedding')
+
         parser.add_argument('--encoder', type=str, help='Encoder model name. '
                                                         'To see encoder specific arguments, use --help on the encoder '
                                                         'architecture. The default is mlp. Every encoder parameter can '
