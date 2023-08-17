@@ -98,15 +98,15 @@ def train(tune_config: dict, config: Config):
 
 
 def test(config: Config):
+    # build model for test
+    model = build_model(config)
+
     train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'],
                                                                        config['scaling_factor'],
                                                                        config['reduction_factor'],
                                                                        config['offset'],
                                                                        config['only_process'],
                                                                        config['pickle_file_name'])
-
-    # build model for test
-    model = build_model(config)
 
     # move model to device if on gpu
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
