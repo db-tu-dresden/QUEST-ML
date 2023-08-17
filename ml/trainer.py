@@ -132,6 +132,8 @@ class Trainer:
         else:
             self.model.eval()
 
+        inputs, outputs, targets = None, None, None
+
         with optional(mode != Mode.TRAIN, torch.no_grad):
             for batch_data in tqdm(dataloader, disable=not self.config['verbose'], file=sys.stdout):
                 inputs, targets = self.batch_data_to_device(batch_data)
@@ -167,7 +169,7 @@ class Trainer:
             epoch_kl /= num_batches
             epoch_kl_rounded /= num_batches
 
-            if mode == Mode.VALID:
+            if mode == Mode.VALID and inputs and outputs and targets:
                 self.logger.log_data(inputs.detach().cpu(), outputs.detach().round().cpu(), targets.detach().cpu(),
                                      epoch_loss.item(), epoch_accuracy.item())
 
