@@ -486,6 +486,8 @@ def system_encoder(cfg: Config, prefix: str = 'encoder_'):
 def system_transformation(cfg: Config, prefix: str = 'transformation_'):
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] \
         if f'{prefix}input_size' in cfg else cfg['system_embedding_size']
+    cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] \
+        if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] \
         if f'{prefix}hidden_layers' in cfg else cfg['hidden_layers']
     cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] \
