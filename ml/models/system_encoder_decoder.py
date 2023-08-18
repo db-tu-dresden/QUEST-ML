@@ -144,7 +144,7 @@ class ProcessStateDecoder(Model):
         if root_parser:
             add_arch_args(root_parser, f'{prefix}model',
                           f'{prefix}model-specific configuration',
-                          prefix=f'{prefix}process_decoder_', default='mlp')
+                          prefix=f'{prefix}model_', default='mlp')
 
     @classmethod
     def build_model(cls, config: Config, prefix: str = 'process_decoder_') -> Model:
