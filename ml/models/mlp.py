@@ -11,18 +11,21 @@ from ml.models.base import Model
 
 @register_model('mlp')
 class MLP(Model):
-    def __init__(self, input_size: int, hidden_size: int, output_size: int, hidden_layers: int = 2):
+    def __init__(self, input_size: int, hidden_size: int, output_size: int, hidden_layers: int = 2, dropout: float = 0):
         super().__init__()
 
         self.model = nn.Sequential()
         self.model.add_module('dense1', nn.Linear(input_size, hidden_size))
         self.model.add_module('act1', nn.ReLU())
+        self.model.add_module('dropout1', nn.Dropout(dropout))
 
-        for i in range(hidden_layers):
-            self.model.add_module(f'dense{i + 2}', nn.Linear(hidden_size, hidden_size))
-            self.model.add_module(f'act{i + 2}', nn.ReLU())
+        for i in range(2, hidden_layers):
+            self.model.add_module(f'dense{i}', nn.Linear(hidden_size, hidden_size))
+            self.model.add_module(f'act{i}', nn.ReLU())
+            self.model.add_module(f'dropout{i}', nn.Dropout(dropout))
 
         self.model.add_module(f'dense{hidden_layers + 2}',  nn.Linear(hidden_size, output_size))
+        self.model.add_module(f'dropout{hidden_layers + 2}', nn.Dropout(dropout))
 
     @staticmethod
     def add_args(parser: argparse.ArgumentParser, prefix: str = ''):
@@ -34,7 +37,7 @@ class MLP(Model):
     @classmethod
     def build_model(cls, cfg: Config, prefix: str = ''):
         return cls(cfg[f'{prefix}input_size'], cfg[f'{prefix}hidden_size'], cfg[f'{prefix}output_size'],
-                   cfg[f'{prefix}hidden_layers'])
+                   cfg[f'{prefix}hidden_layers'], cfg[f'{prefix}dropout'])
 
     def forward(self, x: torch.Tensor):
         out = x
@@ -109,11 +112,13 @@ def mlp(cfg: Config, prefix: str = ''):
     cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else 32
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
     cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 2
+    cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.0
 
     cfg[f'{prefix}input_size'] = cfg[f'{prefix}input_size'] if f'{prefix}input_size' in cfg else cfg['input_size']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg else cfg['hidden_size']
     cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg else cfg['output_size']
     cfg[f'{prefix}hidden_layers'] = cfg[f'{prefix}hidden_layers'] if f'{prefix}hidden_layers' in cfg else cfg['hidden_layers']
+    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else cfg['dropout']
 
 
 @register_model_architecture('flat_mlp', 'flat_mlp')
