@@ -90,3 +90,9 @@ offset: 1
 accuracy: 76.2%
 converged after 20 epochs
 Graph: -
+
+## LSTM in decoder
+#### Process Autoencoding
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/nlaidwsn
+
+#### System Autoencoding
