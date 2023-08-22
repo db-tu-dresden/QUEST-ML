@@ -98,3 +98,8 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/nlaidwsn
 #### System Autoencoding
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6jzlu6t2
 max acc: 74.4 %
+
+# System Encoder-Decoder
+
+https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6xzym8ai
+max acc: 65.5%
