@@ -91,12 +91,10 @@ accuracy: 76.2%
 converged after 20 epochs
 Graph: -
 
-# System Model Raytune Results System Autoencoder
-https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6jzlu6t2
-max acc: 74.4 %
-
 ## LSTM in decoder
 #### Process Autoencoding
 https://wandb.ai/eriknikulski/carQUEST-ML/runs/nlaidwsn
 
 #### System Autoencoding
+https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6jzlu6t2
+max acc: 74.4 %
