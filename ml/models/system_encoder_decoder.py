@@ -385,6 +385,7 @@ def fusion_model(cfg: Config, prefix: str = 'encoder_fusion_'):
         if f'{prefix}model_hidden_layers' in cfg else 0
     cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
         if f'{prefix}model_output_size' in cfg else cfg['system_embedding_size']
+    cfg[f'{prefix}model_dropout'] = cfg[f'{prefix}model_dropout'] if f'{prefix}model_dropout' in cfg else 0.0
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
@@ -401,6 +402,7 @@ def defusion_model(cfg: Config, prefix: str = 'decoder_defusion_'):
         if f'{prefix}model_hidden_layers' in cfg else cfg['encoder_fusion_model_hidden_layers']
     cfg[f'{prefix}model_output_size'] = cfg[f'{prefix}model_output_size'] \
         if f'{prefix}model_output_size' in cfg else cfg['processes'] * cfg['process_embedding_size']
+    cfg[f'{prefix}model_dropout'] = cfg[f'{prefix}model_dropout'] if f'{prefix}model_dropout' in cfg else 0.0
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, f'{prefix}model_')
@@ -412,6 +414,7 @@ def process_encoder(cfg: Config, prefix: str = 'process_encoder_'):
         else cfg['process_embedding_size']
     cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg \
         else cfg['process_embedding_size']
+    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else 0.0
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
@@ -428,6 +431,7 @@ def process_decoder(cfg: Config, prefix: str = 'process_decoder_'):
         if f'{prefix}hidden_layers' in cfg else cfg['process_encoder_hidden_layers']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] \
         if f'{prefix}hidden_size' in cfg else cfg['process_embedding_size']
+    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else 0.0
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
