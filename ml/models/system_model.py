@@ -539,7 +539,7 @@ def system_model(cfg: Config):
     cfg['process_embedding_size'] = cfg['process_embedding_size'] if 'process_embedding_size' in cfg else 256
     cfg['system_embedding_size'] = cfg['system_embedding_size'] if 'system_embedding_size' in cfg else 256
     cfg['hidden_size'] = cfg['hidden_size'] if 'hidden_size' in cfg else cfg['system_embedding_size']
-    cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 5
+    cfg['hidden_layers'] = cfg['hidden_layers'] if 'hidden_layers' in cfg else 0
     cfg['output_size'] = cfg['output_size'] if 'output_size' in cfg else cfg['input_size']
 
     cfg['freeze'] = cfg['freeze'] or False if 'freeze' in cfg else False
