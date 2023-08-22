@@ -99,6 +99,9 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/nlaidwsn
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6jzlu6t2
 max acc: 74.4 %
 
+##### with Dropout
+https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-ge79l8tp
+
 # System Encoder-Decoder
 
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6xzym8ai
