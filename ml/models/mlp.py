@@ -19,7 +19,7 @@ class MLP(Model):
         self.model.add_module('act1', nn.ReLU())
         self.model.add_module('dropout1', nn.Dropout(dropout))
 
-        for i in range(2, hidden_layers):
+        for i in range(2, 2 + hidden_layers):
             self.model.add_module(f'dense{i}', nn.Linear(hidden_size, hidden_size))
             self.model.add_module(f'act{i}', nn.ReLU())
             self.model.add_module(f'dropout{i}', nn.Dropout(dropout))
