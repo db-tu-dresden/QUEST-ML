@@ -109,6 +109,11 @@ https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-gfyk1f25
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-7g3mbth6
 max acc: 50%
 
+## Complete Model
+https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-aaxumfo2
+offset: 1
+max acc: 49.75%
+
 # System Encoder-Decoder
 
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6xzym8ai
