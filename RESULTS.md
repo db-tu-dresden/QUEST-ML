@@ -129,6 +129,10 @@ only_system: True
 offset: 1
 max acc: 44.9%
 
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/b1ryqi9a
+offset: 1
+max acc: 11.25%
+
 https://wandb.ai/eriknikulski/carQUEST-ML/runs/m3k3rz69
 <>
 only_system: True
