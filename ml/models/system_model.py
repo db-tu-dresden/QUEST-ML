@@ -404,6 +404,7 @@ def process_encoder(cfg: Config, prefix: str = 'process_encoder_'):
         else cfg['process_embedding_size']
     cfg[f'{prefix}output_size'] = cfg[f'{prefix}output_size'] if f'{prefix}output_size' in cfg \
         else cfg['process_embedding_size']
+    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else 0.0
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
@@ -464,6 +465,7 @@ def process_decoder(cfg: Config, prefix: str = 'process_decoder_'):
         if f'{prefix}hidden_layers' in cfg else cfg['process_encoder_hidden_layers']
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] \
         if f'{prefix}hidden_size' in cfg else cfg['process_embedding_size']
+    cfg[f'{prefix}dropout'] = cfg[f'{prefix}dropout'] if f'{prefix}dropout' in cfg else 0.0
 
     cfg[f'{prefix}model'] = cfg[f'{prefix}model'] if f'{prefix}model' in cfg else 'mlp'
     ARCH_CONFIG_REGISTRY[cfg[f'{prefix}model']](cfg, prefix)
@@ -531,7 +533,7 @@ def system_model(cfg: Config):
         cfg['load_process_decoder'] = True
         cfg['offset'] = 0
 
-    cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.5
+    cfg['dropout'] = cfg['dropout'] if 'dropout' in cfg else 0.16
 
     cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
     cfg['process_embedding_size'] = cfg['process_embedding_size'] if 'process_embedding_size' in cfg else 16
