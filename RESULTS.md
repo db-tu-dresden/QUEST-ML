@@ -120,3 +120,6 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/l7r0r5z1
 
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6xzym8ai
 max acc: 65.5%
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/08nc7nss
+max acc: 74.18%
