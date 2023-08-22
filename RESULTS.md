@@ -105,6 +105,10 @@ https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-ge79l8tp
 Dropout only in System Encoder/Decoder:
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-gfyk1f25
 
+#### Only System with Offset 1
+https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-7g3mbth6
+max acc: 50%
+
 # System Encoder-Decoder
 
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6xzym8ai
