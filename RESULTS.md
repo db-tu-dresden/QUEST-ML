@@ -102,6 +102,9 @@ max acc: 74.4 %
 ##### with Dropout
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-ge79l8tp
 
+Dropout only in System Encoder/Decoder:
+https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-gfyk1f25
+
 # System Encoder-Decoder
 
 https://wandb.ai/eriknikulski/carQUEST-ML/groups/ray-tune-6xzym8ai
