@@ -123,3 +123,8 @@ max acc: 65.5%
 
 https://wandb.ai/eriknikulski/carQUEST-ML/runs/08nc7nss
 max acc: 74.18%
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/46thzggd
+only_system: True
+offset: 1
+max acc: 44.9%
