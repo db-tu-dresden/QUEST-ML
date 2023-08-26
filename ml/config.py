@@ -28,7 +28,7 @@ def greater_equal_zero(x):
 
 
 def between_zero_one(x):
-    return  0 <= x <= 1
+    return 0 <= x <= 1
 
 
 def length_greater_zero(x):
@@ -58,6 +58,7 @@ class Config:
         'learning_rate': {'type': float, 'lambda': greater_zero},
         'momentum': {'type': float, 'lambda': greater_zero},
         'batch_size': {'type': int, 'lambda': greater_zero},
+        'lambda': {'type': float, 'lambda': between_zero_one},
 
         # learning rate scheduler
         'lr_scheduler_factor': {'type': float, 'lambda': greater_zero},

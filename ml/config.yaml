@@ -19,6 +19,7 @@ epochs: 50
 learning_rate: 0.01
 momentum: 0.9
 batch_size: 16
+lambda: 1.0
 
 # learning rate scheduler
 lr_scheduler_factor: 0.1

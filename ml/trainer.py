@@ -1,3 +1,4 @@
+# import faulthandler; faulthandler.enable()
 import os
 import sys
 from enum import Enum
@@ -5,7 +6,7 @@ from typing import Iterable
 
 import torch
 import torch.nn.functional as F
-from torch import optim, nn
+from torch import optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -15,6 +16,7 @@ from ml.config import Config
 from ml.data import ProcessDataset
 from ml.logger import Logger
 from ml.models import DistributedDataParallel
+from ml.models.CombinedLoss import CombinedLoss
 from ml.utils import optional
 
 
@@ -75,7 +77,7 @@ class Trainer:
                                           pin_memory=self.config['pin_memory'],
                                           drop_last=self.config['drop_last'])
 
-        self.criterion = nn.MSELoss()
+        self.criterion = CombinedLoss(self.config['lambda'])
         self.optimizer = optim.SGD(self.model.parameters(), lr=self.config['learning_rate'],
                                    momentum=self.config['momentum'])
         self.lr_scheduler = ReduceLROnPlateau(self.optimizer, 'min',
