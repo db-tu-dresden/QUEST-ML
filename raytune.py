@@ -1,6 +1,5 @@
 import os.path
 
-import numpy as np
 import torch
 from ray import tune
 from ray.air import session
@@ -9,7 +8,7 @@ from ray.tune.schedulers import ASHAScheduler
 from torch import nn
 
 import wandb
-from ml import Trainer, Config, Parser
+from ml import Trainer, Config, Parser, seed
 from ml.models import build_model
 
 TUNE_CONFIG = {
@@ -121,6 +120,7 @@ def test(config: Config):
 
 
 def run():
+    seed()
     tune_config = TUNE_CONFIG
 
     trainer_config = Config('ml/config.yaml')

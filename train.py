@@ -1,8 +1,9 @@
-from ml import Config, Trainer, Parser
+from ml import Config, Trainer, Parser, seed
 from ml.models import build_model
 
 
 def run():
+    seed()
     config = Config('ml/config.yaml')
 
     parser = Parser(config)
