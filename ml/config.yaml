@@ -25,6 +25,7 @@ lr_scheduler_factor: 0.1
 lr_scheduler_patience: 10
 
 # training configuration
+stepwise: False
 set_gradients_none: False
 fp16: False
 allow_tf32: False

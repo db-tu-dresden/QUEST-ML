@@ -64,6 +64,7 @@ class Config:
         'lr_scheduler_patience': {'type': int, 'lambda': greater_zero},
 
         # training configuration
+        'stepwise': {'type': bool, 'lambda': true},
         'set_gradients_none': {'type': bool, 'lambda': true},
         'fp16': {'type': bool, 'lambda': true},
         'allow_tf32': {'type': bool, 'lambda': true},

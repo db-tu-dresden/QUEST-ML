@@ -142,7 +142,11 @@ class Trainer:
                     self.optimizer.zero_grad(set_to_none=self.config['set_gradients_none'])
 
                 with optional(self.config['fp16'] and self.scaler, torch.cuda.amp.autocast):
-                    outputs = self.model(inputs)
+                    _inputs = inputs
+                    steps = abs(self.config['offset']) if self.config['stepwise'] else 1
+                    for _ in range(steps):
+                        outputs = self.model(_inputs)
+                        _inputs = outputs
                 batch_loss = self.criterion(outputs, targets)
                 batch_accuracy = self.get_accuracy(outputs.detach(), targets.detach())
 
