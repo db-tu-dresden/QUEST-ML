@@ -91,6 +91,10 @@ class Logger:
     def log_model(self):
         self.log_artifact('Model', 'model', self.config['model_save_path'])
 
+    def log_run_url(self):
+        if self.config['wandb'] and wandb.run is not None:
+            print(wandb.run.get_url())
+
     def watch(self, model: nn.Module, *args, **kwargs):
         if self.config['wandb'] and wandb.run is not None:
             wandb.watch(model, *args, **kwargs)

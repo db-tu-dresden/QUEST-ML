@@ -204,6 +204,7 @@ class Trainer:
 
         with self.logger(self.config):
             self.logger.log(self.model, verbose=True)
+            self.logger.log_run_url()
             if self.config['wandb_watch_model']:
                 self.logger.watch(self.model, self.criterion, log='all')
             for epoch in range(self.config['epochs']):
