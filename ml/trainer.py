@@ -16,7 +16,7 @@ from ml.config import Config
 from ml.data import ProcessDataset
 from ml.logger import Logger
 from ml.models import DistributedDataParallel
-from ml.models.CombinedLoss import CombinedLoss
+from ml.models.combined_loss import CombinedLoss
 from ml.utils import optional
 
 
