@@ -12,11 +12,11 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from ml import ddp
+from ml.combined_loss import CombinedLoss
 from ml.config import Config
 from ml.data import ProcessDataset
 from ml.logger import Logger
 from ml.models import DistributedDataParallel
-from ml.models.combined_loss import CombinedLoss
 from ml.utils import optional
 
 
