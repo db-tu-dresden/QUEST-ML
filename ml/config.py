@@ -66,6 +66,7 @@ class Config:
 
         # training configuration
         'stepwise': {'type': bool, 'lambda': true},
+        'stepwise_loss': {'type': bool, 'lambda': true},
         'set_gradients_none': {'type': bool, 'lambda': true},
         'fp16': {'type': bool, 'lambda': true},
         'allow_tf32': {'type': bool, 'lambda': true},

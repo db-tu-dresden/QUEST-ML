@@ -139,6 +139,7 @@ class Trainer:
         with optional(mode != Mode.TRAIN, torch.no_grad):
             for batch_data in tqdm(dataloader, disable=not self.config['verbose'], file=sys.stdout):
                 inputs, targets = self.batch_data_to_device(batch_data)
+                batch_loss = torch.tensor(0.0)
 
                 if mode == Mode.TRAIN:
                     self.optimizer.zero_grad(set_to_none=self.config['set_gradients_none'])
@@ -148,8 +149,12 @@ class Trainer:
                     steps = abs(self.config['offset']) if self.config['stepwise'] else 1
                     for _ in range(steps):
                         outputs = self.model(_inputs)
+                        if self.config['stepwise_loss']:
+                            batch_loss += self.criterion(outputs, targets)
                         _inputs = outputs
-                batch_loss = self.criterion(outputs, targets)
+
+                if not self.config['stepwise_loss']:
+                    batch_loss = self.criterion(outputs, targets)
                 batch_accuracy = self.get_accuracy(outputs.detach(), targets.detach())
 
                 if mode == Mode.TRAIN:
