@@ -13,7 +13,8 @@ def unsqueeze1(x: torch.Tensor):
 
 
 class FusionModel(Model):
-    def __init__(self, input_size: int, hidden_size: int, bidirectional: bool, model: Model, dropout: float):
+    def __init__(self, input_size: int, hidden_size: int, bidirectional: bool, model: Model, dropout: float,
+                 maxpool_states: bool):
         super().__init__()
 
         self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True, bidirectional=bidirectional)
@@ -21,12 +22,19 @@ class FusionModel(Model):
         self.activation = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
 
+        self.maxpool_states = maxpool_states
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = x
         shape = out.shape
-        out, _ = self.lstm(out)
-        out = nn.functional.max_pool2d(out, (shape[1], 1))
-        out = out.squeeze()
+
+        out, (h_0, c_0) = self.lstm(out)
+
+        if self.maxpool_states:
+            out = nn.functional.max_pool2d(out, (shape[1], 1)).squeeze(1)
+        else:
+            out = h_0.transpose(0, 1).reshape((shape[0], -1))
+
         out = self.model(out)
         out = self.activation(out)
         out = self.dropout(out)
@@ -37,6 +45,10 @@ class FusionModel(Model):
         parser.add_argument(f'--{prefix}input_size', type=int, metavar='N', help='Input size')
         parser.add_argument(f'--{prefix}hidden_size', type=int, metavar='N', help='Hidden size')
         parser.add_argument(f'--{prefix}dropout', type=int, metavar='N', help='Dropout value')
+
+        parser.add_argument(f'--{prefix}maxpool_last_layer_hidden_states',
+                            action=argparse.BooleanOptionalAction,
+                            help='Dropout value')
 
         parser.add_argument('--fusion_model', type=str, help='Fusion model name. '
                                                              'To see fusion model specific arguments, use --help on '
@@ -58,7 +70,8 @@ class FusionModel(Model):
         model = model.build_model(config, f'{prefix}model_')
 
         return cls(config[f'{prefix}input_size'], config[f'{prefix}hidden_size'],
-                   config[f'{prefix}bidirectional'], model, config[f'{prefix}dropout'])
+                   config[f'{prefix}bidirectional'], model, config[f'{prefix}dropout'],
+                   config[f'{prefix}maxpool_last_layer_hidden_states'])
 
 
 class DeFusionModel(Model):
@@ -423,6 +436,9 @@ def fusion_model(cfg: Config, prefix: str = 'encoder_fusion_'):
     cfg[f'{prefix}hidden_size'] = cfg[f'{prefix}hidden_size'] if f'{prefix}hidden_size' in cfg \
         else cfg['process_embedding_size']
     cfg[f'{prefix}bidirectional'] = cfg[f'{prefix}bidirectional'] if f'{prefix}bidirectional' in cfg else True
+
+    cfg[f'{prefix}maxpool_last_layer_hidden_states'] = cfg[f'{prefix}maxpool_last_layer_hidden_states'] \
+        if f'{prefix}maxpool_last_layer_hidden_states' in cfg else False
 
     cfg[f'{prefix}model_input_size'] = cfg[f'{prefix}model_input_size'] \
         if f'{prefix}model_input_size' in cfg else 2**int(cfg[f'{prefix}bidirectional']) * cfg[f'{prefix}hidden_size']
