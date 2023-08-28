@@ -1,6 +1,5 @@
 import os.path
 
-import numpy as np
 import torch
 import wandb
 from ray import tune
@@ -11,13 +10,7 @@ from torch import nn
 
 from ml import Trainer, Config, Parser, seed
 from ml.models import build_model
-
-TUNE_CONFIG = {
-    'hidden_size': tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
-    'hidden_layers': tune.sample_from(lambda _: np.random.randint(2, 4)),
-    'learning_rate': tune.loguniform(1e-4, 1e-1),
-    'batch_size': tune.choice([2, 4, 8, 16])
-}
+from ml.scripts.tune_config import TUNE_CONFIG
 
 
 def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_num_epochs: int = 10,
