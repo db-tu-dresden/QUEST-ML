@@ -1,6 +1,6 @@
 import sys
 
-import ml.train
+import ml.scripts.train
 
 if __name__ == '__main__':
-    sys.exit(ml.train.run())
+    sys.exit(ml.scripts.train.run())

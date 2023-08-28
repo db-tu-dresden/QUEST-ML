@@ -1,6 +1,6 @@
 import sys
 
-import ml.raytune
+import ml.scripts.raytune
 
 if __name__ == '__main__':
-    sys.exit(ml.raytune.run())
+    sys.exit(ml.scripts.raytune.run())
