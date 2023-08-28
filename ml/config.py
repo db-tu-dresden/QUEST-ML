@@ -41,6 +41,7 @@ class Config:
         'gpu': {'type': bool, 'lambda': true},
         'world_size': {'type': int, 'lambda': greater_equal_zero},
         'job_id': {'type': int, 'lambda': true},
+        'seed': {'type': int, 'lambda': true},
 
         # logging
         'wandb': {'type': bool, 'lambda': true},

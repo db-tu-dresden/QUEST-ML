@@ -5,9 +5,10 @@ from ml.models import build_model
 
 
 def run():
-    seed()
     cwd = os.path.dirname(os.path.realpath(__file__))
     config = Config(os.path.join(cwd, '../config.yaml'))
+
+    seed(config['seed'])
 
     parser = Parser(config)
     args = parser.parse_args()

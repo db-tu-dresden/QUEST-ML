@@ -114,10 +114,11 @@ def test(config: Config):
 
 
 def run():
-    seed()
     tune_config = TUNE_CONFIG
 
     trainer_config = Config('ml/config.yaml')
+
+    seed(trainer_config['seed'])
 
     parser = Parser(trainer_config, 'Raytune for the task')
     parser.add_argument('-s', '--samples', type=int,
