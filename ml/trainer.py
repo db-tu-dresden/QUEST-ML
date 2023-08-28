@@ -1,4 +1,3 @@
-# import faulthandler; faulthandler.enable()
 import os
 import sys
 from enum import Enum
