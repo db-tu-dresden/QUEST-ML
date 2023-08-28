@@ -116,7 +116,8 @@ def test(config: Config):
 def run():
     tune_config = TUNE_CONFIG
 
-    trainer_config = Config('ml/config.yaml')
+    cwd = os.path.dirname(os.path.realpath(__file__))
+    trainer_config = Config(os.path.join(cwd, '../config.yaml'))
 
     seed(trainer_config['seed'])
 
