@@ -88,8 +88,8 @@ class Logger:
     def log_graph_description(self):
         self.log_artifact('Graph-Description', 'graph_description', self.config['graph_description_path'])
 
-    def log_model(self):
-        self.log_artifact('Model', 'model', self.config['model_save_path'])
+    def log_model(self, save_path):
+        self.log_artifact('Model', 'model', save_path)
 
     def log_run_url(self):
         if self.config['wandb'] and wandb.run is not None:

@@ -244,7 +244,7 @@ class Trainer:
             return
         self.logger.log_system_config()
         self.logger.log_graph_description()
-        self.logger.log_model()
+        self.logger.log_model(self.model.get_save_path(self.config))
 
     def load(self):
         self.load_checkpoint()
