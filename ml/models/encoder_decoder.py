@@ -62,12 +62,12 @@ class EncoderDecoder(Model):
             'model': self.state_dict(),
             'encoder': self.encoder.state_dict(),
             'decoder': self.decoder.state_dict(),
-        }, config['model_save_path'])
+        }, self.get_save_path(config))
 
     def load(self, config: Config):
         if not config['load_model'] and not config['load_encoder'] and not config['load_decoder']:
             return
-        checkpoint = torch.load(config['model_load_path'])
+        checkpoint = torch.load(self.get_load_path(config))
         if config['load_model']:
             self.load_state_dict(checkpoint['model'])
             return

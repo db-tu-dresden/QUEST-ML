@@ -141,14 +141,12 @@ class Config:
         self.data['save_dir'] = self.data['save_dir'] or os.path.join(base_path, 'save')
 
         self.data['model_save_path'] = (self.data['model_save_path'] or
-                                        os.path.join(self.data['save_dir'], self.data['model_file']))
-        self.data['model_load_path'] = (self.data['model_save_path'] or
-                                        os.path.join(self.data['save_dir'], self.data['model_file']))
+                                        os.path.join(self.data['save_dir'], '{model_name}_' + self.data['model_file']))
+        self.data['model_load_path'] = self.data['model_load_path'] or self.data['model_save_path']
 
         self.data['checkpoint_save_path'] = (self.data['checkpoint_save_path'] or
                                              os.path.join(self.data['save_dir'], self.data['checkpoint_file']))
-        self.data['checkpoint_load_path'] = (self.data['checkpoint_load_path'] or
-                                             os.path.join(self.data['save_dir'], self.data['checkpoint_file']))
+        self.data['checkpoint_load_path'] = self.data['checkpoint_load_path'] or self.data['checkpoint_save_path']
 
         self.data['system_config_path'] = (self.data['system_config_path'] or
                                            os.path.join(base_path, 'config.yaml'))
