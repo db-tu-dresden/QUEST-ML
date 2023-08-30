@@ -31,4 +31,10 @@ class Model(nn.Module):
 
 
 class DistributedDataParallel(nn.parallel.DistributedDataParallel, Model):
-    pass
+    def save(self, config: Config):
+        if not ddp.is_main_process():
+            return
+        self.module.save(config)
+
+    def load(self, config: Config):
+        self.module.load(config)
