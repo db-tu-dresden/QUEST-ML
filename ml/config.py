@@ -24,7 +24,7 @@ def greater_zero(x):
 
 
 def greater_equal_zero(x):
-    return x > 0
+    return x >= 0
 
 
 def between_zero_one(x):
@@ -86,6 +86,9 @@ class Config:
         'reduction_factor': {'type': float, 'lambda': between_zero_one},
         'offset': {'type': int, 'lambda': greater_zero},
         'only_process': {'type': bool, 'lambda': true},
+        'enhances': {'type': int, 'lambda': greater_equal_zero},
+        'enhance_base_lambda': {'type': float, 'lambda': greater_zero},
+        'enhance_lambda_variability': {'type': float, 'lambda': true},
 
         # distributed training
         'master_addr': {'type': str, 'lambda': length_greater_zero, 'can_be_none': True},

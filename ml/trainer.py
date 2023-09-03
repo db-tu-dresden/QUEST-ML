@@ -256,13 +256,17 @@ class Trainer:
 
     @staticmethod
     def get_datasets_from_path(path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
-                               only_process: bool = False, pickle_file_name: str = 'da.pkl'):
+                               only_process: bool = False, enhances: int = 0, base_lambda: float = 1.0,
+                               lambda_variability: float = 0.1, pickle_file_name: str = 'da.pkl'):
         return ProcessDataset.from_path(os.path.join(path, 'train', pickle_file_name),
-                                        scaling_factor, reduction_factor, offset, only_process), \
+                                        scaling_factor, reduction_factor, offset, only_process, enhances,
+                                        base_lambda, lambda_variability), \
             ProcessDataset.from_path(os.path.join(path, 'valid', pickle_file_name),
-                                     scaling_factor, reduction_factor, offset, only_process), \
+                                     scaling_factor, reduction_factor, offset, only_process, enhances,
+                                     base_lambda, lambda_variability), \
             ProcessDataset.from_path(os.path.join(path, 'test', pickle_file_name),
-                                     scaling_factor, reduction_factor, offset, only_process)
+                                     scaling_factor, reduction_factor, offset, only_process, enhances,
+                                     base_lambda, lambda_variability)
 
     @classmethod
     def _run(cls, rank: int | None, config: Config, model,
@@ -285,6 +289,9 @@ class Trainer:
                                                                            config['reduction_factor'],
                                                                            config['offset'],
                                                                            config['only_process'],
+                                                                           config['enhances'],
+                                                                           config['enhance_base_lambda'],
+                                                                           config['enhance_lambda_variability'],
                                                                            config['pickle_file_name'])
 
         if config['gpu']:

@@ -22,6 +22,9 @@ def run():
                                                                        config['reduction_factor'],
                                                                        config['offset'],
                                                                        config['only_process'],
+                                                                       config['enhances'],
+                                                                       config['enhance_base_lambda'],
+                                                                       config['enhance_lambda_variability'],
                                                                        config['pickle_file_name'])
     trainer = Trainer(config, model, train_data, valid_data, test_data)
     trainer.test()

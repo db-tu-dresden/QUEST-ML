@@ -43,10 +43,13 @@ num_workers_dataloader: 0
 pickle_file_name: da.pkl
 processes: 0
 jobs: 0
-scaling_factor: 10
-reduction_factor: 0.0
+scaling_factor: 1
+reduction_factor: 0.9
 offset: 1
 only_process: False
+enhances: 0
+enhance_base_lambda: 1.0
+enhance_lambda_variability: 0.1
 
 # distributed training
 master_addr: localhost
