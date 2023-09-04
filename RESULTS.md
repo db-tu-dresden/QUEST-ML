@@ -143,3 +143,12 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/zpnh7z28
 <>
 offset: 1
 max acc: 2.35%
+
+
+## FLAT MLP
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/97i50ek5
+hidden size: 2048
+hidden layers: 3
+
+offset 1:
+    100% acc nach 2 epochs
