@@ -15,5 +15,4 @@ def seed(seed: int = 0, deterministic: bool = True):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    if deterministic:
-        torch.use_deterministic_algorithms(mode=True)
+    torch.use_deterministic_algorithms(mode=deterministic)
