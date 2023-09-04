@@ -1,4 +1,5 @@
 import os
+import pickle
 import sys
 from enum import Enum
 from typing import Iterable
@@ -246,6 +247,9 @@ class Trainer:
         self.logger.log_graph_description()
         self.logger.log_model(self.model.get_save_path(self.config))
 
+        if self.config['save_datasets']:
+            self.save_datasets()
+
     def load(self):
         self.load_checkpoint()
         self.model.load(self.config)
@@ -268,6 +272,20 @@ class Trainer:
                                      scaling_factor, reduction_factor, offset, only_process, enhances,
                                      base_lambda, lambda_variability)
 
+    @staticmethod
+    def load_datasets(path: str):
+        with open(path, 'rb') as f:
+            ds_dict = pickle.load(f)
+        return ds_dict['train_data'], ds_dict['valid_data'], ds_dict['test_data']
+
+    def save_datasets(self):
+        with open(self.config['ds_save_path'], 'wb') as f:
+            pickle.dump({
+                'train_data': self.train_data,
+                'valid_data': self.valid_data,
+                'test_data': self.test_data,
+            }, f)
+
     @classmethod
     def _run(cls, rank: int | None, config: Config, model,
              train_data: ProcessDataset, valid_data: ProcessDataset, test_data: ProcessDataset):
@@ -282,6 +300,9 @@ class Trainer:
             test_data: ProcessDataset = None):
         config['world_size'] = config['world_size'] or torch.cuda.device_count() or 1
         config['master_port'] = ddp.find_free_port(config['master_addr'])
+
+        if config['load_datasets']:
+            train_data, valid_data, test_data = cls.load_datasets(config['ds_load_path'])
 
         if not train_data and not valid_data and not test_data:
             train_data, valid_data, test_data = cls.get_datasets_from_path(config['data_path'],

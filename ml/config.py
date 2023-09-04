@@ -104,11 +104,15 @@ class Config:
         'load': {'type': bool, 'lambda': true},
         'save_model': {'type': bool, 'lambda': true},
         'load_model': {'type': bool, 'lambda': true},
+        'save_datasets': {'type': bool, 'lambda': true},
+        'load_datasets': {'type': bool, 'lambda': true},
 
         # paths
         'base_path': {'type': str, 'lambda': true},
         'data_path': {'type': str, 'lambda': true},
         'save_dir': {'type': str, 'lambda': true},
+        'ds_save_path': {'type': str, 'lambda': true},
+        'ds_load_path': {'type': str, 'lambda': true},
         'checkpoint_file': {'type': str, 'lambda': true},
         'checkpoint_save_path': {'type': str, 'lambda': true},
         'checkpoint_load_path': {'type': str, 'lambda': true},
@@ -142,6 +146,10 @@ class Config:
         self.data['base_path'] = base_path
         self.data['data_path'] = self.data['data_path'] or os.path.join(base_path, 'data')
         self.data['save_dir'] = self.data['save_dir'] or os.path.join(base_path, 'save')
+
+        self.data['ds_save_path'] = (self.data['ds_save_path'] or
+                                     os.path.join(self.data['save_dir'], 'datasets.pickle'))
+        self.data['ds_load_path'] = (self.data['ds_load_path'] or self.data['ds_save_path'])
 
         self.data['model_save_path'] = (self.data['model_save_path'] or
                                         os.path.join(self.data['save_dir'], '{model_name}_' + self.data['model_file']))

@@ -65,11 +65,15 @@ save: True
 load: False
 save_model: True
 load_model: False
+save_datasets: False
+load_datasets: False
 
 # paths
 base_path: ''
 data_path: ''
 save_dir: ''
+ds_save_path: ''
+ds_load_path: ''
 checkpoint_file: 'checkpoint.pt'
 checkpoint_save_path: ''
 checkpoint_load_path: ''
