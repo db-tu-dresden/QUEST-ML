@@ -106,7 +106,7 @@ class ProcessDataset(Dataset):
 
     @staticmethod
     def to_processes(da):
-        return xr.concat(da[::, 1::-2], dim='process')
+        return xr.concat(da[::, 1::-2], dim='process').expand_dims('place_holder', axis=1)
 
     def get_sample_shape(self):
         return self[0][0].shape
