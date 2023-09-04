@@ -33,6 +33,7 @@ class MLP(Model):
         parser.add_argument(f'--{prefix}hidden_size', type=int, metavar='N', help='Hidden size')
         parser.add_argument(f'--{prefix}output_size', type=int, metavar='N', help='Output size')
         parser.add_argument(f'--{prefix}hidden_layers', type=int, metavar='N', help='Number of hidden layers')
+        parser.add_argument(f'--{prefix}dropout', type=float, help='Dropout value')
 
     @classmethod
     def build_model(cls, cfg: Config, prefix: str = ''):
