@@ -160,3 +160,37 @@ https://wandb.ai/eriknikulski/carQUEST-ML/runs/y970uz4x
 
 https://wandb.ai/eriknikulski/carQUEST-ML/runs/e85j1yc4
 ~65%
+
+Tuning lambda:
+
+Best trial config: {'lambda': 0.0, 'hidden_size': 2048, 'hidden_layers': 3, 'learning_rate': 0.012786501847370822}
+Best trial final validation loss: 0.06274252384901047
+Best trial final validation accuracy: 0.02552083507180214
+
+Best trial config: {'lambda': 0.2, 'hidden_size': 1024, 'hidden_layers': 2, 'learning_rate': 0.006729034236445496}
+Best trial final validation loss: 0.05706259235739708
+Best trial final validation accuracy: 0.5041667222976685
+
+Best trial config: {'lambda': 0.4, 'hidden_size': 1024, 'hidden_layers': 2, 'learning_rate': 0.01554257253318455}
+Best trial final validation loss: 0.0453731007874012
+Best trial final validation accuracy: 0.6171875596046448
+
+Best trial config: {'lambda': 0.45, 'hidden_size': 512, 'hidden_layers': 2, 'learning_rate': 0.049408163272648124}
+Best trial final validation loss: 0.053164027631282806
+Best trial final validation accuracy: 0.49427086114883423
+
+Best trial config: {'lambda': 0.5, 'hidden_size': 1024, 'hidden_layers': 2, 'learning_rate': 0.032189452243549674}
+Best trial final validation loss: 0.04268467798829079
+Best trial final validation accuracy: 0.6401041746139526
+
+Best trial config: {'lambda': 0.6, 'hidden_size': 512, 'hidden_layers': 2, 'learning_rate': 0.04407393248372669}
+Best trial final validation loss: 0.0770404115319252
+Best trial final validation accuracy: 0.3151041865348816
+
+Best trial config: {'lambda': 0.8, 'hidden_size': 512, 'hidden_layers': 2, 'learning_rate': 0.015696266176867577}
+Best trial final validation loss: 0.04444761574268341
+Best trial final validation accuracy: 0.3541666865348816
+
+Best trial config: {'lambda': 1.0, 'hidden_size': 512, 'hidden_layers': 2, 'learning_rate': 0.009709370093513872}
+Best trial final validation loss: 0.04658373445272446
+Best trial final validation accuracy: 0.29739585518836975
