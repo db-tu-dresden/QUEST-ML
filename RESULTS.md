@@ -152,3 +152,11 @@ hidden layers: 3
 
 offset 1:
     100% acc nach 2 epochs
+
+
+### clpx graph
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/y970uz4x
+~60%
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/e85j1yc4
+~65%
