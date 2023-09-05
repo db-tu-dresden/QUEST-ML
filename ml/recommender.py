@@ -18,6 +18,7 @@ class Recommender:
 
         while not state[0, -1].ge(self.target_dist).all():
             state = self.model(state)
+            step += 1
 
         return step, state
 
