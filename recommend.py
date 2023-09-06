@@ -14,6 +14,8 @@ def run():
 
     parser = Parser(ml_config)
     parser.add_argument('--tgt', nargs='+', type=int, required=True, help='The target distribution')
+    parser.add_argument('--limit', type=int, metavar='N', default=10,
+                        help='Maximal number of steps to be tested')
     args = parser.parse_args()
 
     ml_config.update_from_args(args)
@@ -26,7 +28,8 @@ def run():
 
     recommender = Recommender(ml_config, sys_config, model,
                               target_dist=torch.tensor(args.tgt),
-                              initial_state=torch.zeros(len(sys_config['processes']) + 1, len(sys_config['jobs'])))
+                              initial_state=torch.zeros(len(sys_config['processes']) + 1, len(sys_config['jobs'])),
+                              limit=args.limit)
     recommender.predict()
 
 
