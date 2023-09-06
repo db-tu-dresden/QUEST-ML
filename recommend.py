@@ -24,7 +24,7 @@ def run():
 
     sys_config = SysConfig(os.path.join(ml_config['base_path'], 'config.yaml'))
 
-    recommender = Recommender(ml_config, model,
+    recommender = Recommender(ml_config, sys_config, model,
                               target_dist=torch.tensor(args.tgt),
                               initial_state=torch.zeros(len(sys_config['processes']) + 1, len(sys_config['jobs'])))
     recommender.predict()
