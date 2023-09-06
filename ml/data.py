@@ -57,6 +57,11 @@ class ProcessDataset(Dataset):
             target_da[i][0] = np.zeros(target_da[i][0].shape)
             target_da[i][-1] = diff[-1]
 
+        negative_target_mask = target_da.where(target_da < 0, 0).drop_indexes(['step', 'process', 'job'])
+        negative_source_mask = source_da.where(source_da < 0, 0).drop_indexes(['step', 'process', 'job'])
+        source_da = source_da - negative_target_mask - negative_source_mask
+        target_da = target_da - negative_target_mask - negative_source_mask
+
         return source_da, target_da
 
     def enhance(self, n: int, base_lambda: float, lambda_variability: float):
