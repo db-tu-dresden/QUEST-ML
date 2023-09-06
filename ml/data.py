@@ -39,7 +39,13 @@ class ProcessDataset(Dataset):
 
         if self.offset == 0:
             return source_da, target_da
-        return source_da[:-self.offset], target_da[self.offset:]
+
+        source_da = source_da[:-abs(self.offset)]
+        target_da = target_da[abs(self.offset):]
+
+        if self.offset < 0:
+            return target_da, source_da
+        return source_da, target_da
 
     def set_diff(self, source_da, target_da):
         for i in range(len(source_da)):
