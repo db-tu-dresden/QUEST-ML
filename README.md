@@ -39,6 +39,9 @@ Some optional arguments are:
 `--wandb`, enables wandb logging, `--no-wand` disables wandb logging. It is activated by default.  
 `--save_model`, to save the model at the end of training, `--no-save_models` to explicitly don't save the model.
 
+Use `--save_datasets` to save the created datasets.  
+To reuse saved datasets, use `--load_datasets`.
+
 
 ## Hyperparameter search
 For hyperparameter search [ray-tune](https://www.ray.io/ray-tune) is used. 
