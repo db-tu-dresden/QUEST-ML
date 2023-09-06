@@ -45,7 +45,7 @@ For hyperparameter search [ray-tune](https://www.ray.io/ray-tune) is used.
 It is necessary to first create a dataset, see [Data creation](#data-creation).  
 After this, simply run: 
 ```shell
-python raytune.py --path PATH-TO-YOUR-DIR
+python tune.py --path PATH-TO-YOUR-DIR
 ```  
 
 Optional cli arguments are:  
@@ -53,7 +53,7 @@ Optional cli arguments are:
 `--max-epochs`: The maximal number of epochs to run per trail, defaults to 10.  
 `--gpus`: GPUs to be used per trial, defaults to 0.  
 
-The config describing the parameter search space is the dictionary `TUNE_CONFIG` defined in `raytune.py`. 
+The config describing the parameter search space is the dictionary `TUNE_CONFIG` defined in `ml/scripts/tune_config.py`. 
 Its default value is:
 ```python
 {
