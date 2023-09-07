@@ -43,8 +43,15 @@ class Recommender:
 
         return step, state
 
-    def predict(self):
-        step, state = self.predict_forward(self.initial_state, self.target_dist, self.limit)
+    def step_through(self, initial_state: torch.Tensor, steps: int):
+        state = initial_state
+        state = state.unsqueeze(0)      # add batch dim
+
+        for _ in range(steps):
+            state = self.model(state)
+
+        return steps, state
+
     def predict_target(self):
         steps, state = self.step_to_target(self.initial_state, self.target_dist, self.limit)
 
@@ -53,3 +60,8 @@ class Recommender:
             print(f'Target distribution is: {state[-1]}')
         else:
             print(f'Target distribution was NOT contained in the state after {steps} steps.')
+
+    def predict_state(self):
+        steps, state = self.step_through(self.initial_state, self.limit)
+
+        print(f'Did {steps} steps from initial state: {self.initial_state} to final state: {state}')
