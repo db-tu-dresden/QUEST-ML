@@ -65,7 +65,10 @@ class Recommender:
     def predict_state(self):
         steps, state = self.step_through(self.initial_state, self.steps)
 
-        print(f'Did {steps} steps from initial state: {self.initial_state} to final state: {state}')
+        print(f'Did {steps} steps from initial state:\n'
+              f'{self.initial_state}\n'
+              f'to final state:'
+              f'\n{state}')
 
     def run(self, action):
         if action == 'STEP_TO':
