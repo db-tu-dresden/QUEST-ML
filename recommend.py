@@ -30,7 +30,7 @@ def run():
                               target_dist=torch.tensor(args.tgt),
                               initial_state=torch.zeros(len(sys_config['processes']) + 1, len(sys_config['jobs'])),
                               limit=args.limit)
-    recommender.predict()
+    recommender.predict_target()
 
 
 if __name__ == '__main__':
