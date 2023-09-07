@@ -46,10 +46,10 @@ class Recommender:
     def predict(self):
         step, state = self.predict_forward(self.initial_state, self.target_dist, self.limit)
     def predict_target(self):
-        step, state = self.step_to_target(self.initial_state, self.target_dist, self.limit)
+        steps, state = self.step_to_target(self.initial_state, self.target_dist, self.limit)
 
         if state is not None:
-            print(f'Target distribution reached after {step} steps.')
+            print(f'Target distribution reached after {steps} steps.')
             print(f'Target distribution is: {state[-1]}')
         else:
-            print(f'Target distribution was NOT contained in the state after {step} steps.')
+            print(f'Target distribution was NOT contained in the state after {steps} steps.')
