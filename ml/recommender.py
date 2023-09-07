@@ -18,7 +18,7 @@ class Recommender:
                  initial_state: torch.Tensor, limit: int, steps: int):
         self.ml_config = ml_config
         self.sys_config = sys_config
-        self.model = model
+        self.model = model.eval()
         self.target_dist = target_dist
         self.initial_state = initial_state
         self.limit = limit
