@@ -25,25 +25,26 @@ class Recommender:
 
         self.arrival_process = MockArrivalProcess(self.sys_config)
 
-    def contains_tgt(self, state: torch.tensor):
-        return state[0, -1].ge(self.target_dist).all()
+    @staticmethod
+    def contains_tgt(state: torch.Tensor, target_dist: torch.Tensor):
+        return state[0, -1].ge(target_dist).all()
 
-    def predict_forward(self):
-        state = self.initial_state
+    def predict_forward(self, initial_state: torch.Tensor, target_dist: torch.Tensor, limit: int):
+        state = initial_state
         state = state.unsqueeze(0)      # add batch dim
         step = 0
 
-        while not self.contains_tgt(state) and step < self.limit:
+        while not self.contains_tgt(state, target_dist) and step < limit:
             state[0, 0] += self.arrival_process.step()
             state = self.model(state)
             step += 1
 
-        state = state if self.contains_tgt(state) else None
+        state = state if self.contains_tgt(state, target_dist) else None
 
         return step, state
 
     def predict(self):
-        step, state = self.predict_forward()
+        step, state = self.predict_forward(self.initial_state, self.target_dist, self.limit)
 
         if state is not None:
             print(f'Target distribution reached after {step} steps.')
