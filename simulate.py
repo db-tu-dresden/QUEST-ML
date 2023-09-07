@@ -26,7 +26,6 @@ def run(args):
     env = Environment()
 
     system = System(config, notation, env=env)
-    system.build()
     system.run()
     system.logger.plot(path=os.path.join(base_path, 'dist.png'))
 

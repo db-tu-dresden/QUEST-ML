@@ -46,6 +46,8 @@ class System:
 
         self.logger = Logger(self.config['loggingRate'], self)
 
+        self.build()
+
     def __repr__(self):
         cls = self.__class__.__name__
         return f'{cls}(config={self.config!r}, notation={self.notation!r}, env={self.env!r})'
