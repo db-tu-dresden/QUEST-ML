@@ -160,9 +160,11 @@ def add_arch_args(parser: argparse.ArgumentParser, key: str, title: str = None, 
             raise RuntimeError()
 
 
-def parse_arch(parser: argparse.ArgumentParser) -> argparse.Namespace:
+def parse_arch(parser: argparse.ArgumentParser, post_arch_arg_add_fn=None) -> argparse.Namespace:
     args, _ = parser.parse_known_args()
     add_arch_args(parser, 'arch', 'Model-specific configuration')
+    if post_arch_arg_add_fn:
+        post_arch_arg_add_fn(parser)
     return parser.parse_args()
 
 

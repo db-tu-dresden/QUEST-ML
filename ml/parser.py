@@ -62,5 +62,5 @@ class Parser(argparse.ArgumentParser):
 
         return vars(ml.models)[parser_id].format_help()
 
-    def parse_args(self) -> argparse.Namespace:
-        return parse_arch(super(Parser, self))
+    def parse_args(self, post_arch_arg_add_fn=None) -> argparse.Namespace:
+        return parse_arch(super(Parser, self), post_arch_arg_add_fn=post_arch_arg_add_fn)

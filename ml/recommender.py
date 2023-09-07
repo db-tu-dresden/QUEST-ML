@@ -15,13 +15,14 @@ class MockArrivalProcess:
 
 class Recommender:
     def __init__(self, ml_config: Config, sys_config, model: Model, target_dist: torch.Tensor,
-                 initial_state: torch.Tensor, limit: int):
+                 initial_state: torch.Tensor, limit: int, steps: int):
         self.ml_config = ml_config
         self.sys_config = sys_config
         self.model = model
         self.target_dist = target_dist
         self.initial_state = initial_state
         self.limit = limit
+        self.steps = steps
 
         self.arrival_process = MockArrivalProcess(self.sys_config)
 
@@ -62,6 +63,13 @@ class Recommender:
             print(f'Target distribution was NOT contained in the state after {steps} steps.')
 
     def predict_state(self):
-        steps, state = self.step_through(self.initial_state, self.limit)
+        steps, state = self.step_through(self.initial_state, self.steps)
 
         print(f'Did {steps} steps from initial state: {self.initial_state} to final state: {state}')
+
+    def run(self, action):
+        if action == 'STEP_TO':
+            self.predict_target()
+
+        if action == 'STEP_THROUGH':
+            self.predict_state()
