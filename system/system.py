@@ -7,7 +7,7 @@ import numpy as np
 from notation import Notation
 from system.config import Config
 from system.environment import Environment
-from system.job import JobTypeCollection
+from system.job import JobTypeCollection, Job, JobType
 from system.logger import Logger
 from system.process import Process, ArrivalProcess, ExitProcess
 from system.queue import Queue
@@ -102,3 +102,17 @@ class System:
             self.env.process(process.run())
 
         self.env.run(until=self.config['until'])
+
+    def set_state(self, state: np.array):
+        assert state.shape == (len(self.processes), len(self.job_types.types))
+        assert not state[0].any()       # checks that arrival queue is empty
+
+        process: Process
+        for i, process in self.processes.items():
+            dist = state[i]
+            job_type: JobType
+            for j, job_type in enumerate(self.job_types.types):
+                amount = dist[j]
+                for k in range(amount):
+                    job = Job(-1, job_type, env=self.env)
+                    process.push(job)
