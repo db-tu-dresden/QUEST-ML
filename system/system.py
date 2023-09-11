@@ -95,13 +95,13 @@ class System:
 
         self.processes = dict(sorted(self.processes.items()))
 
-    def run(self):
+    def run(self, until=None):
         self.env.process(self.logger.run())
 
         for _, process in self.processes.items():
             self.env.process(process.run())
 
-        self.env.run(until=self.config['until'])
+        self.env.run(until=until or self.config['until'])
 
     def set_state(self, state: np.array):
         assert state.shape == (len(self.processes), len(self.job_types.types))
