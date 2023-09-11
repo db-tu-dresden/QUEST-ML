@@ -2,6 +2,7 @@ import argparse
 import os
 from datetime import datetime
 
+import numpy as np
 import torch
 
 from ml import Config as MLConfig, Parser
@@ -25,11 +26,12 @@ def add_subparsers(parser):
                                      help='Number of steps to take from initial state')
 
 
-def validate_state(state, steps, sys_config, ml_config, k=1):
+def validate_state(state, steps, sys_config, ml_config, k=1, verbose=False):
     with open(os.path.join(ml_config['base_path'], 'graph_description.note')) as f:
         text = f.read()
     notation = Notation.parse(text)
 
+    final_states = []
     for i in range(k):
         env = Environment()
         sys_config['randomSeed'] = int(''.join(str(el) for el in datetime.now().timestamp().as_integer_ratio()))
@@ -38,8 +40,18 @@ def validate_state(state, steps, sys_config, ml_config, k=1):
         system.run(steps)
 
         final_state = system.logger.get_current_state()
-        print(f'Final state in run {i + 1} of {k} is:\n'
-              f'{final_state}\n\n')
+        final_states.append(final_state)
+        if verbose:
+            print(f'Final state in run {i + 1} of {k} is:\n'
+                  f'{final_state}\n')
+
+    final_states = np.stack(final_states)
+    mean = final_states.mean(axis=0)
+    std = final_states.std(axis=0)
+    print(f'Mean is: \n'
+          f'{mean}\n')
+    print(f'Standard Deviation is: \n'
+          f'{std}\n')
 
 
 def run():
@@ -48,6 +60,8 @@ def run():
 
     parser = Parser(ml_config)
     parser.add_argument('--k', '-k', metavar='N', type=int, default=1, help='K for k-fold validation')
+    parser.add_argument('--verbose', '-v', default=False, action=argparse.BooleanOptionalAction,
+                        help='If set individual final states of the simulation are printed')
 
     args = parser.parse_args(post_arch_arg_add_fn=add_subparsers)
 
@@ -72,7 +86,7 @@ def run():
     state = state.squeeze().round().int().numpy()
     initial_state = initial_state.round().int().numpy()
 
-    validate_state(initial_state, steps, sys_config, ml_config, 5)
+    validate_state(initial_state, steps, sys_config, ml_config, args.k, args.verbose)
 
 
 if __name__ == '__main__':
