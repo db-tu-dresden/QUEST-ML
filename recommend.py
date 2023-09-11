@@ -6,7 +6,8 @@ import torch
 from ml import Config as MLConfig, Parser
 from ml.models import build_model
 from ml.recommender import Recommender
-from system import Config as SysConfig
+from notation import Notation
+from system import Config as SysConfig, Environment, System
 
 
 def add_subparsers(parser):
@@ -23,11 +24,28 @@ def add_subparsers(parser):
                                      help='Number of steps to take from initial state')
 
 
+def validate_state(state, steps, sys_config, ml_config, k=1):
+    with open(os.path.join(ml_config['base_path'], 'graph_description.note')) as f:
+        text = f.read()
+    notation = Notation.parse(text)
+
+    for i in range(k):
+        env = Environment()
+        system = System(sys_config, notation, env=env)
+        system.set_state(state)
+        system.run(steps)
+
+        final_state = system.logger.get_current_state()
+        print(f'Final state in run {i + 1} of {k} is:\n'
+              f'{final_state}\n\n')
+
+
 def run():
     cwd = os.path.dirname(os.path.realpath(__file__))
     ml_config = MLConfig(os.path.join(cwd, 'ml/config.yaml'))
 
     parser = Parser(ml_config)
+    parser.add_argument('--k', '-k', metavar='N', type=int, default=1, help='K for k-fold validation')
 
     args = parser.parse_args(post_arch_arg_add_fn=add_subparsers)
 
@@ -39,12 +57,20 @@ def run():
 
     sys_config = SysConfig(os.path.join(ml_config['base_path'], 'config.yaml'))
 
+    initial_state = torch.zeros(len(sys_config['processes']) + 1, len(sys_config['jobs']),
+                                requires_grad=False)
+
     recommender = Recommender(ml_config, sys_config, model,
                               target_dist=torch.tensor(args.tgt) if hasattr(args, 'tgt') else None,
-                              initial_state=torch.zeros(len(sys_config['processes']) + 1, len(sys_config['jobs'])),
+                              initial_state=initial_state,
                               limit=args.limit if hasattr(args, 'limit') else None,
                               steps=args.steps if hasattr(args, 'steps') else None)
-    recommender.run(action=args.action)
+    steps, state = recommender.run(action=args.action)
+
+    state = state.squeeze().round().int().numpy()
+    initial_state = initial_state.round().int().numpy()
+
+    validate_state(initial_state, steps, sys_config, ml_config, 5)
 
 
 if __name__ == '__main__':
