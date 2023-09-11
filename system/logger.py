@@ -36,6 +36,12 @@ class Logger:
 
         yield self.system.env.timeout(self.rate)
 
+    def get_current_state(self):
+        job_dists = {}
+        for i, process in self.system.processes.items():
+            job_dists[process.id] = dict(process.job_dist)
+        return np.array([[job for job in process.values()] for process in job_dists.values()])
+
     def run(self):
         while True:
             yield from self.process()
