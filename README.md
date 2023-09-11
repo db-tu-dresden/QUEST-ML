@@ -66,3 +66,32 @@ Its default value is:
     'batch_size': tune.choice([2, 4, 8, 16])
 }
 ```
+
+## Recommender
+Use this to get to a certain target with a pretrained model. 
+Like in training the model and architecture need to be described with `--arch` and possibly additional arguments to 
+set model/architecture parameters.
+The architecture will be created and loaded from the model save path, if not specified this is within a directory 
+called `save` in the path given by `--path`.
+The file name is the architecture name prepended to `_model.pt`.
+An example is `./save/-/save/FlatMLP_model.pt`.  
+The model save path can also be set manually with the CLI argument `--model_save_path`.
+Important is that the specified architecture match the saved model.
+
+Optional CLI arguments are:  
+`--k`: This is the number of times the simulation runs from the initial state, default is 10.  
+`--verbose`: If set the final state of each simulation run will be printed.
+
+The script has two actions:  
+
+>`STEP_TO`: used for reaching a target distribution from some initial state.  
+Arguments are:  
+`--tgt`: Target distribution specified by a space seperated list, i.e. `1 2 3`.  
+`--limit`: Maximal number of steps the model should take.
+
+>`STEP_THROUGH`: used for stepping N times with the model.  
+Argument is:  
+`--until`: Number of steps to take.
+
+After the model ran, the simulation is run from the initial state `k` times.
+Mean and standard deviation of all final states are printed.
