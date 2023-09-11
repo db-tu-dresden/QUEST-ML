@@ -7,8 +7,7 @@ from timing import log_runtime
 
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
-                                         'a graph_description.note describing the process graph lie.',
-                    default='./save/<>')
+                                         'a graph_description.note describing the process graph lie.')
 
 
 @log_runtime
