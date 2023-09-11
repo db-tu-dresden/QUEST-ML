@@ -1,5 +1,6 @@
 import argparse
 import os
+from datetime import datetime
 
 import torch
 
@@ -31,6 +32,7 @@ def validate_state(state, steps, sys_config, ml_config, k=1):
 
     for i in range(k):
         env = Environment()
+        sys_config['randomSeed'] = int(''.join(str(el) for el in datetime.now().timestamp().as_integer_ratio()))
         system = System(sys_config, notation, env=env)
         system.set_state(state)
         system.run(steps)
