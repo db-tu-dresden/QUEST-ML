@@ -35,10 +35,11 @@ class Recommender:
         state = state.unsqueeze(0)      # add batch dim
         step = 0
 
-        while not self.contains_tgt(state, target_dist) and step < limit:
-            state[0, 0] += self.arrival_process.step()
-            state = self.model(state)
-            step += 1
+        with torch.no_grad():
+            while not self.contains_tgt(state, target_dist) and step < limit:
+                state[0, 0] += self.arrival_process.step()
+                state = self.model(state)
+                step += 1
 
         state = state if self.contains_tgt(state, target_dist) else None
 
@@ -48,8 +49,9 @@ class Recommender:
         state = initial_state
         state = state.unsqueeze(0)      # add batch dim
 
-        for _ in range(steps):
-            state = self.model(state)
+        with torch.no_grad():
+            for _ in range(steps):
+                state = self.model(state)
 
         return steps, state
 
