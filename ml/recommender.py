@@ -64,6 +64,8 @@ class Recommender:
         else:
             print(f'Target distribution was NOT contained in the state after {steps} steps.')
 
+        return steps, state
+
     def predict_state(self):
         steps, state = self.step_through(self.initial_state, self.steps)
 
@@ -72,9 +74,11 @@ class Recommender:
               f'to final state:'
               f'\n{state}')
 
+        return steps, state
+
     def run(self, action):
         if action == 'STEP_TO':
-            self.predict_target()
+            return self.predict_target()
 
         if action == 'STEP_THROUGH':
-            self.predict_state()
+            return self.predict_state()
