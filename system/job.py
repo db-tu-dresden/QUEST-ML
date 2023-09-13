@@ -33,6 +33,10 @@ class JobTypeCollection:
         job_type = rng.choice(list(self.types), p=[job_type.arrival_prob for job_type in self.types])
         return Job(job_id, job_type, env=self.env)
 
+    def get_job_by_type_str(self, job_id: int, job_type_str: str):
+        job_type = next(job_type for job_type in self.types if job_type.name == job_type_str)
+        return Job(job_id, job_type, env=self.env)
+
     @classmethod
     def from_config(cls, config: Config, env: Environment):
         types = set(JobType(job['name'], job['arrivalProbability'], job['failureRate'], env=env)

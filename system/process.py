@@ -3,7 +3,7 @@ from __future__ import annotations
 import yaml
 
 from system.environment import Environment
-from system.job import Job, JobTypeCollection, JobType
+from system.job import Job, JobTypeCollection
 from system.queue import Queue
 from system.random import RandomContainer
 
@@ -88,7 +88,7 @@ class ArrivalProcess(Process):
         if job_arrival is None:
             job = self.job_types.get_rand_job(self.last_job_id, self.rng)
         else:
-            job = Job(self.last_job_id, JobType(job_arrival['type'], 0, 0, self.env), self.env)
+            job = self.job_types.get_job_by_type_str(self.last_job_id, job_arrival['type'])
 
         self.job_dist[job.type.name] += 1
 
