@@ -26,7 +26,7 @@ def add_subparsers(parser):
                                      help='Number of steps to take from initial state')
 
 
-def validate_state(state, steps, sys_config, ml_config, k=1, verbose=False):
+def simulate_from_state(state, steps, sys_config, ml_config, k=1, verbose=False):
     with open(os.path.join(ml_config['base_path'], 'graph_description.note')) as f:
         text = f.read()
     notation = Notation.parse(text)
@@ -86,7 +86,7 @@ def run():
     state = state.squeeze().round().int().numpy()
     initial_state = initial_state.round().int().numpy()
 
-    validate_state(initial_state, steps, sys_config, ml_config, args.k, args.verbose)
+    simulate_from_state(initial_state, steps, sys_config, ml_config, args.k, args.verbose)
 
 
 if __name__ == '__main__':
