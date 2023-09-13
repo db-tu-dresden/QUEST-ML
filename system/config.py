@@ -1,7 +1,7 @@
 import logging
 
 import yaml
-from schema import Schema, And, Use, SchemaError
+from schema import Schema, And, Use, SchemaError, Or, Optional
 
 
 def validate_yaml(data: dict, schema: Schema):
@@ -33,6 +33,7 @@ class Config:
             'arrivalProbability': And(Use(float), lambda x: 0 <= x <= 1),
             'failureRate': And(Use(float), lambda x: 0 <= x <= 1)
         }]),
+        Optional('jobArrivalPath', default=None): Or(None, Use(str)),
         'arrivalProcess': {
             'beta': And(Use(float), lambda x: x > 0),
         },

@@ -65,7 +65,8 @@ class System:
         for i, (node, props) in enumerate(nodes):
             queue = Queue(props['data'], env=self.env)
             if i == n - 1:
-                process = ArrivalProcess(-1, self.job_types, rnd=self.rand_containers[node], env=self.env)
+                process = ArrivalProcess(-1, self.job_types, rnd=self.rand_containers[node], env=self.env,
+                                         job_arrival_path=self.config['jobArrivalPath'])
             else:
                 process = Process(node, queue=queue, rnd=self.rand_containers[node], env=self.env)
             self.processes[node] = process

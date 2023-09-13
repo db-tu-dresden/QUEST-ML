@@ -62,6 +62,7 @@ def run():
     parser.add_argument('--k', '-k', metavar='N', type=int, default=1, help='K for k-fold validation')
     parser.add_argument('--verbose', '-v', default=False, action=argparse.BooleanOptionalAction,
                         help='If set individual final states of the simulation are printed')
+    parser.add_argument('--job_arrival_path', type=str, help='Path to yaml file containing job arrivals')
 
     args = parser.parse_args(post_arch_arg_add_fn=add_subparsers)
 
@@ -72,6 +73,7 @@ def run():
     model.load(ml_config)
 
     sys_config = SysConfig(os.path.join(ml_config['base_path'], 'config.yaml'))
+    sys_config['jobArrivalPath'] = args.job_arrival_path or sys_config['jobArrivalPath']
 
     initial_state = torch.zeros(len(sys_config['processes']) + 1, len(sys_config['jobs']),
                                 requires_grad=False)

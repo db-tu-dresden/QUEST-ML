@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import yaml
+
 from system.environment import Environment
-from system.job import Job, JobTypeCollection
+from system.job import Job, JobTypeCollection, JobType
 from system.queue import Queue
 from system.random import RandomContainer
 
@@ -60,17 +62,33 @@ class Process:
 
 
 class ArrivalProcess(Process):
-    def __init__(self, id: int, job_types: JobTypeCollection, env: Environment, rnd: RandomContainer):
+    def __init__(self, id: int, job_types: JobTypeCollection, env: Environment, rnd: RandomContainer,
+                 job_arrival_path: str = None):
         super().__init__(id, env, rnd)
         self.job_types = job_types
         self.last_job_id = -1
 
+        self.job_arrivals = None
+        if job_arrival_path is not None:
+            with open(job_arrival_path) as f:
+                self.job_arrivals = yaml.full_load(f)
+
     def process(self):
-        t = self.rng.exponential(scale=self.beta)
+        job_arrival = None
+        if self.job_arrivals is not None:
+            try:
+                job_arrival = self.job_arrivals.pop(0)
+            except IndexError:
+                yield self.env.timeout(1)
+                return
+        t = self.rng.exponential(scale=self.beta) if job_arrival is None else job_arrival['time'] - self.env.now
         yield self.env.timeout(t)
 
         self.last_job_id += 1
-        job = self.job_types.get_rand_job(self.last_job_id, self.rng)
+        if job_arrival is None:
+            job = self.job_types.get_rand_job(self.last_job_id, self.rng)
+        else:
+            job = Job(self.last_job_id, JobType(job_arrival['type'], 0, 0, self.env), self.env)
 
         self.job_dist[job.type.name] += 1
 
