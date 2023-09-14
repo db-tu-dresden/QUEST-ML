@@ -84,12 +84,12 @@ Optional CLI arguments are:
 
 The script has two actions:  
 
->`STEP_TO`: used for reaching a target distribution from some initial state.  
+`STEP_TO`: used for reaching a target distribution from some initial state.  
 Arguments are:  
 `--tgt`: Target distribution specified by a space seperated list, i.e. `1 2 3`.  
 `--limit`: Maximal number of steps the model should take.
 
->`STEP_THROUGH`: used for stepping N times with the model.  
+`STEP_THROUGH`: used for stepping N times with the model.  
 Argument is:  
 `--until`: Number of steps to take.
 
