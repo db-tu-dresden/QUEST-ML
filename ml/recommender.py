@@ -15,7 +15,8 @@ class MockArrivalProcess:
 
 class Recommender:
     def __init__(self, ml_config: Config, sys_config, model: Model, target_dist: torch.Tensor,
-                 initial_state: torch.Tensor, limit: int, steps: int):
+                 initial_state: torch.Tensor, limit: int, steps: int, k: int, mutate_initial_state: bool,
+                 mutation_low: int, mutation_high: int):
         self.ml_config = ml_config
         self.sys_config = sys_config
         self.model = model.eval()
@@ -23,6 +24,10 @@ class Recommender:
         self.initial_state = initial_state
         self.limit = limit
         self.steps = steps
+        self.k = k
+        self.mutate_initial_state = mutate_initial_state
+        self.mutation_low = mutation_low
+        self.mutation_high = mutation_high
 
         self.arrival_process = MockArrivalProcess(self.sys_config)
 
@@ -55,8 +60,12 @@ class Recommender:
 
         return steps, state
 
-    def predict_target(self):
-        steps, state = self.step_to_target(self.initial_state, self.target_dist, self.limit)
+    def predict_target(self, initial_state: torch.Tensor = None, target_dist: torch.Tensor = None, limit: int = None):
+        initial_state = initial_state or self.initial_state
+        target_dist = target_dist or self.target_dist
+        limit = limit or self.limit
+
+        steps, state = self.step_to_target(initial_state, target_dist, limit)
 
         if state is not None:
             print(f'Target distribution reached after {steps} steps.')
@@ -66,8 +75,11 @@ class Recommender:
 
         return steps, state
 
-    def predict_state(self):
-        steps, state = self.step_through(self.initial_state, self.steps)
+    def predict_state(self, initial_state: torch.Tensor = None, steps: int = None):
+        initial_state = initial_state if initial_state is not None else self.initial_state
+        steps = steps if steps is not None else self.steps
+
+        steps, state = self.step_through(initial_state, steps)
 
         print(f'Did {steps} steps from initial state:\n'
               f'{self.initial_state}\n'
@@ -76,9 +88,27 @@ class Recommender:
 
         return steps, state
 
+    def mutate(self, state: torch.Tensor):
+        shape = state.shape
+        mutation = torch.distributions.Uniform(self.mutation_low, self.mutation_high).sample(shape).round()
+        return state + mutation
+
     def run(self, action):
+        predictions = []
+        initial_state = self.initial_state
+
         if action == 'STEP_TO':
-            return self.predict_target()
+            for _ in range(self.k):
+                predictions.append(self.predict_target(initial_state=initial_state))
+                if self.mutate_initial_state:
+                    initial_state = self.mutate(self.initial_state)
+                    initial_state[initial_state < 0] = 0
 
         if action == 'STEP_THROUGH':
-            return self.predict_state()
+            for _ in range(self.k):
+                predictions.append(self.predict_state(initial_state=initial_state))
+                if self.mutate_initial_state:
+                    initial_state = self.mutate(self.initial_state)
+                    initial_state[initial_state < 0] = 0
+
+        return predictions
