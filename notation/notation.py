@@ -26,7 +26,7 @@ class Parseable:
     def _force_match(cls, string: str):
         match = re.match(cls.PATTERN, string)
         if not match:
-            raise cls.Exception(f'Given string can not be parsed as Reference element. String is: {string}')
+            raise cls.Exception(f'Given string can not be parsed as {cls.__name__}. String is: {string}')
         return match
 
     @classmethod
@@ -280,7 +280,7 @@ class Sequence(Parseable):
                     break
             if not did_match:
                 raise cls.Exception(
-                    f'Given string can not be parsed as ElementSequenceException. String is: {string}')
+                    f'Given string can not be parsed. String is: {string}')
 
         return cls(original_string, first)
 
