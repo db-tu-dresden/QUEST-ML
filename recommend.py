@@ -4,6 +4,7 @@ from datetime import datetime
 
 import numpy as np
 import torch
+from torcheval.metrics.functional import mean_squared_error
 
 from ml import Config as MLConfig, Parser
 from ml.models import build_model
@@ -52,6 +53,31 @@ def simulate_from_state(state, steps, sys_config, ml_config, k=1, verbose=False)
           f'{mean}\n')
     print(f'Standard Deviation is: \n'
           f'{std}\n')
+
+    return list(zip([steps] * k, [torch.tensor(state) for state in final_states]))
+
+
+def find_closest(predictions: [torch.Tensor], simulations: [torch.Tensor]):
+    mean = torch.stack(simulations).mean(axis=0, dtype=torch.float)
+    mses = torch.stack([mean_squared_error(mean, pred.squeeze()) for pred in predictions])
+
+    min_index = mses.argmin()
+
+    print(f'Prediction with lowest MSE to simulation mean is:\n'
+          f'{predictions[min_index]}\n'
+          f'MSE is {mses[min_index]}\n')
+
+    found_identical = False
+    for pred in predictions:
+        pred = pred.squeeze()
+
+        for sim in simulations:
+            if pred.equal(sim):
+                print(f'Prediction {pred} is equal to simulation result {sim}!')
+                found_identical = True
+
+    if not found_identical:
+        print('No identical simulations to predictions found!')
 
 
 def run():
@@ -107,7 +133,8 @@ def run():
     steps = max(steps for steps, state in predictions)
     initial_state = initial_state.round().int().numpy()
 
-    simulate_from_state(initial_state, steps, sys_config, ml_config, args.k_simulation, args.verbose)
+    simulations = simulate_from_state(initial_state, steps, sys_config, ml_config, args.k_simulation, args.verbose)
+    find_closest([state for _, state in predictions], [state for _, state in simulations])
 
 
 if __name__ == '__main__':
