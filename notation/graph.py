@@ -43,12 +43,12 @@ class Graph:
     def remove_edges_from(self, ebunch):
         return self.graph.remove_edges_from(ebunch)
 
-    def join_node(self, root: int = None, data=None):
+    def join_node(self, root: int = None, **attr):
         if root is None:
             root = self.last_node_id
 
         id = self.last_node_id + 1 if self.last_node_id is not None else 0
-        self.add_node(id, data=data)
+        self.add_node(id, **attr)
 
         if self.root_id is None:
             self.root_id = id
@@ -56,25 +56,25 @@ class Graph:
         self.last_node_id = id
 
         if root is not None:
-            self.add_edge(root, id, data=data)
+            self.add_edge(root, id, **attr)
 
         return self.last_node_id
 
-    def join_nodes(self, n: int, root: int = None, data=None):
+    def join_nodes(self, n: int, root: int = None, **attr):
         if root is None:
             root = self.last_node_id
 
         base = self.last_node_id + 1 if self.last_node_id is not None else 0
         ids = list(range(base, base + n))
 
-        self.add_nodes_from(ids, data=data)
+        self.add_nodes_from(ids, **attr)
 
         if self.root_id is None:
             self.root_id = ids[0]
 
         if root is not None:
             ids = [root] + ids
-        self.add_edges_from([(ids[idx], ids[idx + 1]) for idx in range(len(ids) - 1)], data=data)
+        self.add_edges_from([(ids[idx], ids[idx + 1]) for idx in range(len(ids) - 1)], **attr)
 
         self.last_node_id = ids[-1]
 
