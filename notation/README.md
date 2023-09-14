@@ -59,7 +59,9 @@ They are a notation element and are used as reference for a node,
 this enables multiple paths to end at one specific node.
 
 ### Node Labels
-Nodes can be labeled by using brackets with the node label inside, e.g. (NODE_LABEL).
+Nodes can be labeled by using brackets with the node label inside, e.g. ```(NODE_LABEL)```.  
+Note: Anchors are labeled after the anchor notation, e.g. ```!1(First Anchor)```. 
+If one anchor has multiple labels the last label is used.
 
 ## Examples
 
