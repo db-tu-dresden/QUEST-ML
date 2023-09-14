@@ -58,6 +58,9 @@ Anchors are denoted by ```!N``` where ```N``` is some number.
 They are a notation element and are used as reference for a node, 
 this enables multiple paths to end at one specific node.
 
+### Node Labels
+Nodes can be labeled by using brackets with the node label inside, e.g. (NODE_LABEL).
+
 ## Examples
 
 ### Example 1
@@ -100,3 +103,18 @@ $3: -!1
 Plot:
 
 ![example plot 3](example_plot_3.png)
+
+### Example 4
+Notation:
+```
+[A, B, C]
+(Erster)<[($1: [A, B]), ($2: [C])]>(Achter)
+$1: (Zweiter)<[($3: [A]), ($4: [B])]>(Fünfter)
+$2: (Sechster)-(Siebenter)
+$3: (Dritter)
+$4: (Vierter)
+```
+
+Plot:
+
+![example plot 4](example_plot_4.png)
