@@ -244,9 +244,26 @@ class Anchor(Parseable):
         return [self]
 
 
+class NodeName(Parseable):
+    PATTERN = r'\(([^)]+)\)'
+
+    @classmethod
+    def parse(cls, string: str, notation: Notation):
+        match = cls._force_match(string)
+        name = match.group(1)
+        return cls(name)
+
+    def add_to_graph(self, graph: Graph, root: int):
+        self.node_id = root
+        graph.nodes[root]['name'] = self.value
+        if self.next:
+            return self.next.add_to_graph(graph, self.node_id)
+        return [self]
+
+
 class Sequence(Parseable):
     PATTERN = r'.*'
-    elements = [Line, Fork, Reference, Anchor]
+    elements = [NodeName, Line, Fork, Reference, Anchor]
 
     class Exception(Exception):
         pass
