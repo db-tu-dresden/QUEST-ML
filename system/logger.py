@@ -71,7 +71,7 @@ class Logger:
 
     def plot(self, path: str = None, show: bool = True):
         ncols = 4
-        nrows = math.ceil((len(self.da['process']) - 1) / ncols)
+        nrows = math.ceil((len(self.da['process'])) / ncols)
         fig, axs = plt.subplots(figsize=(16, 9), ncols=ncols, nrows=nrows)
 
         for process, ax in zip(self.da['process'].data, axs.ravel()):
