@@ -72,7 +72,7 @@ class Logger:
     def plot(self, path: str = None, show: bool = True):
         ncols = 4
         nrows = math.ceil((len(self.da['process'])) / ncols)
-        fig, axs = plt.subplots(figsize=(16, 9), ncols=ncols, nrows=nrows)
+        fig, axs = plt.subplots(figsize=(16, 9), ncols=ncols, nrows=nrows, layout='constrained')
 
         for process, ax in zip(self.da['process'].data, axs.ravel()):
             ax.plot(self.da['step'], self.da.sel(process=process).sum('job'))
