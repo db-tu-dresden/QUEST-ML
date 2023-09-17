@@ -28,7 +28,7 @@ class Logger:
     def log_processes(self):
         job_dists = {}
         for i, process in self.system.processes.items():
-            job_dists[process.id] = dict(process.job_dist)
+            job_dists[process.name] = dict(process.job_dist)
         self.log[round(self.system.env.now, 1)] = job_dists
 
     def process(self):
@@ -50,7 +50,7 @@ class Logger:
     def da(self):
         steps = list(self.log.keys())
         processes = list(self.log[0].keys())
-        jobs = list(self.log[0][-1].keys())
+        jobs = list(self.log[0][processes[0]].keys())
 
         npa = np.array([[list(p.values()) for p in t.values()] for t in self.log.values()])
         self._da = xr.DataArray(data=npa, dims=['step', 'process', 'job'],

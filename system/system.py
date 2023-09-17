@@ -66,9 +66,10 @@ class System:
             queue = Queue(props['data'], env=self.env)
             if i == n - 1:
                 process = ArrivalProcess(-1, self.job_types, rnd=self.rand_containers[node], env=self.env,
-                                         job_arrival_path=self.config['jobArrivalPath'])
+                                         job_arrival_path=self.config['jobArrivalPath'], name=props.get('name'))
             else:
-                process = Process(node, queue=queue, rnd=self.rand_containers[node], env=self.env)
+                process = Process(node, queue=queue, rnd=self.rand_containers[node], env=self.env,
+                                  name=props.get('name'))
             self.processes[node] = process
 
             for _, out, props in self.notation.graph.edges(node, data=True):
@@ -78,7 +79,8 @@ class System:
         last_process_id, _ = sorted(self.processes.items(), reverse=True)[0]
 
         queue = Queue(self.data, env=self.env)
-        exit_process = ExitProcess(last_process_id + 1, queue=queue, rnd=self.rand_containers[-1], env=self.env)
+        exit_process = ExitProcess(last_process_id + 1, queue=queue, rnd=self.rand_containers[-1], env=self.env,
+                                   name='Exit Process')
         self.processes[last_process_id + 1] = exit_process
 
     def link_exit_process(self):
