@@ -39,7 +39,7 @@ class Config:
         },
         'processes': [{
             'mean': Use(float),
-            'std': And(Use(float), lambda x: x > 0),
+            'std': And(Use(float), lambda x: x >= 0),
         }]
     })
 
