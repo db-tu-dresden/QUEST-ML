@@ -24,7 +24,7 @@ lambda: 1.0
 
 # learning rate scheduler
 lr_scheduler_factor: 0.1
-lr_scheduler_patience: 10
+lr_scheduler_patience: 3
 
 # training configuration
 stepwise: False

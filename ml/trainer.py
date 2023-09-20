@@ -261,16 +261,17 @@ class Trainer:
     @staticmethod
     def get_datasets_from_path(path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
                                only_process: bool = False, enhances: int = 0, base_lambda: float = 1.0,
-                               lambda_variability: float = 0.1, pickle_file_name: str = 'da.pkl'):
+                               lambda_variability: float = 0.1, accumulation_window: int = 1,
+                               pickle_file_name: str = 'da.pkl'):
         return ProcessDataset.from_path(os.path.join(path, 'train', pickle_file_name),
                                         scaling_factor, reduction_factor, offset, only_process, enhances,
-                                        base_lambda, lambda_variability), \
+                                        base_lambda, lambda_variability, accumulation_window), \
             ProcessDataset.from_path(os.path.join(path, 'valid', pickle_file_name),
                                      scaling_factor, reduction_factor, offset, only_process, enhances,
-                                     base_lambda, lambda_variability), \
+                                     base_lambda, lambda_variability, accumulation_window), \
             ProcessDataset.from_path(os.path.join(path, 'test', pickle_file_name),
                                      scaling_factor, reduction_factor, offset, only_process, enhances,
-                                     base_lambda, lambda_variability)
+                                     base_lambda, lambda_variability, accumulation_window)
 
     @staticmethod
     def load_datasets(path: str):
@@ -313,6 +314,7 @@ class Trainer:
                                                                            config['enhances'],
                                                                            config['enhance_base_lambda'],
                                                                            config['enhance_lambda_variability'],
+                                                                           config['accumulation_window'],
                                                                            config['pickle_file_name'])
 
         if config['gpu']:

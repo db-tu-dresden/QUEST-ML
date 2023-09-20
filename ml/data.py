@@ -1,7 +1,6 @@
 import pickle
 import random
 
-import numpy as np
 import torch
 import xarray as xr
 from torch.utils.data import Dataset
@@ -10,12 +9,13 @@ from torch.utils.data import Dataset
 class ProcessDataset(Dataset):
     def __init__(self, da: xr.DataArray, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
                  only_process: bool = False, enhances: int = 0, base_lambda: float = 1.0,
-                 lambda_variability: float = 0.1):
+                 lambda_variability: float = 0.1, accumulation_window: int = 1):
         self.da = da
         self.scaling_factor = scaling_factor
         self.reduction_factor = reduction_factor
         self.offset = offset
         self.only_process = only_process
+        self.accumulation_window = accumulation_window
 
         self.scale(self.scaling_factor)
         self.reduce(self.reduction_factor)
@@ -26,7 +26,7 @@ class ProcessDataset(Dataset):
             source_da = self.to_processes(source_da)
             target_da = self.to_processes(target_da)
         else:
-            source_da, target_da = self.set_diff(source_da, target_da)
+            source_da, target_da = self.set_accumulation_window(source_da, target_da, self.accumulation_window)
 
         self.das = [{'source': source_da, 'target': target_da}]
         self.enhance(enhances, base_lambda, lambda_variability)
@@ -47,21 +47,36 @@ class ProcessDataset(Dataset):
             return target_da, source_da
         return source_da, target_da
 
-    def set_diff(self, source_da, target_da):
-        for i in range(len(source_da)):
-            diff = target_da[i] - source_da[i]
+    def set_accumulation_window(self, source_da, target_da, window_size):
+        assert window_size >= 0
 
-            source_da[i][0] = diff[0]
-            source_da[i][-1] = np.zeros(source_da[i][-1].shape)
+        if window_size == 0:
+            return source_da, target_da
 
-            target_da[i][0] = np.zeros(target_da[i][0].shape)
-            target_da[i][-1] = diff[-1]
+        if self.offset < 0:
+            source_da, target_da = target_da, source_da
 
-        negative_target_mask = target_da.where(target_da < 0, 0).drop_indexes(['step', 'process', 'job'])
-        negative_source_mask = source_da.where(source_da < 0, 0).drop_indexes(['step', 'process', 'job'])
-        source_da = source_da - negative_target_mask - negative_source_mask
-        target_da = target_da - negative_target_mask - negative_source_mask
+        reducer = None
+        curr_elem = None
+        prev_elem = None
 
+        for i, (source_elem, target_elem) in enumerate(zip(source_da, target_da)):
+            prev_elem = curr_elem
+            curr_elem = source_elem.copy()
+
+            if i % window_size == 0:
+                reducer = source_elem.copy()
+
+            if prev_elem is not None:
+                source_elem[0] -= prev_elem[0]
+            source_elem[-1] -= reducer[-1]
+
+            if prev_elem is not None:
+                target_elem[0] -= prev_elem[0]
+            target_elem[-1] -= reducer[-1]
+
+        if self.offset < 0:
+            return target_da, source_da
         return source_da, target_da
 
     def enhance(self, n: int, base_lambda: float, lambda_variability: float):
@@ -96,11 +111,11 @@ class ProcessDataset(Dataset):
     @classmethod
     def from_path(cls, path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
                   only_process: bool = False, enhances: int = 0, base_lambda: float = 1.0,
-                  lambda_variability: float = 0.1):
+                  lambda_variability: float = 0.1, accumulation_window: int = 1):
         with open(path, 'rb') as f:
             da = pickle.load(f)
         return cls(da, scaling_factor, reduction_factor, offset, only_process, enhances,
-                   base_lambda, lambda_variability)
+                   base_lambda, lambda_variability, accumulation_window)
 
     def scale(self, scaling_factor: int):
         assert 1 <= scaling_factor

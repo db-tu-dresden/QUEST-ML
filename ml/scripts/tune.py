@@ -102,6 +102,7 @@ def test(config: Config):
                                                                        config['enhances'],
                                                                        config['enhance_base_lambda'],
                                                                        config['enhance_lambda_variability'],
+                                                                       config['accumulation_window'],
                                                                        config['pickle_file_name'])
 
     # move model to device if on gpu

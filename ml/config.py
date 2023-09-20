@@ -84,6 +84,7 @@ class Config:
         'jobs': {'type': int, 'lambda': true},
         'scaling_factor': {'type': int, 'lambda': greater_zero},
         'reduction_factor': {'type': float, 'lambda': between_zero_one},
+        'accumulation_window': {'type': int, 'lambda': greater_equal_zero},
         'offset': {'type': int, 'lambda': greater_zero},
         'only_process': {'type': bool, 'lambda': true},
         'enhances': {'type': int, 'lambda': greater_equal_zero},
