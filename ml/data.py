@@ -112,8 +112,15 @@ class ProcessDataset(Dataset):
 
     @classmethod
     def from_config(cls, path: str, config: Config):
+        if config['verbose']:
+            print(f'Load data array from path: {path}')
+
         with open(path, 'rb') as f:
             da = pickle.load(f)
+
+        if config['verbose']:
+            print(f'Process data array...')
+
         return cls(da,
                    config['scaling_factor'],
                    config['reduction_factor'],
