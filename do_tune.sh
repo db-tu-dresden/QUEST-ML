@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 
+trap '
+  trap - INT # restore default INT handler
+  kill -s INT "$$"
+' INT
+
 GPUS=0.2
 DATA_PATH=./save/-/
 ARCH=flat_mlp
