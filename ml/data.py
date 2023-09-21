@@ -5,6 +5,8 @@ import torch
 import xarray as xr
 from torch.utils.data import Dataset
 
+from ml import Config
+
 
 class ProcessDataset(Dataset):
     def __init__(self, da: xr.DataArray, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
@@ -109,13 +111,18 @@ class ProcessDataset(Dataset):
             self.das.append({'source': _s, 'target': _t})
 
     @classmethod
-    def from_path(cls, path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
-                  only_process: bool = False, enhances: int = 0, base_lambda: float = 1.0,
-                  lambda_variability: float = 0.1, accumulation_window: int = 1):
+    def from_config(cls, path: str, config: Config):
         with open(path, 'rb') as f:
             da = pickle.load(f)
-        return cls(da, scaling_factor, reduction_factor, offset, only_process, enhances,
-                   base_lambda, lambda_variability, accumulation_window)
+        return cls(da,
+                   config['scaling_factor'],
+                   config['reduction_factor'],
+                   config['offset'],
+                   config['only_process'],
+                   config['enhances'],
+                   config['enhance_base_lambda'],
+                   config['enhance_lambda_variability'],
+                   config['accumulation_window'])
 
     def scale(self, scaling_factor: int):
         assert 1 <= scaling_factor

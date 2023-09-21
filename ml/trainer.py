@@ -259,19 +259,13 @@ class Trainer:
         ddp.cleanup()
 
     @staticmethod
-    def get_datasets_from_path(path: str, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
-                               only_process: bool = False, enhances: int = 0, base_lambda: float = 1.0,
-                               lambda_variability: float = 0.1, accumulation_window: int = 1,
-                               pickle_file_name: str = 'da.pkl'):
-        return ProcessDataset.from_path(os.path.join(path, 'train', pickle_file_name),
-                                        scaling_factor, reduction_factor, offset, only_process, enhances,
-                                        base_lambda, lambda_variability, accumulation_window), \
-            ProcessDataset.from_path(os.path.join(path, 'valid', pickle_file_name),
-                                     scaling_factor, reduction_factor, offset, only_process, enhances,
-                                     base_lambda, lambda_variability, accumulation_window), \
-            ProcessDataset.from_path(os.path.join(path, 'test', pickle_file_name),
-                                     scaling_factor, reduction_factor, offset, only_process, enhances,
-                                     base_lambda, lambda_variability, accumulation_window)
+    def get_datasets(config: Config):
+        return ProcessDataset.from_config(
+                os.path.join(config['data_path'], 'train', config['pickle_file_name']), config), \
+            ProcessDataset.from_config(
+                    os.path.join(config['data_path'], 'valid', config['pickle_file_name']), config), \
+            ProcessDataset.from_config(
+                    os.path.join(config['data_path'], 'test', config['pickle_file_name']), config)
 
     @staticmethod
     def load_datasets(path: str):
@@ -306,16 +300,7 @@ class Trainer:
             train_data, valid_data, test_data = cls.load_datasets(config['ds_load_path'])
 
         if not train_data and not valid_data and not test_data:
-            train_data, valid_data, test_data = cls.get_datasets_from_path(config['data_path'],
-                                                                           config['scaling_factor'],
-                                                                           config['reduction_factor'],
-                                                                           config['offset'],
-                                                                           config['only_process'],
-                                                                           config['enhances'],
-                                                                           config['enhance_base_lambda'],
-                                                                           config['enhance_lambda_variability'],
-                                                                           config['accumulation_window'],
-                                                                           config['pickle_file_name'])
+            train_data, valid_data, test_data = cls.get_datasets(config)
 
         if config['gpu']:
             ddp.run(cls._run, config, model, train_data, valid_data, test_data)

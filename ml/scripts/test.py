@@ -17,15 +17,6 @@ def run():
 
     model = build_model(config)
 
-    train_data, valid_data, test_data = Trainer.get_datasets_from_path(config['data_path'],
-                                                                       config['scaling_factor'],
-                                                                       config['reduction_factor'],
-                                                                       config['offset'],
-                                                                       config['only_process'],
-                                                                       config['enhances'],
-                                                                       config['enhance_base_lambda'],
-                                                                       config['enhance_lambda_variability'],
-                                                                       config['accumulation_window'],
-                                                                       config['pickle_file_name'])
+    train_data, valid_data, test_data = Trainer.get_datasets(config)
     trainer = Trainer(config, model, train_data, valid_data, test_data)
     trainer.test()
