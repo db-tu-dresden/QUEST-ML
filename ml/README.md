@@ -105,3 +105,46 @@ def custom_model_2_layer_30_hidden(cfg: Config):
     pass
 ```
 In this function set the needed parameters to the config.
+
+## Data
+The data used for the datasets are data arrays for training, validation and testing, 
+previously created by the simulation with the script `create_data.py`.
+
+The data array is preprocessed before being used for training, validation or testing.
+
+The parameters for data preprocessing are:  
+
+`scaling_factor`:  integer > 0; specifies the granularity of the dataset. It is always relative to the logging granularity 
+used in the data creation, with the scaling factor `N` specifying the usage of the `N`-th element. 
+E.g. `N=1` every element is used; `N=10` every 10-th element is used.  
+
+`reduction_factor`:  float $`\in [0, 1]`$; specifies how much of the data array should be used for the dataset. 
+E.g. `reduction_factor=0.6`, the first 60% of the data array are used for the dataset.
+
+`offset`:  integer > 0; specifies the horizon i.e. the gap between source and target. With `offset=0` the system behaves as an auto encoder,
+with `offset=1` the system predicts the next step, with `offset=3` the system predicts the third step.
+This argument can be used in combination with the training argument `stepwise`, 
+where the system predicts intermediate steps and uses these for further prediction.
+E.g. if `offset=3` and `stepwise` is set, there will be two intermediate steps.
+
+`only_process`:  specifies that only processes should be learned. 
+If not set one entry in the dataset represents one system state.
+
+`accumulation_window`:  integer >= 0; specifies a window over the dataset where jobs are able to accumulate in queues.
+If `accumulation_window=1` only singular job transitions between queues are present in the dataset.
+If the accumulation window is too large the queues, especially the exit queue, will accumulate large quantities of jobs
+which are difficult for the model to learn.
+If `accumulation_window=0` this process will be skipped and the data will be passed on as is.
+
+`enhances`:  integer >= 0; specifies how many times the whole preprocessed dataset should be duplicated and enhanced.
+If set the original preprocessed dataset will always be present but other adaptations will be added.
+Enhanced means that to the arrival queue and the exit queue a random but fixed job distribution will be added.
+The exponential distribution is used for creating the job distributions, they are rounded to integers.
+
+`enhance_base_lambda`:  float > 0.0; specifies the base lambda (mean) used for the exponential distribution.
+
+`enhance_lambda_variability`:  float; specifies the range $`[-lambda_variability, lambda_variability]`$ 
+of a uniform distribution added to the `base_lambda`. Used for varying the base lambda used for the 
+exponential distribution in the enhancements.
+
+The processing steps associated with the parameters are applied in the order of specification of parameters.
