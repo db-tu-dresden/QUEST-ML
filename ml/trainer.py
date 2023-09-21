@@ -149,12 +149,9 @@ class Trainer:
                     steps = abs(self.config['offset']) if self.config['stepwise'] else 1
                     for _ in range(steps):
                         outputs = self.model(_inputs)
-                        if self.config['stepwise_loss']:
-                            batch_loss += self.criterion(outputs, targets)
                         _inputs = outputs
 
-                if not self.config['stepwise_loss']:
-                    batch_loss = self.criterion(outputs, targets)
+                batch_loss = self.criterion(outputs, targets)
                 batch_accuracy = self.get_accuracy(outputs.detach(), targets.detach())
 
                 if mode == Mode.TRAIN:
