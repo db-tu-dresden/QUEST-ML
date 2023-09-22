@@ -8,6 +8,8 @@ from timing import log_runtime
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
 parser.add_argument('-p', '--path', help='Path where a config.yaml describing the system and '
                                          'a graph_description.note describing the process graph lie.')
+parser.add_argument('-u', '--until', metavar='N', type=int, help='Number of steps until which '
+                                                                 'the simulation should run')
 
 
 @log_runtime
@@ -25,7 +27,7 @@ def run(args):
     env = Environment()
 
     system = System(config, notation, env=env)
-    system.run()
+    system.run(args.until)
     system.logger.plot(path=os.path.join(base_path, 'dist.png'))
 
 
