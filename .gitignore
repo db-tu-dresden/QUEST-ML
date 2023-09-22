@@ -5,3 +5,5 @@ save
 wandb
 
 .wandb.sh
+
+_*.txt
