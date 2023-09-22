@@ -13,6 +13,7 @@ TUNE_CONFIG_PATH=./ml/scripts/tune_config.py
 TUNE_RESULTS_PATH=./tune_results.txt
 
 touch $TUNE_RESULTS_PATH
+truncate -s 0  $TUNE_RESULTS_PATH
 
 list=(1 3 5 10 20 30)
 
@@ -44,5 +45,5 @@ TUNE_CONFIG = {
 
   python3 tune.py --path $DATA_PATH --arch $ARCH --load_datasets --gpus $GPUS -s 1 \
   | grep --after-context 2 'Best trial config' \
-  > "$TUNE_RESULTS_PATH"
+  >> "$TUNE_RESULTS_PATH"
 done
