@@ -32,7 +32,7 @@ TUNE_CONFIG = {
 }
 """ | tee $TUNE_CONFIG_PATH | tail -n +4 | tee -a $TUNE_RESULTS_PATH
 
-  python3 tune.py --path $DATA_PATH --arch $ARCH --load_datasets --gpus $GPUS -s 1 2>&1 \
+  python3 tune.py --path $DATA_PATH --arch $ARCH --gpus $GPUS -s 1 2>&1 \
   | grep --after-context 2 'Best trial config' \
   | tee -a "$TUNE_RESULTS_PATH"
 
