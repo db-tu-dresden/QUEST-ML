@@ -39,5 +39,7 @@ TUNE_CONFIG = {
 }
 """
 
-  python3 tune.py --path $DATA_PATH --arch $ARCH --load_datasets --gpus $GPUS -s 1 | grep --after-context 2 'Best trial config'
+  python3 tune.py --path $DATA_PATH --arch $ARCH --load_datasets --gpus $GPUS -s 1 \
+  | grep --after-context 2 'Best trial config' \
+  > "$TUNE_RESULTS_PATH"
 done
