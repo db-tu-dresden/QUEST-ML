@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+trap '
+  trap - INT # restore default INT handler
+  kill -s INT "$$"
+' INT
+
 while getopts ":n:c:" opt; do
   case $opt in
     n) N="$OPTARG"
