@@ -23,14 +23,21 @@ while getopts ":n:c:" opt; do
   esac
 done
 
-
-RESULTS=./_time_results.txt
+RESULTS="./_time_results.txt"
 touch $RESULTS
 truncate -s 0  $RESULTS
 
-echo "Running $N times: $COMMAND" | tee $RESULTS
+graphs=("-" "--" "-3-" "<->" "cplx")
 
-for i in $(seq 1 $N);
+for graph in "${graphs[@]}"
 do
-  { time eval $COMMAND; } 2>&1 | grep real | awk '{print $2}' | tee -a $RESULTS
+
+  echo "Graph ${graph}; Running $N times: ${COMMAND/@/$graph}" | tee $RESULTS
+
+  for i in $(seq 1 $N);
+  do
+    { time eval $COMMAND; } 2>&1 | grep real | awk '{print $2}' | tee -a $RESULTS
+  done
+
+  printf "\n\n\n" | tee -a $RESULTS
 done
