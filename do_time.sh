@@ -19,7 +19,7 @@ while getopts ":n:c:" opt; do
 done
 
 
-RESULTS=./time_results.txt
+RESULTS=./_time_results.txt
 touch $RESULTS
 truncate -s 0  $RESULTS
 

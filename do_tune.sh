@@ -10,7 +10,7 @@ DATA_PATH=./save/-/
 ARCH=flat_mlp
 
 TUNE_CONFIG_PATH=./ml/scripts/tune_config.py
-TUNE_RESULTS_PATH=./tune_results.txt
+TUNE_RESULTS_PATH=./_tune_results.txt
 
 touch $TUNE_RESULTS_PATH
 truncate -s 0  $TUNE_RESULTS_PATH
