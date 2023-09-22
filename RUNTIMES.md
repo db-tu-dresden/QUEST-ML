@@ -67,18 +67,18 @@
 
 ### cplx
 
-| Graph | Run | Time |
-|:-----:|:---:|:----:|
-| cplx  |  1  |      |
-| cplx  |  2  |      |
-| cplx  |  3  |      |
-| cplx  |  4  |      |
-| cplx  |  5  |      |
-| cplx  |  6  |      |
-| cplx  |  7  |      |
-| cplx  |  8  |      |
-| cplx  |  9  |      |
-| cplx  | 10  |      |
+| Graph | Run |   Time   |
+|:-----:|:---:|:--------:|
+| cplx  |  1  | 1m8.812s |
+| cplx  |  2  | 1m9.627s |
+| cplx  |  3  | 1m9.128s |
+| cplx  |  4  | 1m9.530s |
+| cplx  |  5  | 1m9.405s |
+| cplx  |  6  | 1m8.380s |
+| cplx  |  7  | 1m9.723s |
+| cplx  |  8  | 1m9.368s |
+| cplx  |  9  | 1m9.134s |
+| cplx  | 10  | 1m8.782s |
 
 
 ## Data Preprocessing
