@@ -28,11 +28,9 @@ RESULTS=./_time_results.txt
 touch $RESULTS
 truncate -s 0  $RESULTS
 
-#COMMAND=python3 create_data.py --path './save/-/'
+echo "Running $N times: $COMMAND" | tee $RESULTS
 
-printf "%s\n\n" "$COMMAND" | tee $RESULTS
-
-for i in {0..10};
+for i in $(seq 1 $N);
 do
-  { time "$COMMAND"; } 2>&1 | grep real | tee $RESULTS
+  { time eval $COMMAND; } 2>&1 | grep real | awk '{print $2}' | tee -a $RESULTS
 done
