@@ -30,20 +30,11 @@ TUNE_CONFIG = {
     'hidden_layers': tune.sample_from(lambda _: np.random.randint(2, 4)),
     'learning_rate': tune.loguniform(1e-4, 1e-1),
 }
-""" > $TUNE_CONFIG_PATH
+""" | tee $TUNE_CONFIG_PATH | tail -n +4 | tee -a $TUNE_RESULTS_PATH
 
-  echo """
-Running with config:
-
-TUNE_CONFIG = {
-  'accumulation_window': $item,
-  'hidden_size': tune.sample_from(lambda _: 2 ** np.random.randint(2, 9)),
-  'hidden_layers': tune.sample_from(lambda _: np.random.randint(2, 4)),
-  'learning_rate': tune.loguniform(1e-4, 1e-1),
-}
-"""
-
-  python3 tune.py --path $DATA_PATH --arch $ARCH --load_datasets --gpus $GPUS -s 1 \
+  python3 tune.py --path $DATA_PATH --arch $ARCH --load_datasets --gpus $GPUS -s 1 2>&1 \
   | grep --after-context 2 'Best trial config' \
-  >> "$TUNE_RESULTS_PATH"
+  | tee -a "$TUNE_RESULTS_PATH"
+
+  printf "\n\n\n" | tee -a $TUNE_RESULTS_PATH
 done
