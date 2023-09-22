@@ -3,7 +3,7 @@ import os.path
 import torch
 import wandb
 from ray import tune
-from ray.air import session
+from ray.air import session, RunConfig
 from ray.air.checkpoint import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 from torch import nn
@@ -32,6 +32,7 @@ def build_tuner(config: Config, tune_config: dict, num_samples: int = 10, max_nu
             num_samples=num_samples,
             reuse_actors=False,
         ),
+        run_config=RunConfig(verbose=int(config['verbose'])),
         param_space=tune_config,
     )
 
