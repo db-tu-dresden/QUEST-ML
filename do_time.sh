@@ -36,7 +36,7 @@ do
 
   for i in $(seq 1 $N);
   do
-    { time eval $COMMAND; } 2>&1 | grep real | awk '{print $2}' | tee -a $RESULTS
+    { time eval "${COMMAND/@/$graph}"; } 2>&1 | grep real | awk '{print $2}' | tee -a $RESULTS
   done
 
   printf "\n\n\n" | tee -a $RESULTS
