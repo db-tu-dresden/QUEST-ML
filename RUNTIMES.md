@@ -83,6 +83,8 @@
 
 ## Data Preprocessing
 
+python3 train.py --path './save/@/' --arch flat_mlp --accumulation_window 5 --only_preprocessing
+
 ### -
 
 | Graph | Run | Time |
