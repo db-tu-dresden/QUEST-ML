@@ -32,7 +32,7 @@ graphs=("-" "--" "-3-" "<->" "cplx")
 for graph in "${graphs[@]}"
 do
 
-  echo "Graph ${graph}; Running $N times: ${COMMAND/@/$graph}" | tee $RESULTS
+  echo "Graph ${graph}; Running $N times: ${COMMAND/@/$graph}" | tee -a $RESULTS
 
   for i in $(seq 1 $N);
   do
