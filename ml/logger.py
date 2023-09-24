@@ -25,7 +25,7 @@ class Logger:
         self._epoch = 0
         self.metrics = {}
 
-        self.data_table = wandb.Table(columns=['epoch', 'loss', 'accuracy', 'inputs', 'outputs', 'targets']) \
+        self.data_table = wandb.Table(columns=['epoch', 'loss', 'accuracy', 'inputs', 'outputsR0', 'outputsR1', 'targets']) \
             if self.config['wandb'] else None
 
     def epoch(self, epoch: int):
@@ -50,7 +50,8 @@ class Logger:
         n = self.config['wandb_table_elements']
         self.data_table.add_data(self._epoch, loss, accuracy,
                                  np.array2string(inputs[:n].numpy()),
-                                 np.array2string(outputs[:n].numpy()),
+                                 np.array2string(outputs[:n].round().numpy()),
+                                 np.array2string(outputs[:n].round(decimals=1).numpy()),
                                  np.array2string(targets[:n].numpy()))
         wandb.run.log({self.config['wandb_table_name']: copy(self.data_table)})
 
