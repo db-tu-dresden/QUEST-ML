@@ -25,6 +25,10 @@ class System:
         if config_data != notation.data.value:
             raise ValueError(f'Config and notation do not have the same data elements. '
                              f'Got {config_data!r} from config and {notation.data.value!r} from notation.')
+        if len(config['processes']) != len(notation.graph.nodes):
+            raise ValueError(f'Config and notation specify a different number of processes. '
+                             f'Got {len(config["processes"])} processes from config and '
+                             f'{len(notation.graph.nodes)} processes from notation.')
 
         self.config = config
         self.notation = notation
