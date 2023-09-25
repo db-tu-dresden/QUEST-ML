@@ -42,9 +42,12 @@ class EncoderFusionDecoder(Model):
 
         root_parser = getattr(parser, 'root_parser', None)
         if root_parser:
-            add_arch_args(root_parser, 'encoder', 'Encoder model-specific configuration', prefix='encoder_')
-            add_arch_args(root_parser, 'fusion', 'Fusion model-specific configuration', prefix='fusion_')
-            add_arch_args(root_parser, 'decoder', 'Decoder model-specific configuration', prefix='decoder_')
+            add_arch_args(root_parser, 'encoder', 'encoder-specific configuration',
+                          prefix=f'encoder_', default='mlp')
+            add_arch_args(root_parser, 'fusion', 'fusion-specific configuration',
+                          prefix=f'fusion_', default='mlp')
+            add_arch_args(root_parser, 'decoder', 'decoder-specific configuration',
+                          prefix=f'decoder_', default='mlp')
 
         parser.add_argument('--load_encoder', default=False, action=argparse.BooleanOptionalAction,
                             help='Whether to load the encoder from the provided model state dict')
@@ -97,6 +100,8 @@ class EncoderFusionDecoder(Model):
 
 @register_model_architecture('encoder_fusion_decoder', 'encoder_fusion_decoder_mlp')
 def encoder_fusion_decoder(cfg: Config):
+    cfg['input_size'] = cfg['jobs'] if 'jobs' in cfg else 16
+
     cfg['encoder'] = cfg['encoder'] if 'encoder' in cfg else 'mlp'
     cfg['fusion'] = cfg['fusion'] if 'fusion' in cfg else 'mlp'
     cfg['decoder'] = cfg['decoder'] if 'decoder' in cfg else 'mlp'
