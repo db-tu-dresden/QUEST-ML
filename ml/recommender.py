@@ -61,9 +61,9 @@ class Recommender:
         return steps, state
 
     def predict_target(self, initial_state: torch.Tensor = None, target_dist: torch.Tensor = None, limit: int = None):
-        initial_state = initial_state or self.initial_state
-        target_dist = target_dist or self.target_dist
-        limit = limit or self.limit
+        initial_state = initial_state if initial_state is not None else self.initial_state
+        target_dist = target_dist if target_dist is not None else self.target_dist
+        limit = limit if limit is not None else self.limit
 
         steps, state = self.step_to_target(initial_state, target_dist, limit)
 
