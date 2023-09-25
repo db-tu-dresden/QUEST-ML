@@ -47,6 +47,7 @@ scaling_factor: 1
 reduction_factor: 0.9
 accumulation_window: 1
 offset: 1
+previous_states: 0
 only_process: False
 enhances: 0
 enhance_base_lambda: 1.0

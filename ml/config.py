@@ -86,6 +86,7 @@ class Config:
         'reduction_factor': {'type': float, 'lambda': between_zero_one},
         'accumulation_window': {'type': int, 'lambda': greater_equal_zero},
         'offset': {'type': int, 'lambda': greater_zero},
+        'previous_states': {'type': int, 'lambda': greater_equal_zero},
         'only_process': {'type': bool, 'lambda': true},
         'enhances': {'type': int, 'lambda': greater_equal_zero},
         'enhance_base_lambda': {'type': float, 'lambda': greater_zero},

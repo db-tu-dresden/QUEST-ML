@@ -52,7 +52,7 @@ class FlatMLP(MLP):
         shape = x.shape
         out = x.view(shape[0], -1)
         out = super().forward(out)
-        out = out.view(*shape)
+        out = out.view(shape[0], *shape[2:])
         return out
 
 
@@ -124,7 +124,9 @@ def mlp(cfg: Config, prefix: str = ''):
 
 @register_model_architecture('flat_mlp', 'flat_mlp')
 def flat_mlp(cfg: Config, prefix: str = ''):
-    cfg['input_size'] = cfg['jobs'] * cfg['processes'] if 'jobs' in cfg and 'processes' in cfg else 16
+    cfg['input_size'] = (cfg['previous_states'] + 1) * cfg['jobs'] * cfg['processes'] \
+        if 'jobs' in cfg and 'processes' in cfg else 16
+    cfg['output_size'] = cfg['jobs'] * cfg['processes'] if 'jobs' in cfg and 'processes' in cfg else 16
     mlp(cfg, prefix)
 
 

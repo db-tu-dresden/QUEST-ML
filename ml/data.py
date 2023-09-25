@@ -12,13 +12,14 @@ from ml import Config
 class ProcessDataset(Dataset):
     def __init__(self, da: xr.DataArray, scaling_factor: int = 1, reduction_factor: float = 0.0, offset: int = 1,
                  only_process: bool = False, enhances: int = 0, base_lambda: float = 1.0,
-                 lambda_variability: float = 0.1, accumulation_window: int = 1):
+                 lambda_variability: float = 0.1, accumulation_window: int = 1, previous_states: int = 0):
         self.da = da
         self.scaling_factor = scaling_factor
         self.reduction_factor = reduction_factor
         self.offset = offset
         self.only_process = only_process
         self.accumulation_window = accumulation_window
+        self.previous_states = previous_states
 
         self.scale(self.scaling_factor)
         self.reduce(self.reduction_factor)
@@ -133,7 +134,8 @@ class ProcessDataset(Dataset):
                    config['enhances'],
                    config['enhance_base_lambda'],
                    config['enhance_lambda_variability'],
-                   config['accumulation_window'])
+                   config['accumulation_window'],
+                   config['previous_states'])
 
     def scale(self, scaling_factor: int):
         assert 1 <= scaling_factor
@@ -159,8 +161,29 @@ class ProcessDataset(Dataset):
         return len(self.das) * len(self.das[0]['source'])
 
     def __getitem__(self, item):
+        # Returns source and target
+        # source is of shape IxPxJ
+        # target is of shape PxJ
+        #
+        # I...items = 1 + previous items
+        # P...processes
+        # J...jobs
+
         i = item // len(self.das[0]['source'])
         item = item % len(self.das[0]['source'])
 
-        return (torch.tensor(self.das[i]['source'][item].to_numpy(), dtype=torch.float),
+        prev_states = []
+        shape = self.das[i]['source'][item].shape
+
+        for k in reversed(range(self.previous_states)):
+            if item - k < 0:
+                elem = torch.zeros(shape, dtype=torch.float)
+            else:
+                elem = torch.tensor(self.das[i]['source'][item - k].to_numpy(), dtype=torch.float)
+            prev_states.append(elem)
+
+        return (torch.stack([
+            *prev_states,
+            torch.tensor(self.das[i]['source'][item].to_numpy(), dtype=torch.float)
+        ]),
                 torch.tensor(self.das[i]['target'][item].to_numpy(), dtype=torch.float))
