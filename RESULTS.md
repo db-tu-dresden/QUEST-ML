@@ -194,3 +194,8 @@ Best trial final validation accuracy: 0.3541666865348816
 Best trial config: {'lambda': 1.0, 'hidden_size': 512, 'hidden_layers': 2, 'learning_rate': 0.009709370093513872}
 Best trial final validation loss: 0.04658373445272446
 Best trial final validation accuracy: 0.29739585518836975
+
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/x3yvh28r 65.78%; Acc. Window 100
+
+https://wandb.ai/eriknikulski/carQUEST-ML/runs/inolehud 70.31%; Acc. Window 100; 5 Prev. States 
