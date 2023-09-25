@@ -81,3 +81,11 @@ processes:                        # describes the processing time drawn from the
   - mean: 1.0
     std: 0.2
 ```
+
+Optional entries are:  
+```yaml
+jobArrivalPath: './save/-/job_arrivals.yaml'    # specifies a yaml file with a list of time and job entries, specifying 
+                                                # the job arrivals 
+continueWithRndJobs: False                      # if set to False and jobArrivalPath is given, 
+                                                # no other jobs are created after the given jobs are processed
+```

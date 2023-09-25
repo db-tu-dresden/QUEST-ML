@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import yaml
-
 from system.environment import Environment
 from system.job import Job, JobTypeCollection
 from system.queue import Queue
@@ -64,19 +62,26 @@ class Process:
 
 class ArrivalProcess(Process):
     def __init__(self, id: int, job_types: JobTypeCollection, env: Environment, rnd: RandomContainer,
-                 job_arrival_path: str = None, name: str = None):
+                 job_arrivals: list = None, name: str = None, continue_with_rnd_jobs: bool = True):
         super().__init__(id, env, rnd, name=name)
         self.job_types = job_types
         self.last_job_id = -1
 
-        self.job_arrivals = None
+        self.job_arrivals = job_arrivals
         self.current_job_arrival = None
-        if job_arrival_path is not None:
-            with open(job_arrival_path) as f:
-                self.job_arrivals = yaml.full_load(f)
+
+        self.continue_with_rnd_jobs = continue_with_rnd_jobs
+
+    def push(self, job: Job):
+        if self.job_arrivals is None:
+            self.job_arrivals = []
+        self.job_arrivals.append({
+            'type': job.type.name,
+            'time': None,
+        })
 
     def get_time(self):
-        if self.current_job_arrival:
+        if self.current_job_arrival and self.current_job_arrival['time']:
             return self.current_job_arrival['time'] - self.env.now
         return self.rng.exponential(scale=self.beta)
 
@@ -90,8 +95,11 @@ class ArrivalProcess(Process):
             try:
                 self.current_job_arrival = self.job_arrivals.pop(0)
             except IndexError:
-                yield self.env.timeout(1)
-                return
+                if self.continue_with_rnd_jobs:
+                    self.current_job_arrival = None
+                else:
+                    yield self.env.timeout(1)
+                    return
 
         t = self.get_time()
         yield self.env.timeout(t)

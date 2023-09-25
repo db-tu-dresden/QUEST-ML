@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 import numpy as np
+import yaml
 
 from notation import Notation
 from system.config import Config
@@ -48,6 +49,8 @@ class System:
                                                 beta=self.config['arrivalProcess']['beta'])
                                 for i, rng in enumerate(self.rng.spawn(len(self.notation.graph.nodes) + 1))]
 
+        self.job_arrivals = self.load_job_arrivals(config['jobArrivalPath']) if config['jobArrivalPath'] else None
+
         self.logger = Logger(self.config['loggingRate'], self)
 
         self.build()
@@ -55,6 +58,11 @@ class System:
     def __repr__(self):
         cls = self.__class__.__name__
         return f'{cls}(config={self.config!r}, notation={self.notation!r}, env={self.env!r})'
+
+    @staticmethod
+    def load_job_arrivals(path: str):
+        with open(path) as f:
+            return yaml.full_load(f)
 
     def build_processes(self):
         if not self.notation.graph:
@@ -70,7 +78,8 @@ class System:
             queue = Queue(props['data'], env=self.env)
             if i == n - 1:
                 process = ArrivalProcess(-1, self.job_types, rnd=self.rand_containers[node], env=self.env,
-                                         job_arrival_path=self.config['jobArrivalPath'], name=props.get('name'))
+                                         job_arrivals=self.job_arrivals, name=props.get('name'),
+                                         continue_with_rnd_jobs=self.config['continueWithRndJobs'])
             else:
                 process = Process(node, queue=queue, rnd=self.rand_containers[node], env=self.env,
                                   name=props.get('name'))
@@ -112,7 +121,6 @@ class System:
 
     def set_state(self, state: np.array):
         assert state.shape == (len(self.processes), len(self.job_types.types))
-        assert not state[0].any()       # checks that arrival queue is empty
 
         process: Process
         for i, process in self.processes.items():

@@ -34,6 +34,7 @@ class Config:
             'failureRate': And(Use(float), lambda x: 0 <= x <= 1)
         }]),
         Optional('jobArrivalPath', default=None): Or(None, Use(str)),
+        Optional('continueWithRndJobs', default=True): Use(bool),
         'arrivalProcess': {
             'beta': And(Use(float), lambda x: x > 0),
         },
