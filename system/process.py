@@ -70,29 +70,36 @@ class ArrivalProcess(Process):
         self.last_job_id = -1
 
         self.job_arrivals = None
+        self.current_job_arrival = None
         if job_arrival_path is not None:
             with open(job_arrival_path) as f:
                 self.job_arrivals = yaml.full_load(f)
 
+    def get_time(self):
+        if self.current_job_arrival:
+            return self.current_job_arrival['time'] - self.env.now
+        return self.rng.exponential(scale=self.beta)
+
+    def get_job(self):
+        if self.current_job_arrival:
+            return self.job_types.get_job_by_type_str(self.last_job_id, self.current_job_arrival['type'])
+        return self.job_types.get_rand_job(self.last_job_id, self.rng)
+
     def process(self):
-        job_arrival = None
         if self.job_arrivals is not None:
             try:
-                job_arrival = self.job_arrivals.pop(0)
+                self.current_job_arrival = self.job_arrivals.pop(0)
             except IndexError:
                 yield self.env.timeout(1)
                 return
-        t = self.rng.exponential(scale=self.beta) if job_arrival is None else job_arrival['time'] - self.env.now
+
+        t = self.get_time()
         yield self.env.timeout(t)
 
         self.last_job_id += 1
-        if job_arrival is None:
-            job = self.job_types.get_rand_job(self.last_job_id, self.rng)
-        else:
-            job = self.job_types.get_job_by_type_str(self.last_job_id, job_arrival['type'])
 
+        job = self.get_job()
         self.job_dist[job.type.name] += 1
-
         yield self.next[job.type.name].push(job)
 
     def __repr__(self):
