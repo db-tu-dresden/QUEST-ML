@@ -86,7 +86,7 @@ def run():
 
     parser = Parser(ml_config)
     parser.add_argument('--k_model', metavar='N', type=int, default=1,
-                        help='K for k-fold validation of the simulation')
+                        help='K for k-fold validation of the model')
     parser.add_argument('--k_simulation', metavar='N', type=int, default=1,
                         help='K for k-fold validation of the simulation')
     parser.add_argument('--mutate', action=argparse.BooleanOptionalAction,
@@ -133,6 +133,7 @@ def run():
     steps = max(steps for steps, state in predictions)
     initial_state = initial_state.round().int().numpy()
 
+    print(f'Running simulation {args.k_simulation} times...')
     simulations = simulate_from_state(initial_state, steps, sys_config, ml_config, args.k_simulation, args.verbose)
     find_closest([state for _, state in predictions], [state for _, state in simulations])
 
