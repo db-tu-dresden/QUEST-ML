@@ -46,8 +46,6 @@ class Recommender:
                 state = self.model(state)
                 step += 1
 
-        state = state if self.contains_tgt(state, target_dist) else None
-
         return step, state
 
     def step_through(self, initial_state: torch.Tensor, steps: int):
@@ -67,7 +65,7 @@ class Recommender:
 
         steps, state = self.step_to_target(initial_state, target_dist, limit)
 
-        if state is not None:
+        if self.contains_tgt(state, target_dist):
             print(f'Target distribution reached after {steps} steps.')
             print(f'Target distribution is: {state[-1]}')
         else:
