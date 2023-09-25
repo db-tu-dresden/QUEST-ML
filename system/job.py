@@ -24,13 +24,13 @@ class JobType:
 
 class JobTypeCollection:
 
-    def __init__(self, types: {JobType}, env: Environment):
+    def __init__(self, types: [JobType], env: Environment):
         super().__init__()
         self.types = types
         self.env = env
 
     def get_rand_job(self, job_id: int, rng: np.random.Generator):
-        job_type = rng.choice(list(self.types), p=[job_type.arrival_prob for job_type in self.types])
+        job_type = rng.choice(self.types, p=[job_type.arrival_prob for job_type in self.types])
         return Job(job_id, job_type, env=self.env)
 
     def get_job_by_type_str(self, job_id: int, job_type_str: str):
@@ -39,8 +39,8 @@ class JobTypeCollection:
 
     @classmethod
     def from_config(cls, config: Config, env: Environment):
-        types = set(JobType(job['name'], job['arrivalProbability'], job['failureRate'], env=env)
-                    for job in config['jobs'])
+        types = list(JobType(job['name'], job['arrivalProbability'], job['failureRate'], env=env)
+                     for job in config['jobs'])
         return cls(types, env=env)
 
     def __repr__(self):
