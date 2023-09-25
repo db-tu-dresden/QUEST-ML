@@ -1,6 +1,7 @@
 import pickle
 import random
 
+import numpy
 import torch
 import xarray as xr
 from torch.utils.data import Dataset
@@ -70,12 +71,15 @@ class ProcessDataset(Dataset):
                 reducer = source_elem.copy()
 
             if prev_elem is not None:
-                source_elem[0] -= prev_elem[0]
+                source_da[i - 1][0] = source_elem[0] - prev_elem[0]
             source_elem[-1] -= reducer[-1]
 
             if prev_elem is not None:
-                target_elem[0] -= prev_elem[0]
+                target_da[i - 1][0] = target_elem[0] - prev_elem[0]
             target_elem[-1] -= reducer[-1]
+
+        source_da[-1][0] = numpy.zeros(source_da[-1][0].shape)
+        target_da[-1][0] = numpy.zeros(target_da[-1][0].shape)
 
         if self.offset < 0:
             return target_da, source_da
