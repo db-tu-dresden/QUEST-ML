@@ -1,7 +1,9 @@
 # carQUEST-ML
 Modeling queue simulations in production lines with ML
 
-## Data creation
+The usual steps are: *Data Creation*, *Training*, and finally *Inference*.
+
+## Data Creation
 First a dataset needs to be created. 
 To enable this, create a directory with a config.yaml describing the configuration of the system 
 ([README.md](system/README.md) explains how this is done) 
@@ -75,7 +77,7 @@ To tune nuisance parameters while tuning a hyperparameter use the script [do_tun
 Adapt the script by changing the variables. The variable `list` holds the sequence of values for the hyperparameter
 to be tuned. Adapt the `TUNE_CONFIG` in the string to specify the nuisance parameters.
 
-## Recommender
+## Inference
 Use this to get to a certain target with a pretrained model. 
 Like in training the model and architecture need to be described with `--arch` and possibly additional arguments to 
 set model/architecture parameters.
