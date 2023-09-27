@@ -108,7 +108,6 @@ def run():
 
     ml_config.update_from_args(args)
     ml_config['load_model'] = True
-    verbose = ml_config['verbose']
 
     model = build_model(ml_config)
     model.load(ml_config)
