@@ -26,8 +26,8 @@ def add_subparsers(parser):
                                      help='Number of steps to take from initial state')
 
 
-def simulate_from_state(state, steps, sys_config, ml_config, k=1, verbose=False):
-    with open(os.path.join(ml_config['base_path'], 'graph_description.note')) as f:
+def simulate_from_state(base_path: str, state: torch.Tensor, steps: int, sys_config, k=1, verbose=False):
+    with open(os.path.join(base_path, 'graph_description.note')) as f:
         text = f.read()
     notation = Notation.parse(text)
 
@@ -140,7 +140,8 @@ def run():
     initial_state = initial_state.round().int().numpy()
 
     print(f'Running simulation {args.k_simulation} times...')
-    simulations = simulate_from_state(initial_state, steps, sys_config, ml_config, args.k_simulation, args.verbose)
+    simulations = simulate_from_state(ml_config['base_path'], initial_state, steps, sys_config,
+                                      k=args.k_simulation, verbose=args.verbose)
     find_closest([state for _, state in predictions], [state for _, state in simulations])
 
 
