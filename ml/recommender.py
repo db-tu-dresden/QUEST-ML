@@ -9,7 +9,7 @@ class MockArrivalProcess:
         self.config = config
         self.rng = np.random.default_rng(self.config['randomSeed'])
 
-    def step(self):
+    def step(self) -> torch.Tensor:
         return torch.tensor([self.rng.poisson(job_type['arrivalProbability']) for job_type in self.config['jobs']])
 
 
@@ -32,10 +32,10 @@ class Recommender:
         self.arrival_process = MockArrivalProcess(self.sys_config)
 
     @staticmethod
-    def contains_tgt(state: torch.Tensor, target_dist: torch.Tensor):
+    def contains_tgt(state: torch.Tensor, target_dist: torch.Tensor) -> bool:
         return state[0, -1].ge(target_dist).all()
 
-    def step_to_target(self, initial_state: torch.Tensor, target_dist: torch.Tensor, limit: int):
+    def step_to_target(self, initial_state: torch.Tensor, target_dist: torch.Tensor, limit: int) -> (int, torch.Tensor):
         state = initial_state
         state = state.unsqueeze(0)      # add batch dim
         step = 0
@@ -48,7 +48,7 @@ class Recommender:
 
         return step, state
 
-    def step_through(self, initial_state: torch.Tensor, steps: int):
+    def step_through(self, initial_state: torch.Tensor, steps: int) -> (int, torch.Tensor):
         state = initial_state
         state = state.unsqueeze(0)      # add batch dim
 
@@ -58,10 +58,10 @@ class Recommender:
 
         return steps, state
 
-    def predict_target(self, initial_state: torch.Tensor = None, target_dist: torch.Tensor = None, limit: int = None):
+    def predict_target(self, initial_state: torch.Tensor = None) -> (int, torch.Tensor):
         initial_state = initial_state if initial_state is not None else self.initial_state
-        target_dist = target_dist if target_dist is not None else self.target_dist
-        limit = limit if limit is not None else self.limit
+        target_dist = self.target_dist
+        limit = self.limit
 
         steps, state = self.step_to_target(initial_state, target_dist, limit)
 
@@ -80,9 +80,9 @@ class Recommender:
 
         return steps, state
 
-    def predict_state(self, initial_state: torch.Tensor = None, steps: int = None):
+    def predict_state(self, initial_state: torch.Tensor = None) -> (int, torch.Tensor):
         initial_state = initial_state if initial_state is not None else self.initial_state
-        steps = steps if steps is not None else self.steps
+        steps = self.steps
 
         steps, state = self.step_through(initial_state, steps)
 
@@ -93,27 +93,21 @@ class Recommender:
 
         return steps, state
 
-    def mutate(self, state: torch.Tensor):
+    def mutate(self, state: torch.Tensor) -> torch.Tensor:
         shape = state.shape
         mutation = torch.distributions.Uniform(self.mutation_low, self.mutation_high).sample(shape).round()
         return state + mutation
 
-    def run(self, action):
+    def run(self, action) -> [torch.Tensor]:
         predictions = []
         initial_state = self.initial_state
 
-        if action == 'STEP_TO':
-            for _ in range(self.k):
-                predictions.append(self.predict_target(initial_state=initial_state))
-                if self.mutate_initial_state:
-                    initial_state = self.mutate(self.initial_state)
-                    initial_state[initial_state < 0] = 0
+        methode = self.predict_target if action == 'STEP_TO' else self.predict_state
 
-        if action == 'STEP_THROUGH':
-            for _ in range(self.k):
-                predictions.append(self.predict_state(initial_state=initial_state))
-                if self.mutate_initial_state:
-                    initial_state = self.mutate(self.initial_state)
-                    initial_state[initial_state < 0] = 0
+        for _ in range(self.k):
+            predictions.append(methode(initial_state=initial_state))
+            if self.mutate_initial_state:
+                initial_state = self.mutate(self.initial_state)
+                initial_state[initial_state < 0] = 0
 
         return predictions
