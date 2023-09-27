@@ -67,10 +67,16 @@ class Recommender:
 
         if self.contains_tgt(state, target_dist):
             print(f'Target distribution reached after {steps} steps.')
-            print(f'Final state is: \n{state.squeeze()}\n')
+            print(f'Final state is: \n'
+                  f'{state.squeeze().numpy()}\n'
+                  f'Rounded:\n'
+                  f'{state.squeeze().round().numpy()}\n')
         else:
             print(f'Target distribution was NOT contained in the state after {steps} steps.')
-            print(f'Final state is: \n{state.squeeze()}\n')
+            print(f'Final state is: \n'
+                  f'{state.squeeze().numpy()}\n'
+                  f'Rounded:\n'
+                  f'{state.squeeze().round().numpy()}\n')
 
         return steps, state
 

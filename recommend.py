@@ -51,7 +51,7 @@ def simulate_from_state(base_path: str, state: torch.Tensor, steps: int, sys_con
     print(f'Mean is: \n'
           f'{mean}\n')
     print(f'Standard Deviation is: \n'
-          f'{std}\n')
+          f'{std}\n\n')
 
     return list(zip([steps] * k, [torch.tensor(state) for state in final_states]))
 
@@ -62,8 +62,10 @@ def find_closest(predictions: [torch.Tensor], simulations: [torch.Tensor]):
 
     min_index = mses.argmin()
 
-    print(f'Prediction with lowest MSE to simulation mean is:\n'
+    print(f'\nPrediction with lowest MSE to simulation mean is:\n'
           f'{predictions[min_index].numpy()}\n'
+          f'Rounded:\n'
+          f'{predictions[min_index].round().numpy()}\n\n'
           f'MSE is {mses[min_index]}\n')
 
     found_identical = False
