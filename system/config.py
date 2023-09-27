@@ -39,9 +39,10 @@ class Config:
             'beta': And(Use(float), lambda x: x > 0),
         },
         'processes': [{
+            Optional('name', default=None): Use(str),
             'mean': Use(float),
             'std': And(Use(float), lambda x: x >= 0),
-        }]
+        }],
     })
 
     def __init__(self, path: str, schema: Schema = default_schema):

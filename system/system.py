@@ -41,13 +41,7 @@ class System:
         self.job_types = JobTypeCollection.from_config(self.config, env=self.env)
         self.processes = {}
         self.rng = np.random.default_rng(self.config['randomSeed'])
-        self.rand_containers = [RandomContainer(rng,
-                                                mean=self.config['processes'][i]['mean']
-                                                if i < len(self.config['processes']) else None,
-                                                std=self.config['processes'][i]['std']
-                                                if i < len(self.config['processes']) else None,
-                                                beta=self.config['arrivalProcess']['beta'])
-                                for i, rng in enumerate(self.rng.spawn(len(self.notation.graph.nodes) + 1))]
+        self.rand_containers = self.build_rnd_containers()
 
         self.job_arrivals = self.load_job_arrivals(config['jobArrivalPath']) if config['jobArrivalPath'] else None
 
@@ -58,6 +52,22 @@ class System:
     def __repr__(self):
         cls = self.__class__.__name__
         return f'{cls}(config={self.config!r}, notation={self.notation!r}, env={self.env!r})'
+
+    def build_rnd_containers(self):
+        containers = dict()
+        rngs = self.rng.spawn(len(self.notation.graph.nodes) + 1)
+
+        for i, rng in enumerate(rngs[:-1]):
+            key = self.config['processes'][i]['name'] or i
+            containers[key] = RandomContainer(rng,
+                                              mean=self.config['processes'][i]['mean'],
+                                              std=self.config['processes'][i]['std'],
+                                              beta=self.config['arrivalProcess']['beta'])
+
+        # Exit Process
+        containers[-1] = RandomContainer(rngs[-1])
+
+        return containers
 
     @staticmethod
     def load_job_arrivals(path: str):
@@ -76,12 +86,24 @@ class System:
 
         for i, (node, props) in enumerate(nodes):
             queue = Queue(props['data'], env=self.env)
+            try:
+                rand_container = self.rand_containers[props.get('name', node)]
+            except KeyError:
+                raise Exception(f'Notation and config process name missmatch. '
+                                f'Got {props.get("name", node)} from notation, not found in config.')
+
             if i == n - 1:
-                process = ArrivalProcess(-1, self.job_types, rnd=self.rand_containers[node], env=self.env,
-                                         job_arrivals=self.job_arrivals, name=props.get('name'),
+                process = ArrivalProcess(-1, self.job_types,
+                                         rnd=rand_container,
+                                         env=self.env,
+                                         job_arrivals=self.job_arrivals,
+                                         name=props.get('name'),
                                          continue_with_rnd_jobs=self.config['continueWithRndJobs'])
             else:
-                process = Process(node, queue=queue, rnd=self.rand_containers[node], env=self.env,
+                process = Process(node,
+                                  queue=queue,
+                                  rnd=rand_container,
+                                  env=self.env,
                                   name=props.get('name'))
             self.processes[node] = process
 
@@ -92,7 +114,10 @@ class System:
         last_process_id, _ = sorted(self.processes.items(), reverse=True)[0]
 
         queue = Queue(self.data, env=self.env)
-        exit_process = ExitProcess(last_process_id + 1, queue=queue, rnd=self.rand_containers[-1], env=self.env,
+        exit_process = ExitProcess(last_process_id + 1,
+                                   queue=queue,
+                                   rnd=self.rand_containers[-1],
+                                   env=self.env,
                                    name='Exit Process')
         self.processes[last_process_id + 1] = exit_process
 
