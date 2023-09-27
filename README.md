@@ -42,6 +42,10 @@ Some optional arguments are:
 Use `--save_datasets` to save the created datasets.  
 To reuse saved datasets, use `--load_datasets`.
 
+Training includes preprocessing of the datasets by default.
+If datasets are loaded using `--load_datasets` no preprocessing is done, the datasets are loaded as is.
+Use `--only_preprocessing` to only run preprocessing.
+
 
 ## Hyperparameter search
 For hyperparameter search [ray-tune](https://www.ray.io/ray-tune) is used. 
