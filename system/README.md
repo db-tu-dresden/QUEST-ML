@@ -89,3 +89,5 @@ jobArrivalPath: './save/-/job_arrivals.yaml'    # specifies a yaml file with a l
 continueWithRndJobs: False                      # if set to False and jobArrivalPath is given, 
                                                 # no other jobs are created after the given jobs are processed
 ```
+
+An example job arrival file can be found [here](../save/-/job_arrivals.yaml).
