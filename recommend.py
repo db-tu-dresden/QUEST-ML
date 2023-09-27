@@ -63,7 +63,7 @@ def find_closest(predictions: [torch.Tensor], simulations: [torch.Tensor]):
     min_index = mses.argmin()
 
     print(f'Prediction with lowest MSE to simulation mean is:\n'
-          f'{predictions[min_index]}\n'
+          f'{predictions[min_index].numpy()}\n'
           f'MSE is {mses[min_index]}\n')
 
     found_identical = False
@@ -108,6 +108,7 @@ def run():
 
     ml_config.update_from_args(args)
     ml_config['load_model'] = True
+    verbose = ml_config['verbose']
 
     model = build_model(ml_config)
     model.load(ml_config)
@@ -142,6 +143,8 @@ def run():
     print(f'Running simulation {args.k_simulation} times...')
     simulations = simulate_from_state(ml_config['base_path'], initial_state, steps, sys_config,
                                       k=args.k_simulation, verbose=args.verbose)
+
+    print(f'Finding closest prediction...')
     find_closest([state for _, state in predictions], [state for _, state in simulations])
 
 
