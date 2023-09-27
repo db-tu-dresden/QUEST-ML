@@ -1,16 +1,43 @@
 import numpy as np
 import torch
+import yaml
 
 from ml import Config, Model
 
 
 class MockArrivalProcess:
-    def __init__(self, config):
+    def __init__(self, config, step_size: float):
         self.config = config
+        self.step_size = step_size
+
         self.rng = np.random.default_rng(self.config['randomSeed'])
 
+        with open(config['jobArrivalPath']) as f:
+            self.job_arrivals = yaml.full_load(f)
+        self.current_job_arrivals = []
+        self.continue_with_rnd_jobs = config['continueWithRndJobs']
+
+        self._now = 0
+
     def step(self) -> torch.Tensor:
-        return torch.tensor([self.rng.poisson(job_type['arrivalProbability']) for job_type in self.config['jobs']])
+        self._now += self.step_size
+
+        if self.job_arrivals is not None:
+            self.current_job_arrivals = []
+
+            try:
+                while self.job_arrivals[0]['time'] <= self._now:
+                    self.current_job_arrivals.append(self.job_arrivals.pop(0))
+
+                types = [job['type'] for job in self.current_job_arrivals]
+                job_dist = [sum(1 for _type in types if _type == job_type['name']) for job_type in self.config['jobs']]
+                return torch.tensor(job_dist, dtype=torch.float)
+            except IndexError:
+                if not self.continue_with_rnd_jobs:
+                    return torch.zeros(len(self.config['jobs']))
+
+        return torch.tensor([self.rng.poisson(job_type['arrivalProbability'] * self.step_size)
+                             for job_type in self.config['jobs']], dtype=torch.float)
 
 
 class Recommender:
@@ -29,7 +56,7 @@ class Recommender:
         self.mutation_low = mutation_low
         self.mutation_high = mutation_high
 
-        self.arrival_process = MockArrivalProcess(self.sys_config)
+        self.arrival_process = None
 
     @staticmethod
     def contains_tgt(state: torch.Tensor, target_dist: torch.Tensor) -> bool:
@@ -42,7 +69,8 @@ class Recommender:
 
         with torch.no_grad():
             while not self.contains_tgt(state, target_dist) and step < limit:
-                state[0, 0] += self.arrival_process.step()
+                arrivals = self.arrival_process.step()
+                state[0, 0] += arrivals
                 state = self.model(state)
                 step += 1
 
@@ -103,6 +131,9 @@ class Recommender:
         initial_state = self.initial_state
 
         methode = self.predict_target if action == 'STEP_TO' else self.predict_state
+
+        step_size = self.sys_config['loggingRate'] * self.ml_config['scaling_factor']
+        self.arrival_process = MockArrivalProcess(self.sys_config, step_size=step_size)
 
         for _ in range(self.k):
             predictions.append(methode(initial_state=initial_state))
