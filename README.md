@@ -67,6 +67,10 @@ Its default value is:
 }
 ```
 
+To tune nuisance parameters while tuning a hyperparameter use the script [do_tune.sh](./do_tune.sh). 
+Adapt the script by changing the variables. The variable `list` holds the sequence of values for the hyperparameter
+to be tuned. Adapt the `TUNE_CONFIG` in the string to specify the nuisance parameters.
+
 ## Recommender
 Use this to get to a certain target with a pretrained model. 
 Like in training the model and architecture need to be described with `--arch` and possibly additional arguments to 
