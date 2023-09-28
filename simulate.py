@@ -19,9 +19,9 @@ def run(args):
     base_path = args.path
 
     with open(os.path.join(base_path, 'graph_description.note')) as f:
-        text = f.read()
+        notation_string = f.read()
 
-    notation = Notation.parse(text)
+    notation = Notation.parse(notation_string)
     if args.plot:
         notation.draw(os.path.join(base_path, 'graph.png'))
 
