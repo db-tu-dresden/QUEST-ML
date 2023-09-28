@@ -181,6 +181,9 @@ class Config:
         self.set_base_path()
         self.set_system_data()
 
+        self.schema.schema['arch'] = Use(str)       # add arch to schema for validation
+        self.validate()
+
     def validate(self):
         self.data = validate_yaml(self.data, self.schema)
 
