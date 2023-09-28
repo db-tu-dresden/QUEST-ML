@@ -85,7 +85,7 @@ class Config:
         'scaling_factor': {'type': int, 'lambda': greater_zero},
         'reduction_factor': {'type': float, 'lambda': between_zero_one},
         'accumulation_window': {'type': int, 'lambda': greater_equal_zero},
-        'offset': {'type': int, 'lambda': greater_zero},
+        'offset': {'type': int, 'lambda': true},
         'only_process': {'type': bool, 'lambda': true},
         'enhances': {'type': int, 'lambda': greater_equal_zero},
         'enhance_base_lambda': {'type': float, 'lambda': greater_zero},

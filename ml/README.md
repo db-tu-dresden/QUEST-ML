@@ -113,8 +113,10 @@ E.g. `N=1` every element is used; `N=10` every 10-th element is used.
 `reduction_factor`:  float $`\in [0, 1]`$; specifies how much of the data array should be used for the dataset. 
 E.g. `reduction_factor=0.6`, the first 60% of the data array are used for the dataset.
 
-`offset`:  integer > 0; specifies the horizon i.e. the gap between source and target. With `offset=0` the system behaves as an auto encoder,
-with `offset=1` the system predicts the next step, with `offset=3` the system predicts the third step.
+`offset`:  integer; specifies the horizon i.e. the gap between source and target. 
+With `offset=0` the system behaves as an auto encoder,
+with `offset=1` the system predicts the next state, with `offset=3` the system predicts the state at the third step.
+With `offset=-1` the system predicts the state at the previous step.
 This argument can be used in combination with the training argument `stepwise`, 
 where the system predicts intermediate steps and uses these for further prediction.
 E.g. if `offset=3` and `stepwise` is set, there will be two intermediate steps.
