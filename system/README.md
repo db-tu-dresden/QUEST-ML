@@ -41,7 +41,7 @@ The jobs of each process over time can be plotted by:
 system.logger.plot()
 ```
 
-The job distribution of each process over time can be saved in a xarray DataArray by:
+The job distribution of each process over time can be saved in a pickled xarray DataArray by:
 
 ```python
 system.logger.save('./save/da.pkl')
