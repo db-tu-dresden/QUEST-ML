@@ -9,7 +9,7 @@ from notation import Notation
 
 Create a ```Notation``` instance from an input text:
 ```python
-notation = Notation.parse(text)
+notation = Notation.parse(notation_string)
 ```
 
 To display the resulting graph run:
