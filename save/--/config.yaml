@@ -1,0 +1,24 @@
+until: 10000
+loggingRate: 0.1
+randomSeed: 42
+jobs:
+  - name: 'A'
+    arrivalProbability: 0.2
+    failureRate: 0
+  - name: 'B'
+    arrivalProbability: 0.3
+    failureRate: 0
+  - name: 'C'
+    arrivalProbability: 0.5
+    failureRate: 0
+#jobArrivalPath: './save/-/job_arrivals.yaml'
+#continueWithRndJobs: True
+arrivalProcess:
+  beta: 0.5
+processes:
+  - mean: 0.1
+    std: 0.0
+  - mean: 0.3
+    std: 0.2
+  - mean: 0.3
+    std: 0.2
