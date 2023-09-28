@@ -1,0 +1,6 @@
+[A, B, C]
+(Erster)<[($1: [A, B]), ($2: [C])]>(Achter)
+$1: (Zweiter)<[($3: [A]), ($4: [B])]>(Fünfter)
+$2: (Sechster)-(Siebter)
+$3: (Dritter)
+$4: (Vierter)

@@ -1,0 +1,40 @@
+until: 100
+loggingRate: 0.1
+randomSeed: 42
+jobs:
+  - name: 'A'
+    arrivalProbability: 0.1
+    failureRate: 0
+  - name: 'B'
+    arrivalProbability: 0.1
+    failureRate: 0
+  - name: 'C'
+    arrivalProbability: 0.8
+    failureRate: 0
+arrivalProcess:
+  beta: 1.0
+processes:
+  - name: 'Erster'
+    mean: 1.0
+    std: 0.2
+  - name: 'Zweiter'
+    mean: 1.0
+    std: 0.2
+  - name: 'Dritter'
+    mean: 1.0
+    std: 0.2
+  - name: 'Vierter'
+    mean: 1
+    std: 0.2
+  - name: 'Fünfter'
+    mean: 1.0
+    std: 0.2
+  - name: 'Sechster'
+    mean: 1.0
+    std: 0.2
+  - name: 'Siebter'
+    mean: 1.0
+    std: 0.2
+  - name: 'Achter'
+    mean: 1
+    std: 0.2
