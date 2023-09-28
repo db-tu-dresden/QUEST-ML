@@ -31,9 +31,9 @@ python infer.py --path ./save/- --arch flat_mlp --no-verbose --k_model 4 --k_sim
 
 ## Data Creation
 First a dataset needs to be created. 
-To enable this, create a directory with a config.yaml describing the configuration of the system 
+To enable this, create a directory with a `config.yaml` describing the configuration of the system 
 ([README.md](system/README.md) explains how this is done) 
-and a graph_description.note describing the structure of the system 
+and a `graph_description.note` describing the structure of the system 
 ([README.md](notation/README.md) explains how this is done).
 
 When these two files are present in a directory run: 
