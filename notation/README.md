@@ -18,12 +18,12 @@ notation.draw()
 ```
 
 ## Notation Description
-The notation describes the structure of a very simple planar graph with data flow.  
-The notation is composed out of lines and forks representing the edges of the graph, nodes are implicit.
+The notation describes the structure of a very simple planar graph with data flow.
+It is composed out of lines and forks representing the edges of the graph, nodes are implicit.
 Anchors are also part of the notation, they can be used to reference an existing node.
 The notation string has three main parts, an initial list of data elements that will flow through the graph, 
-the base part and the appendix.  
-The base part describes the initial structure. 
+the base notation and the appendix. 
+The base notation describes the initial structure. 
 Any references used must be described in the appendix.
 Initial data flow description, base and appendix are seperated by a new line (```\n```).
 
@@ -43,14 +43,17 @@ A line is composed of one or multiple line segments. It can be writen as:
 A fork connects one node to multiple sub graphs and optionally joins them together in the end.  
 A fork is denoted by ```<[RS]>```. Where ```RS``` is a comma seperated list of references 
 with a list of data flow elements.  
-An Example fork is ```<[($1: [A, B]), ($2: [C])]>```, where the fork has two branches with the first one receiving 
+An example fork is ```<[($1: [A, B]), ($2: [C])]>```, where the fork has two branches with the first one receiving 
 the data elements ```A``` and ```B```, and the second receiving ```C```.
 
 #### References
-A reference enables the usage of a sub graph, as well as multiple and asymmetric paths in a fork.  
+A reference describes a graph.
+It enables the usage of a sub graph, as well as multiple and asymmetric paths in a fork.  
 Denoted by ```$N```, where ```N``` is some number identifying the reference. 
 A used reference must be defined in the appendix.  
 References can also use other references.  
+An example reference is ```$1: -```.
+
 Note: there is no check for cyclic references; the input is expected to be valid.
 
 ### Anchors
