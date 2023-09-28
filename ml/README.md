@@ -8,16 +8,9 @@ from ml import Config, Trainer, Parser
 from ml.models import build_model
 ```
 
-
-
 `Parser` is a subclass from `argparse.ArgumentParser` containing the relevant arguments.  
 It is explained in more detail in section [Parser](#parser).  
 Additional arguments can be added to the parser as usual.
-
-To retrieve the arguments, use the provided `parse_arch` function, e.g. 
-```python
-args = parse_arch(parser)
-```
 
 Load the config by providing a location to the respective `.yaml` file.
 ```python
@@ -62,18 +55,18 @@ Trainer.run(config, model)
 
 
 ## Parser
-To display all possible parser arguments use the `--help` argument.  
-The arguments are all entries in the config file provided to `Config` (see [config.yaml](config.yaml)).  
-To set boolean values prepend `no` to set to false,  
-e.g. for GPU usage, use `--gpu` to set it to `True` and `--no-gpu` to set it to `False`.  
+To display all possible parser arguments use the `--help` argument. 
+The arguments are all entries in the config file provided to `Config` (see [config.yaml](config.yaml)). 
+To set boolean values prepend `no` to set to false, 
+e.g. for GPU usage, use `--gpu` to set it to `True` and `--no-gpu` to set it to `False`. 
 Additionally, the `base_path` can be set with the shorter argument name `--path`.
 
-To display all available arguments to a specific architecture use `--arch SOME_REGISTERED_ARCHITECTURE --help`.
+To display all available arguments to a specific architecture use `--arch SOME_REGISTERED_ARCHITECTURE --help`, 
+e.g. for FLAT MLP run `python train.py --arch flat_mlp --help`.
 
 
 ## Models
-Models can be added. They need to extend the `ml.models.Model` class.  
-They need to override the following methods:  
+Models can be added. They need to extend the `ml.models.Model` class and override the following methods:  
 ```python
 @staticmethod
 def add_args(parser: argparse.ArgumentParser):
@@ -108,8 +101,7 @@ In this function set the needed parameters to the config.
 
 ## Data
 The data used for the datasets are data arrays for training, validation and testing, 
-previously created by the simulation with the script `create_data.py`.
-
+previously created by the simulation with the script `create_data.py`. 
 The data array is preprocessed before being used for training, validation or testing.
 
 The parameters for data preprocessing are:  
@@ -143,7 +135,7 @@ The exponential distribution is used for creating the job distributions, they ar
 
 `enhance_base_lambda`:  float > 0.0; specifies the base lambda (mean) used for the exponential distribution.
 
-`enhance_lambda_variability`:  float; specifies the range $`[-lambda_variability, lambda_variability]`$ 
+`enhance_lambda_variability`:  float; specifies the range $`[-lambda\_variability, lambda\_variability]`$ 
 of a uniform distribution added to the `base_lambda`. Used for varying the base lambda used for the 
 exponential distribution in the enhancements.
 
