@@ -11,7 +11,7 @@ jobs:
   - name: 'C'
     arrivalProbability: 0.5
     failureRate: 0
-#jobArrivalPath: './save/-/job_arrivals.yaml'
+#jobArrivalPath: './graphs/-/job_arrivals.yaml'
 #continueWithRndJobs: True
 arrivalProcess:
   beta: 0.5

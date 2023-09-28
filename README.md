@@ -3,9 +3,9 @@ Modeling queue simulations in production lines with ML
 
 ## Quick Start
 
-Look in the directory `save/` and pick a graph you like to continue with. 
+Look in the directory `graphs/` and pick a graph you like to continue with. 
 Use the path to the directory in the following examples. 
-For simplicity `./save/-` is used in all examples in this section.
+For simplicity `./graphs/-` is used in all examples in this section.
 
 **First**, install all necessary python packages with 
 ```shell
@@ -14,17 +14,17 @@ pip install -r requirements.txt
 
 **Second**, run data creation with
 ```shell
-python create_data.py --path ./save/-
+python create_data.py --path ./graphs/-
 ```
 
 **Third**, train on the created data with
 ```shell
-python train.py --path ./save/- --arch flat_mlp --epochs 10 --accumulation_window 100
+python train.py --path ./graphs/- --arch flat_mlp --epochs 10 --accumulation_window 100
 ```
 
 **Fourth**, run inference with
 ```shell
-python infer.py --path ./save/- --arch flat_mlp --no-verbose --k_model 4 --k_simulation 10 STEP_TO_TARGET
+python infer.py --path ./graphs/- --arch flat_mlp --no-verbose --k_model 4 --k_simulation 10 STEP_TO_TARGET
 ```
 
 ## Data Creation
@@ -117,7 +117,7 @@ set model/architecture parameters.
 The architecture will be created and loaded from the model save path, if not specified this is within a directory 
 called `save` in the path given by `--path`.
 The file name is the architecture name followed by `_model.pt`.
-An example is `./save/-/save/FlatMLP_model.pt`. 
+An example is `./graphs/-/save/FlatMLP_model.pt`. 
 The model save path can also be set manually with the CLI argument `--model_save_path`.
 Important is that the specified architecture match the saved model.
 

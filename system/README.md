@@ -44,7 +44,7 @@ system.logger.plot()
 The job distribution of each process over time can be saved in a pickled xarray DataArray by:
 
 ```python
-system.logger.save('./save/da.pkl')
+system.logger.save('./graphs/-/da.pkl')
 ```
 
 This creates a DataArray with the dimensions time (step), process, and job.
@@ -87,10 +87,10 @@ processes:                        # describes the processing time drawn from the
 
 Optional entries are:  
 ```yaml
-jobArrivalPath: './save/-/job_arrivals.yaml'    # specifies a yaml file with a list of time and job entries, 
+jobArrivalPath: './graphs/-/job_arrivals.yaml'  # specifies a yaml file with a list of time and job entries, 
                                                 # specifying the job arrivals 
 continueWithRndJobs: False                      # if set to False and jobArrivalPath is given, 
                                                 # no other jobs are created after the given jobs are processed
 ```
 
-An example job arrival file can be found [here](../save/-/job_arrivals.yaml).
+An example job arrival file can be found [here](../graphs/-/job_arrivals.yaml).
