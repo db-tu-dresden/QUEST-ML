@@ -8,8 +8,8 @@ from torcheval.metrics.functional import mean_squared_error
 
 from ml import Config as MLConfig, Parser
 from ml.config import InferenceConfig
+from ml.inferer import Inferer
 from ml.models import build_model
-from ml.recommender import Recommender
 from notation import Notation
 from system import Config as SysConfig, Environment, System
 
@@ -127,15 +127,15 @@ def run():
     if args.action == 'STEP_TO_TARGET':
         assert tgt_dist.shape == (len(sys_config['jobs']),)
 
-    recommender = Recommender(ml_config, sys_config, model,
-                              target_dist=tgt_dist,
-                              initial_state=initial_state,
-                              limit=getattr(args, 'limit', None),
-                              steps=getattr(args, 'steps', None),
-                              k=args.k_model,
-                              mutate_initial_state=args.mutate if args.mutate is not None else args.k_model > 1,
-                              mutation_low=args.mutation_low,
-                              mutation_high=args.mutation_high)
+    recommender = Inferer(ml_config, sys_config, model,
+                          target_dist=tgt_dist,
+                          initial_state=initial_state,
+                          limit=getattr(args, 'limit', None),
+                          steps=getattr(args, 'steps', None),
+                          k=args.k_model,
+                          mutate_initial_state=args.mutate if args.mutate is not None else args.k_model > 1,
+                          mutation_low=args.mutation_low,
+                          mutation_high=args.mutation_high)
     predictions = recommender.run(action=args.action)
 
     steps = max(steps for steps, state in predictions)

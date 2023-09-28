@@ -40,7 +40,7 @@ class MockArrivalProcess:
                              for job_type in self.config['jobs']], dtype=torch.float)
 
 
-class Recommender:
+class Inferer:
     def __init__(self, ml_config: Config, sys_config, model: Model, target_dist: torch.Tensor,
                  initial_state: torch.Tensor, limit: int, steps: int, k: int, mutate_initial_state: bool,
                  mutation_low: int, mutation_high: int):

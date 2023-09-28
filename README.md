@@ -81,7 +81,7 @@ to be tuned. Adapt the `TUNE_CONFIG` in the string to specify the nuisance param
 Use this to get to a certain target with a pretrained model. 
 
 ```shell
-python recommend.py --path PATH-TO-YOUR-DIR
+python infer.py --path PATH-TO-YOUR-DIR [ STEP_TO_TARGET | STEP_UNTIL ]
 ```  
 
 Like in training, the model and architecture need to be described with `--arch` and possibly additional arguments to 
