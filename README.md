@@ -1,8 +1,6 @@
 # carQUEST-ML
 Modeling queue simulations in production lines with ML
 
-The usual steps are: *Data Creation*, *Training*, and finally *Inference*.
-
 ## Quick Start
 
 Look in the directory `save/` and pick a graph you like to continue with. 
