@@ -79,27 +79,43 @@ to be tuned. Adapt the `TUNE_CONFIG` in the string to specify the nuisance param
 
 ## Inference
 Use this to get to a certain target with a pretrained model. 
-Like in training the model and architecture need to be described with `--arch` and possibly additional arguments to 
+
+```shell
+python recommend.py --path PATH-TO-YOUR-DIR
+```  
+
+Like in training, the model and architecture need to be described with `--arch` and possibly additional arguments to 
 set model/architecture parameters.
 The architecture will be created and loaded from the model save path, if not specified this is within a directory 
 called `save` in the path given by `--path`.
-The file name is the architecture name prepended to `_model.pt`.
+The file name is the architecture name followed by `_model.pt`.
 An example is `./save/-/save/FlatMLP_model.pt`.  
 The model save path can also be set manually with the CLI argument `--model_save_path`.
 Important is that the specified architecture match the saved model.
 
+The provided path also needs to include a file called `inference_config.yaml`, 
+including the entries `initialState` and `targetDist`.
+
 Optional CLI arguments are:  
-`--k`: This is the number of times the simulation runs from the initial state, default is 10.  
+
+`--k_model`: This is the number of times the model based simulation is runs from the initial state, default is 1.  
+`--k_simulation`: This is the number of times the simulation runs from the initial state, default is 1.  
+`--mutate`: This is relevant if `k_model` is > 1. For each additional run the initial state is mutated 
+by adding an integer tensor sampled from a uniform distribution to the initial state. 
+It is active by default if `k_model` is larger 1.  
+`--mutation_low`: Controls the lower bound of the uniform distribution used by `mutate`. Default is -2.  
+`--mutation_high`: Controls the upper bound of the uniform distribution used by `mutate`. Default is 2.  
+`--job_arrival_path`: Path to a yaml file containing job arrivals. 
+See [System Readme](./system/README.md) for further detail.  
 `--verbose`: If set the final state of each simulation run will be printed.
 
 The script has two actions:  
 
-`STEP_TO`: used for reaching a target distribution from some initial state.  
+`STEP_TO_TARGET`: used for reaching a target distribution from some initial state.  
 Arguments are:  
-`--tgt`: Target distribution specified by a space seperated list, i.e. `1 2 3`.  
 `--limit`: Maximal number of steps the model should take.
 
-`STEP_THROUGH`: used for stepping N times with the model.  
+`STEP_UNTIL`: used for stepping N times with the model.  
 Argument is:  
 `--until`: Number of steps to take.
 

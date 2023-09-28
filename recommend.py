@@ -17,11 +17,11 @@ from system import Config as SysConfig, Environment, System
 def add_subparsers(parser):
     subparsers = parser.add_subparsers(help='Actions', parser_class=argparse.ArgumentParser, dest='action')
 
-    step_to_parser = subparsers.add_parser('STEP_TO')
+    step_to_parser = subparsers.add_parser('STEP_TO_TARGET')
     step_to_parser.add_argument('--limit', type=int, metavar='N', default=10,
                                 help='Maximal number of steps to be tested')
 
-    step_through_parser = subparsers.add_parser('STEP_THROUGH')
+    step_through_parser = subparsers.add_parser('STEP_UNTIL')
     step_through_parser.add_argument('--steps', type=int, metavar='N', required=True,
                                      help='Number of steps to take from initial state')
 
@@ -124,7 +124,7 @@ def run():
     # +1 for the implicit exit process
     assert initial_state.shape == (len(sys_config['processes']) + 1, len(sys_config['jobs']))
 
-    if args.action == 'STEP_TO':
+    if args.action == 'STEP_TO_TARGET':
         assert tgt_dist.shape == (len(sys_config['jobs']),)
 
     recommender = Recommender(ml_config, sys_config, model,

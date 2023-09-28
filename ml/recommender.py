@@ -130,7 +130,7 @@ class Recommender:
         predictions = []
         initial_state = self.initial_state
 
-        methode = self.predict_target if action == 'STEP_TO' else self.predict_state
+        methode = self.predict_target if action == 'STEP_TO_TARGET' else self.predict_state
 
         step_size = self.sys_config['loggingRate'] * self.ml_config['scaling_factor']
         self.arrival_process = MockArrivalProcess(self.sys_config, step_size=step_size)
