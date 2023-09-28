@@ -134,7 +134,7 @@ It is active by default if `k_model` is larger 1.
 `--mutation_low`: Controls the lower bound of the uniform distribution used by `mutate`. Default is -2.  
 `--mutation_high`: Controls the upper bound of the uniform distribution used by `mutate`. Default is 2.  
 `--job_arrival_path`: Path to a yaml file containing job arrivals. 
-See [System Readme](./system/README.md) for further detail.  
+See [system/README.md](system/README.md) for further detail.  
 `--verbose`: If set the final state of each simulation run will be printed.
 
 The script has two actions, `STEP_TO_TARGET` and `STEP_UNTIL`, one of them must be chosen.  
