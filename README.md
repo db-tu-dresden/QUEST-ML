@@ -109,7 +109,7 @@ It is active by default if `k_model` is larger 1.
 See [System Readme](./system/README.md) for further detail.  
 `--verbose`: If set the final state of each simulation run will be printed.
 
-The script has two actions:  
+The script has two actions, `STEP_TO_TARGET` and `STEP_UNTIL` one of them must be chosen.  
 
 `STEP_TO_TARGET`: used for reaching a target distribution from some initial state.  
 Arguments are:  
@@ -119,5 +119,6 @@ Arguments are:
 Argument is:  
 `--until`: Number of steps to take.
 
-After the model ran, the simulation is run from the initial state `k` times.
-Mean and standard deviation of all final states are printed.
+After the model ran `k_model` times , the simulation is run from the initial state `k_simulation` times.
+Mean and standard deviation of all final states of the simulation are printed, in addition to 
+the closest matching final state from the model inference.
