@@ -9,9 +9,6 @@ Look in the directory `save/` and pick a graph you like to continue with.
 Use the path to the directory in the following examples. 
 For simplicity `./save/-` is used in all examples in this section.
 
-Note, if you use another directory than `./save/-`, copy the `inference_config.yaml` file 
-from `./save./-` to that directory or else the inference won't work!
-
 **First**, install all necessary python packages with 
 ```shell
 pip install -r requirements.txt
