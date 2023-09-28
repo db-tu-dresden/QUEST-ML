@@ -3,6 +3,35 @@ Modeling queue simulations in production lines with ML
 
 The usual steps are: *Data Creation*, *Training*, and finally *Inference*.
 
+## Quick Start
+
+Look in the directory `save/` and pick a graph you like to continue with. 
+Use the path to the directory in the following examples. 
+For simplicity `./save/-` is used in all examples in this section.
+
+Note, if you use another directory than `./save/-`, copy the `inference_config.yaml` file 
+from `./save./-` to that directory or else the inference won't work!
+
+**First**, install all necessary python packages with 
+```shell
+pip install -r requirements.txt
+```
+
+**Second**, run data creation with
+```shell
+python create_data.py --path ./save/-
+```
+
+**Third**, train on the created data with
+```shell
+python train.py --path ./save/- --arch flat_mlp --epochs 10 --accumulation_window 100
+```
+
+**Fourth**, run inference with
+```shell
+python infer.py --path ./save/- --arch flat_mlp --no-verbose --k_model 4 --k_simulation 10 STEP_TO_TARGET
+```
+
 ## Data Creation
 First a dataset needs to be created. 
 To enable this, create a directory with a config.yaml describing the configuration of the system 
