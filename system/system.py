@@ -34,6 +34,7 @@ class System:
         self.config = config
         self.notation = notation
         self.data = self.notation.data.value
+        self.data = [job['name'] for job in self.config['jobs']]
 
         self.env = env
         env.system = self
