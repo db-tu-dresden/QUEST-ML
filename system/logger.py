@@ -8,6 +8,8 @@ import numpy as np
 import xarray as xr
 from matplotlib import pyplot as plt
 
+from system import ArrivalProcess
+
 if TYPE_CHECKING:
     from system.system import System
 
@@ -41,6 +43,11 @@ class Logger:
         for i, process in self.system.processes.items():
             job_dists[process.id] = dict(process.job_dist)
         return np.array([[job for job in process.values()] for process in job_dists.values()])
+
+    def get_job_arrivals(self):
+        arrival_process: ArrivalProcess
+        _, arrival_process = sorted(self.system.processes)[0]
+        return arrival_process.observed_job_arrivals
 
     def run(self):
         while True:

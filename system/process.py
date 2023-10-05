@@ -69,6 +69,7 @@ class ArrivalProcess(Process):
 
         self.job_arrivals = job_arrivals
         self.current_job_arrival = None
+        self.observed_job_arrivals = []
 
         self.continue_with_rnd_jobs = continue_with_rnd_jobs
 
@@ -90,6 +91,12 @@ class ArrivalProcess(Process):
             return self.job_types.get_job_by_type_str(self.last_job_id, self.current_job_arrival['type'])
         return self.job_types.get_rand_job(self.last_job_id, self.rng)
 
+    def observed_job_arrival(self, job: Job):
+        self.observed_job_arrivals.append({
+            'type': job.type.name,
+            'time': self.env.now,
+        })
+
     def process(self):
         if self.job_arrivals is not None:
             try:
@@ -108,6 +115,7 @@ class ArrivalProcess(Process):
 
         job = self.get_job()
         self.job_dist[job.type.name] += 1
+        self.observed_job_arrival(job)
         yield self.next[job.type.name].push(job)
 
     def __repr__(self):
