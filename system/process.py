@@ -116,5 +116,13 @@ class ArrivalProcess(Process):
 
 
 class ExitProcess(Process):
+    def __init__(self, id: int, env: Environment, rnd: RandomContainer, queue: Queue = None, name: str = None):
+        super().__init__(id, env, rnd, queue, name)
+        self.break_event = None
+        self.break_condition = None
+
     def process(self):
+        if self.break_event is not None and self.break_condition is not None:
+            if self.break_condition(self):
+                self.break_event.succeed()
         yield self.env.timeout(1)

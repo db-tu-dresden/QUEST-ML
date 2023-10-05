@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing
 from collections import defaultdict
 
 import numpy as np
@@ -33,8 +34,10 @@ class System:
 
         self.config = config
         self.notation = notation
-        self.data = self.notation.data.value
         self.data = [job['name'] for job in self.config['jobs']]
+
+        self.until = None
+        self.break_condition = None
 
         self.env = env
         env.system = self
@@ -53,6 +56,15 @@ class System:
     def __repr__(self):
         cls = self.__class__.__name__
         return f'{cls}(config={self.config!r}, notation={self.notation!r}, env={self.env!r})'
+
+    def set_break_condition(self, condition: typing.Callable[[ExitProcess], bool]):
+        self.until = self.env.event()
+        self.break_condition = condition
+
+        exit_process: ExitProcess
+        _, exit_process = sorted(self.processes.items())[-1]
+        exit_process.break_event = self.until
+        exit_process.break_condition = self.break_condition
 
     def build_rnd_containers(self):
         containers = dict()
@@ -143,7 +155,7 @@ class System:
         for _, process in self.processes.items():
             self.env.process(process.run())
 
-        self.env.run(until=until or self.config['until'])
+        self.env.run(until=until or self.until or self.config['until'])
 
     def set_state(self, state: np.array):
         assert state.shape == (len(self.processes), len(self.job_types.types))
