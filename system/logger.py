@@ -52,6 +52,9 @@ class Logger:
     def get_current_steps(self):
         return self.system.env.now
 
+    def get_runtime(self):
+        return self.runtime
+
     def run(self):
         while True:
             yield from self.process()
