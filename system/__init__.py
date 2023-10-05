@@ -45,7 +45,7 @@ def simulate_from_state(config: Config, notation_path: str, state: torch.Tensor,
         sys.set_state(state)
         sys.run(steps)
 
-        final_state = sys.logger.get_current_state()
+        final_state = sys.logger.get_state()
         final_states.append(final_state)
         if verbose:
             print(f'Final state in run {i + 1} of {k} is:\n'

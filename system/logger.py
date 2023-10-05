@@ -38,7 +38,7 @@ class Logger:
 
         yield self.system.env.timeout(self.rate)
 
-    def get_current_state(self):
+    def get_state(self):
         job_dists = {}
         for i, process in self.system.processes.items():
             job_dists[process.id] = dict(process.job_dist)
@@ -49,7 +49,7 @@ class Logger:
         _, arrival_process = sorted(self.system.processes.items())[0]
         return arrival_process.observed_job_arrivals
 
-    def get_current_steps(self):
+    def get_steps(self):
         return self.system.env.now
 
     def get_runtime(self):
