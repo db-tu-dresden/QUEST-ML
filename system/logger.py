@@ -49,6 +49,9 @@ class Logger:
         _, arrival_process = sorted(self.system.processes)[0]
         return arrival_process.observed_job_arrivals
 
+    def get_current_steps(self):
+        return self.system.env.now
+
     def run(self):
         while True:
             yield from self.process()
