@@ -1,17 +1,15 @@
 import argparse
 import os
-from datetime import datetime
 
-import numpy as np
 import torch
 from torcheval.metrics.functional import mean_squared_error
 
+import system
 from ml import Config as MLConfig, Parser
 from ml.config import InferenceConfig
 from ml.inferer import Inferer
 from ml.models import build_model
-from notation import Notation
-from system import Config as SysConfig, Environment, System
+from system import Config as SysConfig
 
 
 def add_subparsers(parser):
@@ -24,36 +22,6 @@ def add_subparsers(parser):
     step_through_parser = subparsers.add_parser('STEP_UNTIL')
     step_through_parser.add_argument('--steps', type=int, metavar='N', required=True,
                                      help='Number of steps to take from initial state')
-
-
-def simulate_from_state(base_path: str, state: torch.Tensor, steps: int, sys_config, k=1, verbose=False):
-    with open(os.path.join(base_path, 'graph_description.note')) as f:
-        text = f.read()
-    notation = Notation.parse(text)
-
-    final_states = []
-    for i in range(k):
-        env = Environment()
-        sys_config['randomSeed'] = int(''.join(str(el) for el in datetime.now().timestamp().as_integer_ratio()))
-        system = System(sys_config, notation, env=env)
-        system.set_state(state)
-        system.run(steps)
-
-        final_state = system.logger.get_current_state()
-        final_states.append(final_state)
-        if verbose:
-            print(f'Final state in run {i + 1} of {k} is:\n'
-                  f'{final_state}\n')
-
-    final_states = np.stack(final_states)
-    mean = final_states.mean(axis=0)
-    std = final_states.std(axis=0)
-    print(f'Mean is: \n'
-          f'{mean}\n')
-    print(f'Standard Deviation is: \n'
-          f'{std}\n\n')
-
-    return list(zip([steps] * k, [torch.tensor(state) for state in final_states]))
 
 
 def find_closest(predictions: [torch.Tensor], simulations: [torch.Tensor]):
@@ -142,8 +110,9 @@ def run():
     initial_state = initial_state.round().int().numpy()
 
     print(f'Running simulation {args.k_simulation} times...')
-    simulations = simulate_from_state(ml_config['base_path'], initial_state, steps, sys_config,
-                                      k=args.k_simulation, verbose=args.verbose)
+    notation_path = os.path.join(ml_config['base_path'], 'graph_description.note')
+    simulations = system.simulate_from_state(sys_config, notation_path, initial_state, steps,
+                                             k=args.k_simulation, verbose=args.verbose)
 
     print(f'Finding closest prediction...')
     find_closest([state for _, state in predictions], [state for _, state in simulations])
