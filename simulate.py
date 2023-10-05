@@ -1,8 +1,7 @@
 import argparse
 import os.path
 
-from notation import Notation
-from system import Config, Environment, System
+import system
 from timing import log_runtime
 
 parser = argparse.ArgumentParser(description='ML model for sequence to sequence translation')
@@ -17,22 +16,10 @@ parser.add_argument('--plot', default=True, action=argparse.BooleanOptionalActio
 @log_runtime
 def run(args):
     base_path = args.path
+    notation_path = os.path.join(base_path, 'graph_description.note')
+    save_path = base_path
 
-    with open(os.path.join(base_path, 'graph_description.note')) as f:
-        notation_string = f.read()
-
-    notation = Notation.parse(notation_string)
-    if args.plot:
-        notation.draw(os.path.join(base_path, 'graph.png'))
-
-    config = Config(os.path.join(base_path, 'config.yaml'))
-
-    env = Environment()
-
-    system = System(config, notation, env=env)
-    system.run(args.until)
-    if args.plot:
-        system.logger.plot(path=os.path.join(base_path, 'dist.png'))
+    system.simulate(notation_path, save_path, args.plot, args.until)
 
 
 if __name__ == '__main__':
