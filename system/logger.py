@@ -46,7 +46,7 @@ class Logger:
 
     def get_job_arrivals(self):
         arrival_process: ArrivalProcess
-        _, arrival_process = sorted(self.system.processes)[0]
+        _, arrival_process = sorted(self.system.processes.items())[0]
         return arrival_process.observed_job_arrivals
 
     def get_current_steps(self):
