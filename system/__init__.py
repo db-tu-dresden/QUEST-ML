@@ -64,9 +64,7 @@ def simulate_from_state(config: Config, notation_path: str, state: torch.Tensor,
 
 def simulate_to_target(config: Config, notation_path: str, initial_state: torch.Tensor, target_dist: torch.Tensor):
     def break_on_target(process: ExitProcess):
-        if all(target_dist[i] <= job_count for i, (_, job_count) in enumerate(process.job_dist.items())):
-            return True
-        return False
+        return all(target_dist[i] <= job_count for i, (_, job_count) in enumerate(process.job_dist.items()))
 
     with open(notation_path) as f:
         notation_string = f.read()
