@@ -12,8 +12,10 @@ class MockArrivalProcess:
 
         self.rng = np.random.default_rng(self.config['randomSeed'])
 
-        with open(config['jobArrivalPath']) as f:
-            self.job_arrivals = yaml.full_load(f)
+        self.job_arrivals = None
+        if config['jobArrivalPath']:
+            with open(config['jobArrivalPath']) as f:
+                self.job_arrivals = yaml.full_load(f)
         self.current_job_arrivals = []
         self.continue_with_rnd_jobs = config['continueWithRndJobs']
 
