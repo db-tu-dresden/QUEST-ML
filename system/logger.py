@@ -21,6 +21,8 @@ class Logger:
         self.default_dist = {job_type.name: 0 for job_type in self.system.job_types.types}
         self._da = xr.DataArray()
 
+        self.runtime = None
+
     def __repr__(self):
         cls = self.__class__.__name__
         return f'{cls}(rate={self.rate!r}, system={self.system!r})'

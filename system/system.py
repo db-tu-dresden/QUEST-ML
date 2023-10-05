@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import timeit
 import typing
 from collections import defaultdict
 
@@ -150,12 +151,18 @@ class System:
         self.processes = dict(sorted(self.processes.items()))
 
     def run(self, until=None):
+        start = timeit.default_timer()
+
         self.env.process(self.logger.run())
 
         for _, process in self.processes.items():
             self.env.process(process.run())
 
         self.env.run(until=until or self.until or self.config['until'])
+
+        stop = timeit.default_timer()
+
+        self.logger.runtime = stop - start
 
     def set_state(self, state: np.array):
         assert state.shape == (len(self.processes), len(self.job_types.types))
