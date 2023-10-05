@@ -125,4 +125,4 @@ class ExitProcess(Process):
         if self.break_event is not None and self.break_condition is not None:
             if self.break_condition(self):
                 self.break_event.succeed()
-        yield self.env.timeout(1)
+        yield self.env.timeout(self.env.system.logger.rate)
