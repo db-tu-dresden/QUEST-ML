@@ -3,7 +3,7 @@ import logging
 import os
 
 import yaml
-from schema import Schema, And, Use, SchemaError, Or
+from schema import Schema, And, Use, SchemaError, Or, Optional
 
 from system.config import Config as SystemConfig
 
@@ -13,6 +13,10 @@ def validate_yaml(data: dict, schema: Schema):
         return schema.validate(data)
     except SchemaError as e:
         logging.exception(e)
+
+
+def dict_merge(d1: dict, d2: dict) -> dict:
+    return d1.update(d2) or d1
 
 
 def true(*args, **kwargs):
@@ -125,12 +129,14 @@ class Config:
         'output_file': {'type': str, 'lambda': true},
     }
 
-    default_schema = Schema({
+    default_schema = Schema(dict_merge({
         k:
             Or(None, And(Use(v['type']), v['lambda'])) if 'can_be_none' in v and v['can_be_none'] else
             And(Use(v['type']), v['lambda'])
         for k, v in config_dict.items()
-    })
+    }, {
+        Optional(object): object            # To allow extra keys to be parsed
+    }))
 
     def __init__(self, path: str, schema: Schema = default_schema):
         self.path = path
@@ -181,7 +187,6 @@ class Config:
         self.set_base_path()
         self.set_system_data()
 
-        self.schema.schema['arch'] = Use(str)       # add arch to schema for validation
         self.validate()
 
     def validate(self):
