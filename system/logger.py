@@ -8,10 +8,8 @@ import numpy as np
 import xarray as xr
 from matplotlib import pyplot as plt
 
-from system import ArrivalProcess
-
 if TYPE_CHECKING:
-    from system.system import System
+    from system.system import System, ArrivalProcess
 
 
 class Logger:
