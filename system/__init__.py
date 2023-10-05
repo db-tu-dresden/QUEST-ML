@@ -26,10 +26,10 @@ def simulate(notation_path: str, save_path: str, plot: bool, until: int):
 
     env = Environment()
 
-    system = System(config, notation, env=env)
-    system.run(until)
+    sys = System(config, notation, env=env)
+    sys.run(until)
     if plot:
-        system.logger.plot(path=os.path.join(save_path, 'dist.png'))
+        sys.logger.plot(path=os.path.join(save_path, 'dist.png'))
 
 
 def simulate_from_state(config: Config, notation_path: str, state: torch.Tensor, steps: int, k: int = 1, verbose=False):
