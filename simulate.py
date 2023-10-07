@@ -21,8 +21,6 @@ def run(args):
     config = system.Config(os.path.join(base_path, 'config.yaml'))
     system.simulate(config, notation_path, args.until, plot=args.plot)
 
-    system.simulate(notation_path, save_path, args.plot, args.until)
-
 
 if __name__ == '__main__':
     args = parser.parse_args()
