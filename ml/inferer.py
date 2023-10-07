@@ -6,9 +6,10 @@ from ml import Config, Model
 
 
 class MockArrivalProcess:
-    def __init__(self, config, step_size: float):
+    def __init__(self, config, step_size: float, model_direction: bool):
         self.config = config
         self.step_size = step_size
+        self.model_direction = model_direction
 
         self.rng = np.random.default_rng(self.config['randomSeed'])
 
@@ -135,7 +136,9 @@ class Inferer:
         initial_state = self.initial_state
 
         step_size = self.sys_config['loggingRate'] * self.ml_config['scaling_factor']
-        self.arrival_process = MockArrivalProcess(self.sys_config, step_size=step_size)
+        self.arrival_process = MockArrivalProcess(self.sys_config,
+                                                  step_size=step_size,
+                                                  model_direction=self.ml_config['offset'] >= 0)
 
         for _ in range(self.k):
             prediction = None
