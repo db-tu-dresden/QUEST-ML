@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import torch
 import yaml
@@ -6,17 +8,29 @@ from ml import Config, Model
 
 
 class MockArrivalProcess:
-    def __init__(self, config, step_size: float, model_direction: bool):
+    def __init__(self, config, step_size: float, model_direction: int = None, steps: int = None):
         self.config = config
         self.step_size = step_size
         self.model_direction = model_direction
+        self.steps = steps
 
         self.rng = np.random.default_rng(self.config['randomSeed'])
 
-        self.job_arrivals = None
+        self.job_arrivals = []
         if config['jobArrivalPath']:
             with open(config['jobArrivalPath']) as f:
                 self.job_arrivals = yaml.full_load(f)
+
+            if self.model_direction == -1:
+                max_time = round(max(elem['time'] for elem in self.job_arrivals))
+                for elem in self.job_arrivals:
+                    elem['time'] = max_time - elem['time']
+
+            if self.steps:
+                self.job_arrivals = [elem for elem in self.job_arrivals if elem['time'] <= self.steps]
+
+            self.job_arrivals.sort(key=lambda x: x['time'])
+
         self.current_job_arrivals = []
         self.continue_with_rnd_jobs = config['continueWithRndJobs']
 
@@ -138,7 +152,8 @@ class Inferer:
         step_size = self.sys_config['loggingRate'] * self.ml_config['scaling_factor']
         self.arrival_process = MockArrivalProcess(self.sys_config,
                                                   step_size=step_size,
-                                                  model_direction=self.ml_config['offset'] >= 0)
+                                                  model_direction=round(math.tanh(self.ml_config['offset'])),
+                                                  steps=self.steps)
 
         for _ in range(self.k):
             prediction = None
