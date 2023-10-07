@@ -84,6 +84,8 @@ class Inferer:
 
         with torch.no_grad():
             for _ in range(steps):
+                arrivals = self.arrival_process.step()
+                state[0, 0] += arrivals
                 state = self.model(state)
 
         return steps, state
