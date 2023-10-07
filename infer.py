@@ -2,6 +2,7 @@ import argparse
 import os
 
 import torch
+import yaml
 from torcheval.metrics.functional import mean_squared_error
 
 import system
@@ -22,6 +23,33 @@ def add_subparsers(parser):
     step_through_parser = subparsers.add_parser('STEP_UNTIL')
     step_through_parser.add_argument('--steps', type=int, metavar='N', required=True,
                                      help='Number of steps to take from initial state')
+
+
+def run_simulation(args: argparse.Namespace, sys_config: SysConfig, ml_config: MLConfig,
+                   initial_state: torch.Tensor, tgt_dist: torch.Tensor):
+    print(f'Running simulation {args.k_simulation} times...')
+    notation_path = os.path.join(ml_config['base_path'], 'graph_description.note')
+    _initial_state = initial_state.round().int().numpy()
+
+    simulation_data = []
+
+    if args.action == 'STEP_TO_TARGET':
+        simulation_data = system.simulate_to_target(sys_config, notation_path, _initial_state, tgt_dist,
+                                                    k=args.k_simulation, verbose=args.verbose)
+    if args.action == 'STEP_UNTIL':
+        simulation_data = system.simulate_from_state(sys_config, notation_path, _initial_state, args.steps,
+                                                     k=args.k_simulation, verbose=args.verbose)
+
+    quickest = sorted(simulation_data, key=lambda x: x['steps'])[0]
+
+    _job_arrival_path = os.path.join(ml_config['base_path'], '_job_arrivals.yaml')
+    with open(_job_arrival_path, 'w') as f:
+        yaml.dump(quickest['job_arrivals'], f)
+
+    sys_config['jobArrivalPath'] = _job_arrival_path
+    sys_config['continueWithRndJobs'] = True
+
+    return [torch.tensor(elem['final_state']) for elem in simulation_data]
 
 
 def find_closest(predictions: [torch.Tensor], simulations: [torch.Tensor]):
@@ -70,8 +98,8 @@ def run():
                         help='Low value of the uniform probability distribution used for mutation')
     parser.add_argument('--mutation_high', metavar='N', type=int, default=2,
                         help='Low value of the uniform probability distribution used for mutation')
-    parser.add_argument('--verbose', '-v', default=False, action=argparse.BooleanOptionalAction,
-                        help='If set individual final states of the simulation are printed')
+    parser.add_argument('--verbose', '-v', default=True, action=argparse.BooleanOptionalAction,
+                        help='If set prints simulation output')
     parser.add_argument('--job_arrival_path', type=str, help='Path to yaml file containing job arrivals')
 
     args = parser.parse_args(post_arch_arg_add_fn=add_subparsers)
@@ -95,6 +123,16 @@ def run():
     if args.action == 'STEP_TO_TARGET':
         assert tgt_dist.shape == (len(sys_config['jobs']),)
 
+    ###################
+    # Run simulations #
+    ###################
+
+    simulation_data = run_simulation(args, sys_config, ml_config, initial_state, tgt_dist)
+
+    #################
+    # Run inference #
+    #################
+
     recommender = Inferer(ml_config, sys_config, model,
                           target_dist=tgt_dist,
                           initial_state=initial_state,
@@ -106,16 +144,12 @@ def run():
                           mutation_high=args.mutation_high)
     predictions = recommender.run(action=args.action)
 
-    steps = max(steps for steps, state in predictions)
-    initial_state = initial_state.round().int().numpy()
-
-    print(f'Running simulation {args.k_simulation} times...')
-    notation_path = os.path.join(ml_config['base_path'], 'graph_description.note')
-    simulations = system.simulate_from_state(sys_config, notation_path, initial_state, steps,
-                                             k=args.k_simulation, verbose=args.verbose)
+    ##############################
+    # Compare / Evaluate Results #
+    ##############################
 
     print(f'Finding closest prediction...')
-    find_closest([state for _, state in predictions], [state for _, state in simulations])
+    find_closest([state for _, state in predictions], simulation_data)
 
 
 if __name__ == '__main__':
