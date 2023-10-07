@@ -132,13 +132,19 @@ class Inferer:
         predictions = []
         initial_state = self.initial_state
 
-        methode = self.predict_target if action == 'STEP_TO_TARGET' else self.predict_state
-
         step_size = self.sys_config['loggingRate'] * self.ml_config['scaling_factor']
         self.arrival_process = MockArrivalProcess(self.sys_config, step_size=step_size)
 
         for _ in range(self.k):
-            predictions.append(methode(initial_state=initial_state))
+            prediction = None
+
+            if action == 'STEP_TO_TARGET':
+                prediction = self.predict_target(initial_state=initial_state)
+            if action == 'STEP_UNTIL':
+                prediction = self.predict_state(initial_state=initial_state)
+
+            predictions.append(prediction)
+
             if self.mutate_initial_state:
                 initial_state = self.mutate(self.initial_state)
                 initial_state[initial_state < 0] = 0
