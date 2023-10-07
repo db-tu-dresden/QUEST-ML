@@ -17,7 +17,9 @@ parser.add_argument('--plot', default=True, action=argparse.BooleanOptionalActio
 def run(args):
     base_path = args.path
     notation_path = os.path.join(base_path, 'graph_description.note')
-    save_path = base_path
+
+    config = system.Config(os.path.join(base_path, 'config.yaml'))
+    system.simulate(config, notation_path, args.until, plot=args.plot)
 
     system.simulate(notation_path, save_path, args.plot, args.until)
 
