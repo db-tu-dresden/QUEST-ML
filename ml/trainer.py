@@ -285,6 +285,12 @@ class Trainer:
             ddp.setup(rank, config)
 
         trainer = cls(config, model, train_data, valid_data, test_data)
+
+        if config['only_preprocessing']:
+            if config['save_datasets']:
+                trainer.save_datasets()
+            return
+
         trainer.train()
 
     @classmethod
@@ -298,9 +304,6 @@ class Trainer:
 
         if not train_data and not valid_data and not test_data:
             train_data, valid_data, test_data = cls.get_datasets(config)
-
-        if config['only_preprocessing']:
-            return
 
         if config['gpu']:
             ddp.run(cls._run, config, model, train_data, valid_data, test_data)
