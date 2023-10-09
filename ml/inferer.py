@@ -74,6 +74,11 @@ class Inferer:
         self.mutation_high = mutation_high
 
         self.arrival_process = None
+        self.model_direction = round(math.tanh(self.ml_config['offset']))
+        self.step_size = self.sys_config['loggingRate'] * self.ml_config['scaling_factor']
+
+        if self.model_direction == -1:
+            self.initial_state[-1] = self.target_dist
 
     @staticmethod
     def contains_tgt(state: torch.Tensor, target_dist: torch.Tensor) -> bool:
@@ -149,10 +154,9 @@ class Inferer:
         predictions = []
         initial_state = self.initial_state
 
-        step_size = self.sys_config['loggingRate'] * self.ml_config['scaling_factor']
         self.arrival_process = MockArrivalProcess(self.sys_config,
-                                                  step_size=step_size,
-                                                  model_direction=round(math.tanh(self.ml_config['offset'])),
+                                                  step_size=self.step_size,
+                                                  model_direction=self.model_direction,
                                                   steps=self.steps)
 
         for _ in range(self.k):
