@@ -49,7 +49,7 @@ def run_simulation(args: argparse.Namespace, sys_config: SysConfig, ml_config: M
     sys_config['jobArrivalPath'] = _job_arrival_path
     sys_config['continueWithRndJobs'] = True
 
-    return [torch.tensor(elem['final_state']) for elem in simulation_data]
+    return simulation_data
 
 
 def find_closest(predictions: [torch.Tensor], simulations: [torch.Tensor]):
@@ -133,23 +133,23 @@ def run():
     # Run inference #
     #################
 
-    recommender = Inferer(ml_config, sys_config, model,
-                          target_dist=tgt_dist,
-                          initial_state=initial_state,
-                          limit=getattr(args, 'limit', None),
-                          steps=getattr(args, 'steps', None),
-                          k=args.k_model,
-                          mutate_initial_state=args.mutate if args.mutate is not None else args.k_model > 1,
-                          mutation_low=args.mutation_low,
-                          mutation_high=args.mutation_high)
-    predictions = recommender.run(action=args.action)
+    inferer = Inferer(ml_config, sys_config, model,
+                      target_dist=tgt_dist,
+                      initial_state=initial_state,
+                      limit=getattr(args, 'limit', None),
+                      steps=getattr(args, 'steps', round(max(sim['steps'] for sim in simulation_data))),
+                      k=args.k_model,
+                      mutate_initial_state=args.mutate if args.mutate is not None else args.k_model > 1,
+                      mutation_low=args.mutation_low,
+                      mutation_high=args.mutation_high)
+    predictions = inferer.run(action=args.action)
 
     ##############################
     # Compare / Evaluate Results #
     ##############################
 
     print(f'Finding closest prediction...')
-    find_closest([state for _, state in predictions], simulation_data)
+    find_closest([state for _, state in predictions], [torch.tensor(elem['final_state']) for elem in simulation_data])
 
 
 if __name__ == '__main__':
