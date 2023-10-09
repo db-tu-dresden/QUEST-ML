@@ -18,23 +18,32 @@ class MockArrivalProcess:
 
         self.job_arrivals = []
         if config['jobArrivalPath']:
-            with open(config['jobArrivalPath']) as f:
-                self.job_arrivals = yaml.full_load(f)
-
-            if self.model_direction == -1:
-                max_time = round(max(elem['time'] for elem in self.job_arrivals))
-                for elem in self.job_arrivals:
-                    elem['time'] = max_time - elem['time']
-
-            if self.steps:
-                self.job_arrivals = [elem for elem in self.job_arrivals if elem['time'] <= self.steps]
-
-            self.job_arrivals.sort(key=lambda x: x['time'])
+            self.load_job_arrivals()
+            self.process_job_arrivals()
 
         self.current_job_arrivals = []
-        self.continue_with_rnd_jobs = config['continueWithRndJobs']
+        self.continue_with_rnd_jobs = self.config['continueWithRndJobs']
 
         self._now = 0
+
+    def load_job_arrivals(self):
+        if self.config['jobArrivalPath']:
+            with open(self.config['jobArrivalPath']) as f:
+                self.job_arrivals = yaml.full_load(f)
+
+    def process_job_arrivals(self):
+        if not self.job_arrivals or len(self.job_arrivals) == 0:
+            return
+
+        if self.model_direction == -1:
+            max_time = round(max(elem['time'] for elem in self.job_arrivals))
+            for elem in self.job_arrivals:
+                elem['time'] = max_time - elem['time']
+
+        if self.steps:
+            self.job_arrivals = [elem for elem in self.job_arrivals if elem['time'] <= self.steps]
+
+        self.job_arrivals.sort(key=lambda x: x['time'])
 
     def step(self) -> torch.Tensor:
         self._now += self.step_size
