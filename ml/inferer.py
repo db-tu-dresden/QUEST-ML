@@ -115,7 +115,7 @@ class Inferer:
         target_dist = self.target_dist
         limit = self.limit
 
-        steps, state = self.step_to_target(initial_state, target_dist, limit)
+        steps, state = self.step_to_target(initial_state.clone(), target_dist, limit)
 
         if self.contains_tgt(state, target_dist):
             print(f'Target distribution reached after {steps} steps.')
@@ -136,10 +136,10 @@ class Inferer:
         initial_state = initial_state if initial_state is not None else self.initial_state
         steps = self.steps
 
-        steps, state = self.step_through(initial_state, steps)
+        steps, state = self.step_through(initial_state.clone(), steps)
 
         print(f'Did {steps} steps from initial state:\n'
-              f'{self.initial_state}\n'
+              f'{initial_state}\n'
               f'to final state:'
               f'\n{state}')
 
@@ -174,7 +174,7 @@ class Inferer:
             predictions.append(prediction)
 
             if self.mutate_initial_state:
-                initial_state = self.mutate(self.initial_state)
+                initial_state = self.mutate(self.initial_state.clone())
                 initial_state[initial_state < 0] = 0
 
         return predictions
