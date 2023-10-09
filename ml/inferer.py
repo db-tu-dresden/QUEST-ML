@@ -159,6 +159,10 @@ class Inferer:
                                                   model_direction=self.model_direction,
                                                   steps=self.steps)
 
+        if action == 'STEP_TO_TARGET' and self.model_direction == -1:
+            print(f'Warning: Changing action from {action} to STEP_UNTIL, because model direction is negative!')
+            action = 'STEP_UNTIL'
+
         for _ in range(self.k):
             prediction = None
 
