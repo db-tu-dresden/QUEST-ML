@@ -52,6 +52,7 @@ def simulate(config: Config, notation: Notation, steps: int, k: int = 1, initial
         run_data.append({
             'steps': sys.logger.get_steps(),
             'runtime': sys.logger.get_runtime(),
+            'initial_state': initial_state.numpy(),
             'final_state': sys.logger.get_state(),
             'job_arrivals': sys.logger.get_job_arrivals()
         })
@@ -94,12 +95,22 @@ def simulate_to_target(config: Config, notation: Notation, initial_state: torch.
             suffix = f'_{k}' if k > 1 else ''
             sys.logger.plot(path=os.path.join(config['base_path'], f'dist{suffix}.png'))
 
-        run_data.append({
-            'steps': sys.logger.get_steps(),
-            'runtime': sys.logger.get_runtime(),
-            'final_state': sys.logger.get_state(),
-            'job_arrivals': sys.logger.get_job_arrivals()
-        })
+        if sys.logger.get_steps() > max_steps:
+            run_data.append({
+                'steps': None,
+                'runtime': None,
+                'initial_state': None,
+                'final_state': None,
+                'job_arrivals': None,
+            })
+        else:
+            run_data.append({
+                'steps': sys.logger.get_steps(),
+                'runtime': sys.logger.get_runtime(),
+                'initial_state': initial_state.numpy(),
+                'final_state': sys.logger.get_state(),
+                'job_arrivals': sys.logger.get_job_arrivals(),
+            })
 
     if verbose:
         print_run_stats(run_data, k)
