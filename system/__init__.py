@@ -1,3 +1,4 @@
+import math
 import os
 from datetime import datetime
 
@@ -67,8 +68,11 @@ def simulate_from_state(config: Config, notation: Notation, initial_state: torch
 
 
 def simulate_to_target(config: Config, notation: Notation, initial_state: torch.Tensor, target_dist: torch.Tensor,
-                       k: int = 1, verbose: bool = False, vary_random_seed: bool = True, plot: bool = False):
+                       k: int = 1, verbose: bool = False, vary_random_seed: bool = True, plot: bool = False,
+                       max_steps: int = math.inf):
     def break_on_target(process: ExitProcess):
+        if process.env.now > max_steps:
+            return True
         return all(target_dist[i] <= job_count for i, (_, job_count) in enumerate(process.job_dist.items()))
 
     if plot:
