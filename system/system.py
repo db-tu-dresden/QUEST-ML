@@ -173,6 +173,6 @@ class System:
             job_type: JobType
             for j, job_type in enumerate(self.job_types.types):
                 amount = dist[j]
-                for k in range(amount):
+                for k in range(int(amount)):
                     job = Job(-1, job_type, env=self.env)
                     process.push(job)
