@@ -250,5 +250,5 @@ Out[3]: 24.698703105997993
 timeit.timeit(lambda: self.model(state), number=100000)     # 100k  
 Out[4]: 24.352715600994998
 
--> 0.00024 sec
+-> 0.00024 sec  
 -> 0.24 ms
