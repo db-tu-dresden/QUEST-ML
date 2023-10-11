@@ -1,4 +1,4 @@
-from ml.config import Config
+from ml.config import Config, InferenceConfig
 from ml.data import ProcessDataset
 from ml.logger import Logger
 from ml.models.base import Model, DistributedDataParallel
