@@ -70,6 +70,10 @@ class Predictor:
         mutation[mutation < 0] = 0
         return state + mutation
 
+    @staticmethod
+    def contains_tgt(state, target_dist) -> bool:
+        return bool((state[0, -1] >= target_dist).all())
+
     def method1(self):
         sim_data = system.simulate_to_target(
             self.sys_config, self.notation, self.initial_state, self.tgt_dist,
@@ -87,9 +91,13 @@ class Predictor:
         run_data.sort(key=lambda x: x['steps'])
 
         for i in range(self.config['print_quickest']):
+            if len(run_data) <= i:
+                break
             print(f'\n\n'
-                  f'{i + 1}. quickest:\n'
-                  f'initial state: \n{run_data[i]["initial_state"]}\n'
+                  f'{i + 1}. quickest:')
+            if not self.contains_tgt(run_data[i]['final_state'], self.tgt_dist.numpy()):
+                print('did NOT include target distribution!')
+            print(f'initial state: \n{run_data[i]["initial_state"]}\n'
                   f'final state: \n{run_data[i]["final_state"]}\n'
                   f'steps: {run_data[i]["steps"]:.{4}f}\n'
                   f'runtime: {run_data[i]["runtime"]:.{7}f} sec\n')
