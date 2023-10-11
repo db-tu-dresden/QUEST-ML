@@ -10,6 +10,7 @@ from ml import Config as MLConfig, Parser
 from ml.config import InferenceConfig
 from ml.inferer import Inferer
 from ml.models import build_model
+from notation import Notation
 from system import Config as SysConfig
 
 
@@ -29,15 +30,19 @@ def run_simulation(args: argparse.Namespace, sys_config: SysConfig, ml_config: M
                    initial_state: torch.Tensor, tgt_dist: torch.Tensor):
     print(f'Running simulation {args.k_simulation} times...')
     notation_path = os.path.join(ml_config['base_path'], 'graph_description.note')
+    with open(notation_path) as f:
+        notation_string = f.read()
+    notation = Notation.parse(notation_string)
+
     _initial_state = initial_state.round().int().numpy()
 
     simulation_data = []
 
     if args.action == 'STEP_TO_TARGET':
-        simulation_data = system.simulate_to_target(sys_config, notation_path, _initial_state, tgt_dist,
+        simulation_data = system.simulate_to_target(sys_config, notation, _initial_state, tgt_dist,
                                                     k=args.k_simulation, verbose=args.verbose)
     if args.action == 'STEP_UNTIL':
-        simulation_data = system.simulate_from_state(sys_config, notation_path, _initial_state, args.steps,
+        simulation_data = system.simulate_from_state(sys_config, notation, _initial_state, args.steps,
                                                      k=args.k_simulation, verbose=args.verbose)
 
     quickest = sorted(simulation_data, key=lambda x: x['steps'])[0]

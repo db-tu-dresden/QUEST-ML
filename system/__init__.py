@@ -27,12 +27,8 @@ def print_run_stats(run_data: list, k: int):
           f'{np.std([elem["final_state"] for elem in run_data], axis=0)}\n')
 
 
-def simulate(config: Config, notation_path: str, steps: int, k: int = 1, initial_state: torch.Tensor = None,
+def simulate(config: Config, notation: Notation, steps: int, k: int = 1, initial_state: torch.Tensor = None,
              verbose=False, vary_random_seed: bool = True, plot: bool = False):
-    with open(notation_path) as f:
-        text = f.read()
-    notation = Notation.parse(text)
-
     if plot:
         notation.draw(os.path.join(config['base_path'], 'graph.png'))
 
@@ -65,19 +61,15 @@ def simulate(config: Config, notation_path: str, steps: int, k: int = 1, initial
     return run_data
 
 
-def simulate_from_state(config: Config, notation_path: str, initial_state: torch.Tensor, steps: int, k: int = 1,
+def simulate_from_state(config: Config, notation: Notation, initial_state: torch.Tensor, steps: int, k: int = 1,
                         verbose=False, vary_random_seed: bool = True, plot: bool = False):
-    return simulate(config, notation_path, steps, k, initial_state, verbose, vary_random_seed, plot)
+    return simulate(config, notation, steps, k, initial_state, verbose, vary_random_seed, plot)
 
 
-def simulate_to_target(config: Config, notation_path: str, initial_state: torch.Tensor, target_dist: torch.Tensor,
+def simulate_to_target(config: Config, notation: Notation, initial_state: torch.Tensor, target_dist: torch.Tensor,
                        k: int = 1, verbose: bool = False, vary_random_seed: bool = True, plot: bool = False):
     def break_on_target(process: ExitProcess):
         return all(target_dist[i] <= job_count for i, (_, job_count) in enumerate(process.job_dist.items()))
-
-    with open(notation_path) as f:
-        notation_string = f.read()
-    notation = Notation.parse(notation_string)
 
     if plot:
         notation.draw(os.path.join(config['base_path'], 'graph.png'))
