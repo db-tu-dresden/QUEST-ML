@@ -27,6 +27,7 @@ class Predictor:
         self.model.load(self.config)
 
         self.sys_config = system.Config(os.path.join(self.config['base_path'], 'config.yaml'))
+        self.job_names = [job['name'] for job in self.sys_config['jobs']]
 
         notation_path = os.path.join(self.config['base_path'], 'graph_description.note')
         with open(notation_path) as f:
@@ -45,6 +46,8 @@ class Predictor:
 
         parser.add_argument('--k_model', metavar='N', type=int, default=1,
                             help='K for k-fold validation of the model')
+        parser.add_argument('--max_model_steps', metavar='N', type=int, default=100,
+                            help='Maximum steps for the model to take')
 
         parser.add_argument('--max_simulations', metavar='N', type=int, default=1000,
                             help='Maximum times for simulation to run')
@@ -70,6 +73,12 @@ class Predictor:
         mutation[mutation < 0] = 0
         return state + mutation
 
+    def get_job_arrivals(self, prev_state: torch.Tensor, curr_state: torch.Tensor, step: int) -> list[dict[str, int]]:
+        prev_state.round_()
+        curr_state.round_()
+        diff = (curr_state - prev_state).sum(axis=1)
+        return [{'name': name, 'step': step} for name, count in zip(self.job_names, diff) for _ in range(int(count))]
+
     @staticmethod
     def contains_tgt(state, target_dist) -> bool:
         return bool((state[0, -1] >= target_dist).all())
@@ -79,10 +88,34 @@ class Predictor:
             self.sys_config, self.notation, self.initial_state, self.tgt_dist,
             k=self.config['max_simulations'],
             max_steps=self.config['max_simulation_steps'])
-        return sim_data
 
     def method2(self):
-        return []
+        state = self.initial_state.unsqueeze(0)         # add batch dim
+        prev_state = state
+        job_arrivals = []
+        start = timeit.default_timer()
+
+        with torch.no_grad():
+            for step in range(self.config['max_model_steps']):
+                if self.contains_tgt(state, self.tgt_dist):
+                    break
+                state = self.model(state)
+                job_arrivals.extend(self.get_job_arrivals(prev_state.squeeze(), state.squeeze(), step))
+                prev_state = state
+                step += 1
+
+        stop = timeit.default_timer()
+        runtime = stop - start
+
+        res = {
+            'steps': step,
+            'runtime': runtime,
+            'initial_state': self.initial_state.numpy(),
+            'final_state': state.numpy(),
+            'job_arrivals': job_arrivals,
+        }
+
+        return [res]
 
     def method3(self):
         return []
