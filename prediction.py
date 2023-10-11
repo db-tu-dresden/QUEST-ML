@@ -75,7 +75,7 @@ class Predictor:
         return bool((state[0, -1] >= target_dist).all())
 
     def method1(self):
-        sim_data = system.simulate_to_target(
+        return system.simulate_to_target(
             self.sys_config, self.notation, self.initial_state, self.tgt_dist,
             k=self.config['max_simulations'],
             max_steps=self.config['max_simulation_steps'])
