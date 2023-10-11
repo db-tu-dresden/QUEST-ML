@@ -241,13 +241,13 @@ python3 train.py --path './save/@/' --arch flat_mlp --accumulation_window 5 --on
 
 # Inference
 
-timeit.timeit(lambda: self.model(state), number=10000)      # 10k
+timeit.timeit(lambda: self.model(state), number=10000)      # 10k  
 Out[2]: 2.5571630820049904
 
-timeit.timeit(lambda: self.model(state), number=100000)     # 100k
+timeit.timeit(lambda: self.model(state), number=100000)     # 100k  
 Out[3]: 24.698703105997993
 
-timeit.timeit(lambda: self.model(state), number=100000)     # 100k
+timeit.timeit(lambda: self.model(state), number=100000)     # 100k  
 Out[4]: 24.352715600994998
 
 -> 0.00024 sec
