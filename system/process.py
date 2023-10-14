@@ -67,7 +67,7 @@ class ArrivalProcess(Process):
         self.job_types = job_types
         self.last_job_id = -1
 
-        self.job_arrivals = job_arrivals
+        self.job_arrivals = None if job_arrivals is None else sorted(job_arrivals, key=lambda x: x['time'])
         self.current_job_arrival = None
         self.observed_job_arrivals = []
 
