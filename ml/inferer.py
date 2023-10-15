@@ -36,7 +36,7 @@ class MockArrivalProcess:
             return
 
         if self.model_direction == -1:
-            max_time = round(max(elem['time'] for elem in self.job_arrivals))
+            max_time = math.ceil(max(elem['time'] for elem in self.job_arrivals))
             for elem in self.job_arrivals:
                 elem['time'] = max_time - elem['time']
 
