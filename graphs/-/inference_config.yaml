@@ -3,4 +3,4 @@ initialState: [
   [0, 0, 0],
   [0, 0, 0],
 ]
-targetDist: [1, 2, 3]
+targetDist: [3, 4, 20]
