@@ -18,7 +18,7 @@ from system.random import RandomContainer
 
 
 class System:
-    def __init__(self, config: Config, notation: Notation, env: Environment):
+    def __init__(self, config: Config, notation: Notation, env: Environment, job_arrivals: list[dict] = None):
         super().__init__()
         if config is None or not isinstance(config, Config):
             raise ValueError(f'Config must be specified and of type Config. Got {config!r}')
@@ -48,7 +48,8 @@ class System:
         self.rng = np.random.default_rng(self.config['randomSeed'])
         self.rand_containers = self.build_rnd_containers()
 
-        self.job_arrivals = self.load_job_arrivals(config['jobArrivalPath']) if config['jobArrivalPath'] else None
+        self.job_arrivals = job_arrivals \
+            if job_arrivals else self.load_job_arrivals(config['jobArrivalPath']) if config['jobArrivalPath'] else None
 
         self.logger = Logger(self.config['loggingRate'], self)
 
