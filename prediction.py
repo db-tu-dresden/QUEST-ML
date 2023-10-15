@@ -45,24 +45,26 @@ class Predictor:
                             choices=['method1', 'method2', 'method3'],
                             help='Methode to be run')
 
-        parser.add_argument('--max_model_steps', metavar='N', type=int, default=1000,
+        parser.add_argument('--max_model_steps', metavar='N', type=int, default=100,
                             help='Maximum steps for the model to take.'
                                  'Note that one model step does NOT necessarily equate to one simulation step.'
                                  'The model step size is dependent on the config values of \'scaling_factor\''
                                  'and \'loggingRate\', the model step size is \'scaling_factor\' * \'loggingRate\'!')
 
-        parser.add_argument('--max_simulations', metavar='N', type=int, default=100,
+        parser.add_argument('--max_simulations', metavar='N', type=int, default=5,
                             help='Maximum times for simulation to run')
-        parser.add_argument('--max_simulation_steps', metavar='N', type=int, default=100,
+        parser.add_argument('--max_simulation_steps', metavar='N', type=int, default=20,
                             help='Maximum steps for the simulation to take')
 
-        parser.add_argument('--mutations', metavar='N', type=int, default=10,
-                            help='Number of times the job arrivals are mutated. '
+        parser.add_argument('--mutations', metavar='N', type=int, default=300,
+                            help='Number of times the original job arrivals from the model are mutated. '
                                  'Used in method3 after initial job_arrivals are created '
                                  'by (backwards) model inference')
-        parser.add_argument('--mutation_low', metavar='N', type=int, default=-2,
+        parser.add_argument('--sub_mutations', metavar='N', type=int, default=1,
+                            help='Number of times the original mutated state is subsequently mutated')
+        parser.add_argument('--mutation_low', metavar='N', type=int, default=-3,
                             help='Low value of the uniform probability distribution used for mutation')
-        parser.add_argument('--mutation_high', metavar='N', type=int, default=2,
+        parser.add_argument('--mutation_high', metavar='N', type=int, default=3,
                             help='Low value of the uniform probability distribution used for mutation')
 
         parser.add_argument('--print_quickest', metavar='N', type=int, default=3,
