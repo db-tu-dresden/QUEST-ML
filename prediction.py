@@ -209,13 +209,7 @@ class Predictor:
                 prev_state = state
                 state = self.model(state)
                 job_arrivals.extend(
-                    self.get_job_arrivals(state.squeeze(), prev_state.squeeze(), step=step * model_step_size))
-
-        # did 'max_model_steps' - 'step' steps -> subtract 'step' from the step value in job arrivals
-        for job_arr in job_arrivals:
-            job_arr['time'] -= step * model_step_size
-        job_arrivals.sort(key=lambda x: x['time'])
-        job_arrivals = self.shift_job_arrivals(job_arrivals)
+                    self.get_job_arrivals(state.squeeze(), prev_state.squeeze(), step=0.0))
 
         stop = timeit.default_timer()
         runtime = stop - start
@@ -233,13 +227,16 @@ class Predictor:
         self.sys_config['continueWithRndJobs'] = True
         self.sys_config['jobArrivalPath'] = None
 
-        for _ in range(self.config['mutations']):
-            res.extend(system.simulate_to_target(
-                self.sys_config, self.notation, self.initial_state, self.tgt_dist,
-                k=self.config['max_simulations'],
-                max_steps=self.config['max_simulation_steps'],
-                job_arrivals=job_arrivals))
+        for _ in range(max(1, self.config['mutations'] + 1)):
+            for _ in range(max(1, self.config['sub_mutations'] + 1)):
+                res.extend(system.simulate_to_target(
+                    self.sys_config, self.notation, self.initial_state, self.tgt_dist,
+                    k=self.config['max_simulations'],
+                    max_steps=self.config['max_simulation_steps'],
+                    job_arrivals=job_arrivals))
 
+                job_arrivals = self.mutate_job_arrivals(job_arrivals)
+                job_arrivals = self.shift_job_arrivals(job_arrivals)
             job_arrivals = self.mutate_job_arrivals(original_job_arrivals)
             job_arrivals = self.shift_job_arrivals(job_arrivals)
 
