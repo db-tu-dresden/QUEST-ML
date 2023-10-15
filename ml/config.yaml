@@ -45,7 +45,7 @@ processes: 0
 jobs: 0
 scaling_factor: 1
 reduction_factor: 0.9
-accumulation_window: 1
+accumulation_window: 100
 offset: 1
 only_process: False
 enhances: 0
