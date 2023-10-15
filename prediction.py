@@ -130,7 +130,7 @@ class Predictor:
             job_arr['time'] -= start
         return job_arrivals
 
-    def get_job_arrivals(self, prev_state: torch.Tensor, curr_state: torch.Tensor, step: int) -> list[dict[str, int]]:
+    def get_job_arrivals(self, prev_state: torch.Tensor, curr_state: torch.Tensor, step: float) -> list[dict[str, int]]:
         prev_state = prev_state.round()
         curr_state = curr_state.round()
         diff = (curr_state - prev_state).sum(axis=1)
