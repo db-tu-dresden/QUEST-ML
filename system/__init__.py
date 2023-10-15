@@ -70,7 +70,7 @@ def simulate_from_state(config: Config, notation: Notation, initial_state: torch
 
 def simulate_to_target(config: Config, notation: Notation, initial_state: torch.Tensor, target_dist: torch.Tensor,
                        k: int = 1, verbose: bool = False, vary_random_seed: bool = True, plot: bool = False,
-                       max_steps: int = math.inf):
+                       max_steps: int = math.inf, job_arrivals: list[dict] = None):
     def break_on_target(process: ExitProcess):
         if process.env.now > max_steps:
             return True
@@ -86,7 +86,7 @@ def simulate_to_target(config: Config, notation: Notation, initial_state: torch.
         if vary_random_seed:
             config['randomSeed'] = int(''.join(str(el) for el in datetime.now().timestamp().as_integer_ratio()))
 
-        sys = System(config, notation, env=env)
+        sys = System(config, notation, env=env, job_arrivals=job_arrivals)
         sys.set_break_condition(break_on_target)
         sys.set_state(initial_state)
         sys.run()

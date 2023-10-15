@@ -229,19 +229,15 @@ class Predictor:
 
         original_job_arrivals = job_arrivals
 
+        self.sys_config['continueWithRndJobs'] = True
+        self.sys_config['jobArrivalPath'] = None
+
         for _ in range(self.config['mutations']):
-            job_arrival_path = os.path.join(self.config['job_arrival_save_dir'], f'job_arrivals.yaml')
-            Path(self.config['job_arrival_save_dir']).mkdir(parents=True, exist_ok=True)
-            with open(job_arrival_path, 'w') as f:
-                yaml.dump(job_arrivals, f)
-
-            self.sys_config['jobArrivalPath'] = job_arrival_path
-            self.sys_config['continueWithRndJobs'] = True
-
             res.extend(system.simulate_to_target(
                 self.sys_config, self.notation, self.initial_state, self.tgt_dist,
                 k=self.config['max_simulations'],
-                max_steps=self.config['max_simulation_steps']))
+                max_steps=self.config['max_simulation_steps'],
+                job_arrivals=job_arrivals))
 
             job_arrivals = self.mutate_job_arrivals(original_job_arrivals)
             job_arrivals = self.shift_job_arrivals(job_arrivals)
