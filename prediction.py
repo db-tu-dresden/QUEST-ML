@@ -176,7 +176,7 @@ class Predictor:
             'steps': step,
             'runtime': runtime,
             'initial_state': self.initial_state.numpy(),
-            'final_state': state.numpy(),
+            'final_state': state.squeeze().round().numpy(),
             'job_arrivals': job_arrivals,
         }
 
