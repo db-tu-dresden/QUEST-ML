@@ -99,7 +99,7 @@ class Predictor:
                 job_type_count = sum(1 for job_arr in job_arrivals if job_arr['type'] == job_type)
                 job_index = np.random.choice(range(job_type_count))
 
-                # iterate over job arrivals; find job_index's occurence of job with type job_name; delete it
+                # iterate over job arrivals; find job_index's occurrence of job with type job_name; delete it
                 c = 0
                 for i, job_arr in enumerate(job_arrivals):
                     if job_arr['type'] == job_type:
@@ -110,12 +110,11 @@ class Predictor:
 
             if count > 0:
                 # add
-                times = [np.random.uniform(high=self.config['max_model_steps']) for _ in range(count)]
                 new_arrivals = [
                     {
                         'time': time,
                         'type': job_type,
-                    } for time in times]
+                    } for time in np.zeros(count)]
 
                 job_arrivals = job_arrivals + new_arrivals
                 job_arrivals.sort(key=lambda x: x['time'])
