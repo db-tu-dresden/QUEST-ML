@@ -45,13 +45,15 @@ class Predictor:
                             choices=['method1', 'method2', 'method3'],
                             help='Methode to be run')
 
-        parser.add_argument('--max_model_steps', metavar='N', type=int, default=100,
+        parser.add_argument('--max_model_steps', metavar='N', type=int, default=200,
                             help='Maximum steps for the model to take.'
                                  'Note that one model step does NOT necessarily equate to one simulation step.'
                                  'The model step size is dependent on the config values of \'scaling_factor\''
                                  'and \'loggingRate\', the model step size is \'scaling_factor\' * \'loggingRate\'!')
+        parser.add_argument('--max_model_simulations', metavar='N', type=int, default=5,
+                            help='Used in method3. Maximum times for simulation to run')
 
-        parser.add_argument('--max_simulations', metavar='N', type=int, default=5,
+        parser.add_argument('--max_simulations', metavar='N', type=int, default=10000,
                             help='Maximum times for simulation to run')
         parser.add_argument('--max_simulation_steps', metavar='N', type=int, default=20,
                             help='Maximum steps for the simulation to take')
@@ -230,7 +232,7 @@ class Predictor:
             for _ in range(max(1, self.config['sub_mutations'] + 1)):
                 res.extend(system.simulate_to_target(
                     self.sys_config, self.notation, self.initial_state, self.tgt_dist,
-                    k=self.config['max_simulations'],
+                    k=self.config['max_model_simulations'],
                     max_steps=self.config['max_simulation_steps'],
                     job_arrivals=job_arrivals))
 
