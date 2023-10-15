@@ -29,8 +29,17 @@ class JobTypeCollection:
         self.types = types
         self.env = env
 
+        self.rnd_job_types = []
+
     def get_rand_job(self, job_id: int, rng: np.random.Generator):
-        job_type = rng.choice(self.types, p=[job_type.arrival_prob for job_type in self.types])
+        try:
+            job_type = self.rnd_job_types.pop()
+        except IndexError:
+            self.rnd_job_types = list(rng.choice(
+                self.types,
+                size=100,
+                p=[job_type.arrival_prob for job_type in self.types]))
+            job_type = self.rnd_job_types.pop()
         return Job(job_id, job_type, env=self.env)
 
     def get_job_by_type_str(self, job_id: int, job_type_str: str):
