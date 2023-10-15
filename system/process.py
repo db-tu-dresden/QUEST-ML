@@ -129,8 +129,12 @@ class ExitProcess(Process):
         self.break_event = None
         self.break_condition = None
 
-    def process(self):
+    def push(self, job: Job):
+        self.job_dist[job.type.name] += 1
         if self.break_event is not None and self.break_condition is not None:
             if self.break_condition(self):
                 self.break_event.succeed()
+        return self.queue.put(job)
+
+    def process(self):
         yield self.env.timeout(self.env.system.logger.rate)
