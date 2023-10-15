@@ -74,7 +74,7 @@ def simulate_to_target(config: Config, notation: Notation, initial_state: torch.
     def break_on_target(process: ExitProcess):
         if process.env.now > max_steps:
             return True
-        return all(target_dist[i] <= job_count for i, (_, job_count) in enumerate(process.job_dist.items()))
+        return (target_dist <= torch.tensor(list(process.job_dist.values()), dtype=torch.float)).all()
 
     if plot:
         notation.draw(os.path.join(config['base_path'], 'graph.png'))
