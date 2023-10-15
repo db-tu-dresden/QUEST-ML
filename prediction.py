@@ -214,13 +214,12 @@ class Predictor:
         stop = timeit.default_timer()
         runtime = stop - start
 
+        print(f'Model inference time: {runtime}')
         print(f'Reached state:\n'
               f'{state.numpy()}\n'
               f'rounded:\n'
               f'{state.round().numpy()}\n'
               f'after {self.config["max_model_steps"] - step} steps.')
-        print(f'Created job arrivals are:\n'
-              f'{yaml.dump(job_arrivals, indent=4)}')
 
         original_job_arrivals = job_arrivals
 
