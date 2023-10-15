@@ -11,14 +11,25 @@ jobs:
   - name: 'C'
     arrivalProbability: 0.8
     failureRate: 0
+#arrivalProcess:
+#  beta: 1.0
+#processes:
+#  - mean: 1.0
+#    std: 0.2
+#  - mean: 1.0
+#    std: 0.2
+#  - mean: 1.0
+#    std: 0.2
+#  - mean: 0.8
+#    std: 0.2
 arrivalProcess:
-  beta: 1.0
+  beta: 0.5
 processes:
-  - mean: 1.0
-    std: 0.2
-  - mean: 1.0
-    std: 0.2
-  - mean: 1.0
-    std: 0.2
-  - mean: 0.8
-    std: 0.2
+  - mean: 0.1
+    std: 0.0
+  - mean: 0.3
+    std: 0.0
+  - mean: 0.5
+    std: 0.0
+  - mean: 0.2
+    std: 0.0
