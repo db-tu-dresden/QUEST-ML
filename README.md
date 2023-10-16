@@ -157,7 +157,7 @@ Use this to get the sequence of jobs that need to be put into the system to reac
 from an initial state.
 
 ```shell
-python predict.py --path ./graphs/- --arch flat_mlp --method [method1, method2, method3]    # choose one of the methods
+python predict.py --path ./graphs/- --arch flat_mlp --method [ method1 | method2 | method3 ]
 ```
 
 The initial state and target distribution need to be provided inside a `inference_config.yaml` file, 
