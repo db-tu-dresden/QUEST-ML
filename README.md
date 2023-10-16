@@ -150,3 +150,63 @@ Argument is:
 After the model ran `k_model` times , the simulation is run from the initial state `k_simulation` times.
 Mean and standard deviation of all final states of the simulation are printed, in addition to 
 the closest matching final state from the model inference.
+
+
+# Prediction
+Use this to get the sequence of jobs that need to be put into the system to reach some target output distribution 
+from an initial state.
+
+The initial state and target distribution need to be provided inside a `inference_config.yaml` file, 
+see [graphs/-/inference_config.yaml](graphs/-/inference_config.yaml).
+This file needs to be inside the directory provided by the `--path` argument.
+
+The primary argument for this script is `--method`, it states the method that should be used for 
+reaching the target distribution from the initial state.  
+These methods are:  
+
+`method1`: Running the simulation from the initial state until the target state is reached. 
+This is done multiple times to find the best simulation run.  
+
+`method2`: Using the trained model to step from the initial state until the target state is reached. 
+Note, this requires the model to be trained with a POSITIVE offset, the default offset is `1`. 
+The offset describes in which direction the model steps and how large the step is. 
+Also note that one model step is dependent on the logging rate of the simulation and the scaling factor of the dataset.
+So one model `step` is `logging_rate * scaling_factor`, default `logging_rate` is `0.1` and default `scaling_factor` is `1`.
+
+`method3`: This tries to reduce the search space of the simulation with the help of the pretrained model. 
+The model is used to run backwards from a target state that includes the target distribution 
+until the initial state is reached. 
+This results in an initial sequence of jobs to be added. 
+The simulation then runs multiple times from the initial state to the target state, utilizing the sequence of jobs provided.
+Between each simulation run the sequence of jobs is altered in the sense that some jobs are added and some are removed.
+Note, this requires the model to be trained with a NEGATIVE offset, e.g. provide `--offset -1` to the training command.
+
+
+Optional CLI arguments are:
+
+`--max_model_steps`: Maximum steps for the model to take, default `200`. 
+This is highly dependent on the desired target distribution.
+Note that one model step does NOT necessarily equate to one simulation step.
+The model step size is dependent on the config values of `scaling_factor`
+and `logging_rate`, the model step size is `scaling_factor * logging_rate`!
+
+`--max_model_simulations`: Used in method3. Maximum times for simulation to run, default `1`.
+
+`--max_simulations`: Maximum times for simulation to run, default `100`.
+
+`--max_simulation_steps`: Maximum steps for the simulation to take, default `20`. 
+This value should be highly dependent on the desired target distribution. 
+Generally the lower, the better, to finish off simulations that run too long.
+
+`--mutations`: Number of times the original job arrivals are mutated, default `30`.
+
+`--sub_mutations`: Number of times the original mutated job arrivals are subsequently mutated, default `1`.
+
+`--mutation_low`: Low value of the uniform probability distribution used for mutation, default `-3`.
+
+`--mutation_high`: High value of the uniform probability distribution used for mutation, default `3`.
+
+`--print_quickest`: Number of quickest elements that are printed out, default `3`.
+
+`--job_arrival_save_dir`: Directory where the created job arrival sequences are saved. 
+Defaults to `dir_given_by_path_arg/job_arrivals`.
