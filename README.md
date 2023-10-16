@@ -22,9 +22,9 @@ python create_data.py --path ./graphs/-
 python train.py --path ./graphs/- --arch flat_mlp --epochs 10 --accumulation_window 100
 ```
 
-**Fourth**, run inference with
+**Fourth**, run predictions with
 ```shell
-python infer.py --path ./graphs/- --arch flat_mlp --no-verbose --k_model 4 --k_simulation 10 STEP_TO_TARGET
+python predict.py --path ./graphs/- --arch flat_mlp --method method1
 ```
 
 ## Data Creation
@@ -155,6 +155,10 @@ the closest matching final state from the model inference.
 # Prediction
 Use this to get the sequence of jobs that need to be put into the system to reach some target output distribution 
 from an initial state.
+
+```shell
+python predict.py --path ./graphs/- --arch flat_mlp --method [method1, method2, method3]    # choose one of the methods
+```
 
 The initial state and target distribution need to be provided inside a `inference_config.yaml` file, 
 see [graphs/-/inference_config.yaml](graphs/-/inference_config.yaml).
