@@ -53,7 +53,7 @@ class Predictor:
         parser.add_argument('--max_model_simulations', metavar='N', type=int, default=1,
                             help='Used in method3. Maximum times for simulation to run')
 
-        parser.add_argument('--max_simulations', metavar='N', type=int, default=100,
+        parser.add_argument('--max_simulations', metavar='N', type=int, default=1000,
                             help='Maximum times for simulation to run')
         parser.add_argument('--max_simulation_steps', metavar='N', type=int, default=20,
                             help='Maximum steps for the simulation to take')
@@ -62,11 +62,11 @@ class Predictor:
                             help='Number of times the original job arrivals from the model are mutated. '
                                  'Used in method3 after initial job_arrivals are created '
                                  'by (backwards) model inference')
-        parser.add_argument('--sub_mutations', metavar='N', type=int, default=1,
+        parser.add_argument('--sub_mutations', metavar='N', type=int, default=3,
                             help='Number of times the original mutated state is subsequently mutated')
-        parser.add_argument('--mutation_low', metavar='N', type=int, default=-3,
+        parser.add_argument('--mutation_low', metavar='N', type=int, default=-.5,
                             help='Low value of the uniform probability distribution used for mutation')
-        parser.add_argument('--mutation_high', metavar='N', type=int, default=3,
+        parser.add_argument('--mutation_high', metavar='N', type=int, default=.5,
                             help='Low value of the uniform probability distribution used for mutation')
 
         parser.add_argument('--print_quickest', metavar='N', type=int, default=3,
@@ -135,7 +135,7 @@ class Predictor:
     def get_job_arrivals(self, prev_state: torch.Tensor, curr_state: torch.Tensor, step: float) -> list[dict[str, int]]:
         prev_state = prev_state.round()
         curr_state = curr_state.round()
-        diff = (curr_state - prev_state).sum(axis=1)
+        diff = (curr_state - prev_state).sum(axis=0)
         return [{'time': step, 'type': name} for name, count in zip(self.job_names, diff) for _ in range(int(count))]
 
     @staticmethod
