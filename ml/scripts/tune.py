@@ -4,7 +4,7 @@ import torch
 import wandb
 from ray import tune
 from ray.air import session, RunConfig
-from ray.air.checkpoint import Checkpoint
+from ray.train import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 from torch import nn
 
