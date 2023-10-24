@@ -1,5 +1,5 @@
-# carQUEST-ML
-Modeling queue simulations in production lines with ML
+# QUEST-ML
+Queuing System Simulation Modeling with Machine Learning
 
 ## Quick Start
 
