@@ -6,7 +6,7 @@ trap '
 ' INT
 
 GPUS=0.2
-DATA_PATH=./save/-/
+DATA_PATH=./graphs/-/
 ARCH=flat_mlp
 
 TUNE_CONFIG_PATH=./ml/scripts/tune_config.py
