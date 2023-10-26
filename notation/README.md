@@ -18,7 +18,7 @@ notation.draw()
 ```
 
 ## Notation Description
-The notation describes the structure of a very simple planar graph with data flow.
+The notation describes the structure of a very simple graph with data flow.
 It is composed out of lines and forks representing the edges of the graph, nodes are implicit.
 Anchors are also part of the notation, they can be used to reference an existing node.
 The notation string has three main parts, an initial list of data elements that will flow through the graph, 
